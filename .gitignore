@@ -33,6 +33,7 @@
 #Linux Files
 
 *~
+*.out
 
 #ROS Files
 
