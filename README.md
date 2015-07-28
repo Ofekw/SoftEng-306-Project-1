@@ -5,7 +5,7 @@ Install instructions.
 
 1)Create a file named .#setupConfig in your home directory.
 2)Add the path to your workspace containing the se306Project1 package as the first line of the .#setupConfig file.
-  e.g mine is /home/patrick/PycharmProjects/306Ros.
+  e.g default folder should is (if your git repo is in your home directory): SoftEng-306-Project-1/
 
 Run Instructions.
 
