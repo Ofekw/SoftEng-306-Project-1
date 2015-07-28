@@ -1,4 +1,4 @@
-# SoftEng-306-Project Group 8
+# SoftEng-306-Project Group 8 (FloppyDisk)
 A simulation tool for testing harvesting robots in kiwifruit orchards
 
 Install instructions. 
