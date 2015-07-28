@@ -18,3 +18,10 @@ Note: # = run command in new terminal. Start with terminal in workspace containi
 5)cd ..
 6)rosrun se306Project1 R0
 7)#rosrun se306Project1 R1
+
+Update ROS_PACKAGE_PATH
+
+run: gedit ~/.bashrc
+scroll to the bottom of the file.
+add: source ~/<path to workspace>/setup.bash (Leave the other source commands)
+update the export to: export ROS_PACKAGE_PATH=$ROS_PACKAGE_PATH:$HOME/<path to workspace>/se306Project1
