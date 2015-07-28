@@ -29,3 +29,12 @@
 
 # PyCharm Files
 .idea
+
+#Linux Files
+
+*~
+
+#ROS Files
+
+se306Project1/bin/
+se306Project1/build/
