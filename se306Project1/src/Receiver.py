@@ -17,6 +17,9 @@ def StageOdom_callback(msg):
 def StageLaser_callback(msg):
     pass
 
+def comCallback(message):
+    rospy.loginfo(rospy.get_caller_id() + "I heard %s", message.data)
+
 def main():
 
     theta = math.pi/2.0
@@ -26,24 +29,23 @@ def main():
     linear_x = 0.2
     angular_z = 0.2
 
-    rospy.init_node("RobotNode0")
+    rospy.init_node("RobotNode1")
 
     #handler initiation here
 
-    RobotNode_stage_pub = rospy.Publisher("robot_0/cmd_vel", geometry_msgs.msg.Twist, queue_size=10)
+    RobotNode_stage_pub = rospy.Publisher("robot_1/cmd_vel", geometry_msgs.msg.Twist, queue_size=10)
 
-    StageOdo_sub = rospy.Subscriber("robot_0/odom", nav_msgs.msg.Odometry, StageOdom_callback)
+    StageOdo_sub = rospy.Subscriber("robot_1/odom", nav_msgs.msg.Odometry, StageOdom_callback)
 
-    StageLaser_sub = rospy.Subscriber("robot_0/base_scan",sensor_msgs.msg.LaserScan,StageLaser_callback)
+    StageLaser_sub = rospy.Subscriber("robot_1/base_scan",sensor_msgs.msg.LaserScan,StageLaser_callback)
 
-    com_pub = rospy.Publisher('communicate',String)
+    com_sub = rospy.Subscriber('communicate',String, comCallback)
 
     rospy.Rate(10)
 
     count = 0
 
     RobotNode_cmdvel = geometry_msgs.msg.Twist()
-    RobotNode_position = nav_msgs.msg.Odometry()
 
 
 
@@ -56,14 +58,9 @@ def main():
         RobotNode_cmdvel.angular.z  = 20
         RobotNode_stage_pub.publish(RobotNode_cmdvel)
 
-        xstring = ("Im at x %f", RobotNode_position.pose.pose.position.x)
-        com_pub.publish("" + xstring.__str__() + "")
 
         #should be spin Once
         #rospy.spin()
-
-
-
 
 
         rospy.sleep(0.01)
