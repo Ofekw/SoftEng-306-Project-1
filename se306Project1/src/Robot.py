@@ -48,9 +48,9 @@ class Robot:
 
         self.theta = yaw
 
-        rospy.loginfo("Current x position: %f" , self.px)
-        rospy.loginfo("Current y position: %f", self.py)
-        rospy.loginfo("Current theta: %f", self.theta)
+        #rospy.loginfo("Current x position: %f" , self.px)
+        #rospy.loginfo("Current y position: %f", self.py)
+        #rospy.loginfo("Current theta: %f", self.theta)
 
     def move_forward(self, dist):
         """
@@ -132,9 +132,9 @@ class Robot:
 
         pi = math.pi
 
-        thetaTarg = self.theta + math.pi/2
+        thetaTarg = self.theta - math.pi/2
 
-        if (thetaTarg < pi):
+        if (thetaTarg < -pi):
             thetaTarg = pi + (thetaTarg + pi)
 
         while (abs(self.theta - thetaTarg) > 0.01):
