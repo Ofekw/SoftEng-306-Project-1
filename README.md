@@ -9,21 +9,14 @@ Install instructions.
 
 Run Instructions.
 
-Note: # = run command in new terminal. Start with terminal in workspace containing se306Project1 etc.
+Run build script.
 
-1)#roscore
+From commandline in your workspace run:
+python run.py
 
-2)#rosrun stage_ros stageros world/myworld.world
+Adding Robots.
 
-3)cd se306Project1
-
-4)#rosmake
-
-5)cd ..
-
-6)rosrun se306Project1 R0
-
-7)#rosrun se306Project1 R1
+A robotList.txt file has been added at the project root directory. To add a new robot, simply add <robotsName>.py on a new line in the file.
 
 Update ROS_PACKAGE_PATH
 
