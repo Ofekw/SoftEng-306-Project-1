@@ -9,6 +9,12 @@ from tf.transformations import *
 import math
 
 
+"""
+@class
+
+The Robot class used to represent a robot in the world stage.
+Can go forward and turn left or right or by a certain angle.
+"""
 class Robot:
 
     def __init__(self,r_id,x_off,y_off):
@@ -33,6 +39,12 @@ class Robot:
 
         self.RobotNode_cmdvel = geometry_msgs.msg.Twist()
 
+    """
+    @function
+    @parameter: Msg msg
+
+    Callback function to update position and other odometry values
+    """
     def StageOdom_callback(self,msg):
 
         self.px = msg.pose.pose.position.x
@@ -46,6 +58,13 @@ class Robot:
         #rospy.loginfo("Current y position: %f", self.py)
         #rospy.loginfo("Current theta: %f", self.theta)
 
+    """
+    @function
+    @parameter: int dist
+
+
+    Moves the Robot forward by a certain specified distance
+    """
     def move_forward(self, dist):
         """
         Changes the forward velocity of the robot to 1. It will then move forward, until the distance it has moved forward
@@ -94,6 +113,14 @@ class Robot:
         self.RobotNode_cmdvel.linear.x = 0
         self.RobotNode_stage_pub.publish(self.RobotNode_cmdvel)
 
+
+    """
+    @function
+
+    @parameter:String direction
+
+    Turn function which allows the robot to turn 90 degrees ( a right angle) either left or right.
+    """
     def turn(self, direction):
 
         pi = math.pi
@@ -113,13 +140,13 @@ class Robot:
         while (abs(self.theta - thetaTarg) > 0.01):
             thetaDiff = abs(self.theta - thetaTarg)
 
-        #Set the angular velocity to optimal values that don't overshoot pi/4
+        #Set the angular velocity to optimal values that don't overshoot pi/2
             if (thetaDiff > 0.5):
-                self.RobotNode_cmdvel.angular.z = 3 * dir
+                self.RobotNode_cmdvel.angular.z = 2.5 * dir
             elif (thetaDiff > 0.1):
-                self.RobotNode_cmdvel.angular.z = 0.5 * dir
+                self.RobotNode_cmdvel.angular.z = 0.4 * dir
             else:
-                self.RobotNode_cmdvel.angular.z = 0.05 * dir
+                self.RobotNode_cmdvel.angular.z = 0.04 * dir
 
             self.RobotNode_stage_pub.publish(self.RobotNode_cmdvel)
 
@@ -131,6 +158,59 @@ class Robot:
         self.RobotNode_stage_pub.publish(self.RobotNode_cmdvel)
 
 
+    """
+    @function
+
+    @parameter:float angle
+
+    Turn function which allows the robot to turn a specified number of degrees either left or right.
+    A negative angle would denote a right rotation and vice-versa
+    """
+    def rotate(self, angle_in_degrees):
+
+        if (angle_in_degrees<0):
+            dir = -1
+        else:
+            dir = 1
+        pi=math.pi
+        #convert degrees to radians
+        angle_in_radians = (math.pi/180) *angle_in_degrees
+
+        thetaTarg = self.theta + angle_in_radians
+
+        if (thetaTarg > pi):
+            thetaTarg = - pi + (thetaTarg - pi)
+        elif (thetaTarg < -pi):
+            thetaTarg = pi + (thetaTarg + pi)
+
+        while (abs(self.theta - thetaTarg) > 0.01):
+            thetaDiff = abs(self.theta - thetaTarg)
+
+        #Set the angular velocity to optimal values that don't overshoot pi/2
+            if (thetaDiff > 0.5):
+                self.RobotNode_cmdvel.angular.z = 2.5  * dir
+            elif (thetaDiff > 0.1):
+                self.RobotNode_cmdvel.angular.z = 0.4 * dir
+            else:
+                self.RobotNode_cmdvel.angular.z = 0.04 * dir
+
+            self.RobotNode_stage_pub.publish(self.RobotNode_cmdvel)
+
+            rospy.sleep(0.0001)
+
+            print("Rotating - current theta is " + str(self.theta) +", target theta is " + str(thetaTarg))
+
+        self.RobotNode_cmdvel.angular.z = 0
+        self.RobotNode_stage_pub.publish(self.RobotNode_cmdvel)
+
+
+
+
+"""
+@MAIN
+
+Main function that creates robot and sets path
+"""
 
 def main():
     #Construction of Robot objects take 3 params... Robot ID, Start X, Start Y. Start X and Start Y correlates to the myworld.world file
@@ -156,6 +236,14 @@ def main():
             robot0.turn("right")
             robot0.move_forward(0.5)
             robot0.turn("right")
+
+
+        # robot0.rotate(-180)
+        # rospy.sleep(1)
+        # robot0.move_forward(5)
+        # robot0.rotate(-90)
+        # robot0.move_forward(5)
+
 
 
 
