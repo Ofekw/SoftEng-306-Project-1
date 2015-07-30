@@ -13,6 +13,9 @@ def StageOdom_callback(msg):
     py = 10+msg.pose.pose.position.y
     rospy.loginfo("Current x position is: %f", px)
     rospy.loginfo("Current y position is: %f",py)
+    xpos = str(px)
+    ypos = str(py)
+    com_pub.publish("\n" + rospy.get_caller_id() +  " is at position x: " + xpos + "\nposition y: " + ypos)
 
 def StageLaser_callback(msg):
     pass
@@ -36,7 +39,8 @@ def main():
 
     StageLaser_sub = rospy.Subscriber("robot_0/base_scan",sensor_msgs.msg.LaserScan,StageLaser_callback)
 
-    com_pub = rospy.Publisher('communicate',String)
+    global com_pub
+    com_pub = rospy.Publisher("communicate",String)
 
     rospy.Rate(10)
 
@@ -56,8 +60,7 @@ def main():
         RobotNode_cmdvel.angular.z  = 20
         RobotNode_stage_pub.publish(RobotNode_cmdvel)
 
-        xstring = ("Im at x %f", RobotNode_position.pose.pose.position.x)
-        com_pub.publish("" + xstring.__str__() + "")
+
 
         #should be spin Once
         #rospy.spin()

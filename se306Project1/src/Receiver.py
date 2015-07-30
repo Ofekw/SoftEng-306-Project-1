@@ -9,16 +9,17 @@ import math
 
 
 def StageOdom_callback(msg):
-    px = 5+msg.pose.pose.position.x
-    py = 10+msg.pose.pose.position.y
-    rospy.loginfo("Current x position is: %f", px)
-    rospy.loginfo("Current y position is: %f",py)
+    # px = 5+msg.pose.pose.position.x
+    # py = 10+msg.pose.pose.position.y
+    # rospy.loginfo("Current x position is: %f", px)
+    # rospy.loginfo("Current y position is: %f",py)
+    pass
 
 def StageLaser_callback(msg):
     pass
 
 def comCallback(message):
-    rospy.loginfo(rospy.get_caller_id() + "I heard %s", message.data)
+    rospy.loginfo(message.data)
 
 def main():
 
@@ -39,7 +40,7 @@ def main():
 
     StageLaser_sub = rospy.Subscriber("robot_1/base_scan",sensor_msgs.msg.LaserScan,StageLaser_callback)
 
-    com_sub = rospy.Subscriber('communicate',String, comCallback)
+    com_sub = rospy.Subscriber("communicate", String, comCallback)
 
     rospy.Rate(10)
 
