@@ -68,8 +68,8 @@ class Robot:
             #If the remaining distance is less than 1m, then decelerate the robot. Having a slower moving robot will
             #provide increased accuracy when stopping
             if (distToGo < 1):
-                #Set forward velocity to 0.4m/s
-                self.RobotNode_cmdvel.linear.x = 0.4
+                #Set forward velocity to 0.7m/s
+                self.RobotNode_cmdvel.linear.x = 0.7
             else:
                 #Set forward velocity to 2.0m/s
                 self.RobotNode_cmdvel.linear.x = 2
@@ -94,63 +94,42 @@ class Robot:
         self.RobotNode_cmdvel.linear.x = 0
         self.RobotNode_stage_pub.publish(self.RobotNode_cmdvel)
 
-    def turn_left(self):
+    def turn(self, direction):
 
         pi = math.pi
 
-        thetaTarg = self.theta + pi/2
 
-        if (thetaTarg > pi):
-            thetaTarg = - pi + (thetaTarg - pi)
+        if (direction == "left"):
+            thetaTarg = self.theta + pi/2
+            dir = 1
+            if (thetaTarg > pi):
+                thetaTarg = - pi + (thetaTarg - pi)
+        elif (direction == "right"):
+            thetaTarg = self.theta - pi/2
+            dir = -1
+            if (thetaTarg < -pi):
+                thetaTarg = pi + (thetaTarg + pi)
 
         while (abs(self.theta - thetaTarg) > 0.01):
             thetaDiff = abs(self.theta - thetaTarg)
 
         #Set the angular velocity to optimal values that don't overshoot pi/4
             if (thetaDiff > 0.5):
-                self.RobotNode_cmdvel.angular.z = 3
+                self.RobotNode_cmdvel.angular.z = 3 * dir
             elif (thetaDiff > 0.1):
-                self.RobotNode_cmdvel.angular.z = 0.5
+                self.RobotNode_cmdvel.angular.z = 0.5 * dir
             else:
-                self.RobotNode_cmdvel.angular.z = 0.05
+                self.RobotNode_cmdvel.angular.z = 0.05 * dir
 
             self.RobotNode_stage_pub.publish(self.RobotNode_cmdvel)
 
             rospy.sleep(0.0001)
 
-            print("Turning left, current theta is " + str(self.theta) +", target theta is " + str(thetaTarg))
+            print("Turning " + direction + " current theta is " + str(self.theta) +", target theta is " + str(thetaTarg))
 
         self.RobotNode_cmdvel.angular.z = 0
         self.RobotNode_stage_pub.publish(self.RobotNode_cmdvel)
 
-    def turn_right(self):
-
-        pi = math.pi
-
-        thetaTarg = self.theta - math.pi/2
-
-        if (thetaTarg < -pi):
-            thetaTarg = pi + (thetaTarg + pi)
-
-        while (abs(self.theta - thetaTarg) > 0.01):
-            thetaDiff = abs(self.theta - thetaTarg)
-
-        #Set the angular velocity to optimal values that don't overshoot pi/4
-            if (thetaDiff > 0.5):
-                self.RobotNode_cmdvel.angular.z = -3
-            elif (thetaDiff > 0.1):
-                self.RobotNode_cmdvel.angular.z = -0.5
-            else:
-                self.RobotNode_cmdvel.angular.z = -0.05
-
-            self.RobotNode_stage_pub.publish(self.RobotNode_cmdvel)
-
-            rospy.sleep(0.0001)
-
-            print("Turning left, current theta is " + str(self.theta) +", target theta is " + str(thetaTarg))
-
-        self.RobotNode_cmdvel.angular.z = 0
-        self.RobotNode_stage_pub.publish(self.RobotNode_cmdvel)
 
 
 def main():
@@ -167,8 +146,17 @@ def main():
 
     while not rospy.is_shutdown():
 
-        robot0.move_forward(5)
-        robot0.turn_right()
+    #A Zig zag motion that emulates the robots going through rows of trees in the orchard
+        for i in range(0,5):
+            robot0.move_forward(5)
+            robot0.turn("left")
+            robot0.move_forward(0.5)
+            robot0.turn("left")
+            robot0.move_forward(5)
+            robot0.turn("right")
+            robot0.move_forward(0.5)
+            robot0.turn("right")
+
 
 
 if __name__ == '__main__':
