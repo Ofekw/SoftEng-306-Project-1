@@ -22,7 +22,7 @@ class Robot:
 
         robot_id = r_id
 
-        robot_node_name = ("RobotNode" +str(r_id))
+        robot_node_name = ("RobotNode" + str(r_id))
 
         robot_node_identifier = ("robot_"+ str(r_id))
 
@@ -52,32 +52,49 @@ class Robot:
 
     def move_forward(self, dist):
         """
-        Changes the forward velocity of the robot to 1. It will then move the given distance value in metres.
+        Changes the forward velocity of the robot to 1. It will then move forward, until the distance it has moved forward
+        has reached the distance passed to this function.
         """
+
+        #Initiate the distance gained as 0
         dist_gained = 0
+
+        #Iniate a reference to the initial x and y positions
         previousX = self.px
         previousY = self.py
 
+        #While the distance that the robot has gained has not exceeded the given distance, continue to move the robot forward
         while (dist_gained < dist):
+
+            #Calculate remaining distance to travel
             distToGo = dist - dist_gained
 
+            #If the remaining distance is less than 1m, then decelerate the robot. Having a slower moving robot will
+            #provide increased accuracy when stopping
             if (distToGo < 1):
+                #Set forward velocity to 0.4m/s
                 self.RobotNode_cmdvel.linear.x = 0.4
             else:
+                #Set forward velocity to 2.0m/s
                 self.RobotNode_cmdvel.linear.x = 2
 
+
+            #Publish the velocity change
             self.RobotNode_stage_pub.publish(self.RobotNode_cmdvel)
 
+            #Sleep rospy for 2ms
             rospy.sleep(0.02)
 
+            #Calculate the change in x and y positions from the initial x and y positions, prior to the robot moving
             xDiff = abs(previousX - self.px)
             yDiff = abs(previousY - self.py)
 
+            #Find the distance gained by calculating sqrt(xDiff^2 + yDiff^2)
             dist_gained = math.sqrt(xDiff * xDiff + yDiff * yDiff)
 
             print("Moving Forward: " + str(distToGo) + "m to go")
 
-
+        #Stop robot by setting forward velocity to 0 and then publish change
         self.RobotNode_cmdvel.linear.x = 0
         self.RobotNode_stage_pub.publish(self.RobotNode_cmdvel)
 
