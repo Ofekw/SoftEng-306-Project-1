@@ -13,32 +13,30 @@ class Robot:
 
     def __init__(self,r_id,x_off,y_off):
 
-        self.x_offset = x_off
-        self.y_offset = y_off
+        #declaring the instance variables
         self.robot_id = 0
         self.linearX = 0
         self.angularZ = 0
         self.theta = 0
-        self.px = 0
-        self.py = 0
+        self.px = x_off
+        self.py = y_off
         self.robot_id = r_id
         self.robot_node_name = ("RobotNode" +str(r_id))
         self.robot_node_identifier = ("robot_"+ str(r_id))
 
+        #Node Initiation
         rospy.init_node(self.robot_node_name)
 
+        #setting up publishers and subscribers
         self.RobotNode_stage_pub = rospy.Publisher(self.robot_node_identifier+"/cmd_vel", geometry_msgs.msg.Twist, queue_size=10)
-
-        self.RobotQuaternionPub = rospy.Publisher(self.robot_node_identifier+"/odom", nav_msgs.msg.Odometry, queue_size=10)
-
         self.StageOdo_sub = rospy.Subscriber(self.robot_node_identifier+"/odom", nav_msgs.msg.Odometry, self.StageOdom_callback)
 
         self.RobotNode_cmdvel = geometry_msgs.msg.Twist()
 
     def StageOdom_callback(self,msg):
 
-        self.px = self.x_offset+msg.pose.pose.position.x
-        self.py = self.y_offset+msg.pose.pose.position.y
+        self.px = msg.pose.pose.position.x
+        self.py = msg.pose.pose.position.y
 
         (roll, pitch, yaw) = euler_from_quaternion((msg.pose.pose.orientation.x, msg.pose.pose.orientation.y, msg.pose.pose.orientation.z, msg.pose.pose.orientation.w))
 
