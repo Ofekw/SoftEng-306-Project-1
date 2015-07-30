@@ -11,8 +11,10 @@ import math
 class Robot:
 
 
-    def __init__(self, r_id):
+    def __init__(self,r_id,x_off,y_off):
 
+        self.x_offset = x_off
+        self.y_offset = y_off
         self.robot_id = 0
         self.linearX = 0
         self.angularZ = 0
@@ -39,8 +41,8 @@ class Robot:
 
     def StageOdom_callback(self,msg):
 
-        self.px = msg.pose.pose.position.x
-        self.py = msg.pose.pose.position.y
+        self.px = self.x_offset+msg.pose.pose.position.x
+        self.py = self.y_offset+msg.pose.pose.position.y
 
         (roll, pitch, yaw) = euler_from_quaternion((msg.pose.pose.orientation.x, msg.pose.pose.orientation.y, msg.pose.pose.orientation.z, msg.pose.pose.orientation.w))
 
@@ -157,7 +159,7 @@ class Robot:
 
 def main():
 
-    robot0 = Robot(0)
+    robot0 = Robot(0,5,10)
 
     #StageLaser_sub = rospy.Subscriber("robot_0/base_scan",sensor_msgs.msg.LaserScan,StageLaser_callback)
 
