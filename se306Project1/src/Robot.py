@@ -8,38 +8,50 @@ from sensor_msgs.msg import*
 from tf.transformations import *
 import math
 
+class Robot:
 
-linearX = 0
-angularZ = 0
-theta = 0
 
-px = 0
-py = 0
+    def __init__(self,r_id):
 
-def StageOdom_callback(msg):
-    global px, py, theta
+        self.robot_id = 0
+        self.linearX = 0
+        self.angularZ = 0
+        self.theta = 0
+        self.px = 0
+        self.py = 0
 
-    px = msg.pose.pose.position.x
-    py = msg.pose.pose.position.y
+        robot_id = r_id
 
-    (roll, pitch, yaw) = euler_from_quaternion((msg.pose.pose.orientation.x, msg.pose.pose.orientation.y, msg.pose.pose.orientation.z, msg.pose.pose.orientation.w))
+        robot_node_name = ("RobotNode" +str(r_id))
+        robot_node_identifier = ("robot_"+ str(r_id))
 
-    theta = yaw
+        rospy.init_node(robot_node_name)
 
-    rospy.loginfo("Current x position: %f" , px)
-    rospy.loginfo("Current y position: %f", py)
-    rospy.loginfo("Current theta: %f", theta)
+        self.RobotNode_stage_pub = rospy.Publisher(robot_node_identifier+"/cmd_vel", geometry_msgs.msg.Twist, queue_size=10)
+
+        self.RobotQuaternionPub = rospy.Publisher(robot_node_identifier+"/odom", nav_msgs.msg.Odometry, queue_size=10)
+
+        self.StageOdo_sub = rospy.Subscriber(robot_node_identifier+"/odom", nav_msgs.msg.Odometry, self.StageOdom_callback)
+
+
+    def StageOdom_callback(self,msg):
+
+        self.px = msg.pose.pose.position.x
+        self.py = msg.pose.pose.position.y
+
+        (roll, pitch, yaw) = euler_from_quaternion((msg.pose.pose.orientation.x, msg.pose.pose.orientation.y, msg.pose.pose.orientation.z, msg.pose.pose.orientation.w))
+
+        theta = yaw
+
+        rospy.loginfo("Current x position: %f" , self.px)
+        rospy.loginfo("Current y position: %f", self.py)
+        rospy.loginfo("Current theta: %f", self.theta)
+
 
 def main():
 
-    rospy.init_node("RobotNode0")
+    robot0 = Robot(0)
 
-
-    RobotNode_stage_pub = rospy.Publisher("robot_0/cmd_vel", geometry_msgs.msg.Twist, queue_size=10)
-
-    RobotQuaternionPub = rospy.Publisher("robot_0/odom", nav_msgs.msg.Odometry, queue_size=10)
-
-    StageOdo_sub = rospy.Subscriber("robot_0/odom", nav_msgs.msg.Odometry, StageOdom_callback)
 
     #StageLaser_sub = rospy.Subscriber("robot_0/base_scan",sensor_msgs.msg.LaserScan,StageLaser_callback)
 
@@ -49,13 +61,11 @@ def main():
 
     RobotNode_cmdvel = geometry_msgs.msg.Twist()
 
-    RobotQuaternion = nav_msgs.msg.Odometry()
-
     while not rospy.is_shutdown():
 
-        while (theta < math.pi and theta>=0):
+        while (robot0.theta < math.pi and robot0.theta>=0):
             RobotNode_cmdvel.angular.z = math.pi*40
-            RobotNode_stage_pub.publish(RobotNode_cmdvel)
+            robot0.RobotNode_stage_pub.publish(RobotNode_cmdvel)
 
             rospy.sleep(1)
             ++count
