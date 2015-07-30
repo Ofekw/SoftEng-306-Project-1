@@ -98,7 +98,7 @@ class Robot:
 
         pi = math.pi
 
-        thetaTarg = self.theta + math.pi/2
+        thetaTarg = self.theta + pi/2
 
         if (thetaTarg > pi):
             thetaTarg = - pi + (thetaTarg - pi)
@@ -106,16 +106,17 @@ class Robot:
         while (abs(self.theta - thetaTarg) > 0.01):
             thetaDiff = abs(self.theta - thetaTarg)
 
+        #Set the angular velocity to optimal values that don't overshoot pi/4
             if (thetaDiff > 0.5):
-                self.RobotNode_cmdvel.angular.z = 1
+                self.RobotNode_cmdvel.angular.z = 3
             elif (thetaDiff > 0.1):
-                self.RobotNode_cmdvel.angular.z = 0.1
+                self.RobotNode_cmdvel.angular.z = 0.5
             else:
-                self.RobotNode_cmdvel.angular.z = 0.03
+                self.RobotNode_cmdvel.angular.z = 0.05
 
             self.RobotNode_stage_pub.publish(self.RobotNode_cmdvel)
 
-            rospy.sleep(0.01)
+            rospy.sleep(0.0001)
 
             print("Turning left, current theta is " + str(self.theta) +", target theta is " + str(thetaTarg))
 
@@ -134,16 +135,17 @@ class Robot:
         while (abs(self.theta - thetaTarg) > 0.01):
             thetaDiff = abs(self.theta - thetaTarg)
 
+        #Set the angular velocity to optimal values that don't overshoot pi/4
             if (thetaDiff > 0.5):
-                self.RobotNode_cmdvel.angular.z = -1
+                self.RobotNode_cmdvel.angular.z = -3
             elif (thetaDiff > 0.1):
-                self.RobotNode_cmdvel.angular.z = -0.1
+                self.RobotNode_cmdvel.angular.z = -0.5
             else:
-                self.RobotNode_cmdvel.angular.z = -0.03
+                self.RobotNode_cmdvel.angular.z = -0.05
 
             self.RobotNode_stage_pub.publish(self.RobotNode_cmdvel)
 
-            rospy.sleep(0.01)
+            rospy.sleep(0.0001)
 
             print("Turning left, current theta is " + str(self.theta) +", target theta is " + str(thetaTarg))
 
