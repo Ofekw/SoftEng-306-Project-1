@@ -20,7 +20,7 @@ void StageOdom_callback(nav_msgs::Odometry msg)
 {
 	//This is the call back function to process odometry messages coming from Stage. 	
 	px = 5 + msg.pose.pose.position.x;
-	py =10 + msg.pose.pose.position.y;
+	py = 10 + msg.pose.pose.position.y;
 	ROS_INFO("Current x position is: %f", px);
 	ROS_INFO("Current y position is: %f", py);
 }
@@ -58,7 +58,7 @@ ros::Publisher RobotNode_stage_pub = n.advertise<geometry_msgs::Twist>("robot_1/
 
 //subscribe to listen to messages coming from stage
 ros::Subscriber StageOdo_sub = n.subscribe<nav_msgs::Odometry>("robot_1/odom",1000, StageOdom_callback);
-ros::Subscriber StageLaser_sub = n.subscribe<sensor_msgs::LaserScan>("robot_1/base_scan",1000,StageLaser_callback);
+ros::Subscriber StageLaser_sub = n.subscribe<sensor_msgs::LaserScan>("robot_1/base_scan", 1000 ,StageLaser_callback);
 
 ros::Rate loop_rate(10);
 
@@ -72,11 +72,15 @@ geometry_msgs::Twist RobotNode_cmdvel;
 while (ros::ok())
 {
 	//messages to stage
-	RobotNode_cmdvel.linear.x = linear_x;
-	RobotNode_cmdvel.angular.z = angular_z;
+	//RobotNode_cmdvel.linear.x = linear_x;
+	//RobotNode_cmdvel.angular.z = angular_z;
         
 	//publish the message
-	RobotNode_stage_pub.publish(RobotNode_cmdvel);
+	//RobotNode_stage_pub.publish(RobotNode_cmdvel);
+
+	if (px < (px + 5)) {
+		moveForward(5);
+	}
 	
 	ros::spinOnce();
 
@@ -85,5 +89,25 @@ while (ros::ok())
 }
 
 return 0;
+
+}
+
+void moveForward(int dist)
+{
+	ros::Publisher RobotNode_stage_pub = n.advertise<geometry_msgs::Twist>("robot_1/cmd_vel",1000);
+
+	geometry_msgs::Twist RobotNode_cmdvel;
+
+	float pxTarg = px + dist;
+
+	RobotNode_cmdvel.linear.x = 1;
+	RobotNode_stage_pub.publish(RobotNode_cmdvel);
+
+	while (px < pxTarg) {
+		ros::spinOnce();
+	}
+
+	RobotNode_cmdvel.linear.x = 0;
+	RobotNode_stage_pub.publish(RobotNode_cmdvel);
 
 }
