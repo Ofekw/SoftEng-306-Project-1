@@ -5,18 +5,20 @@ from std_msgs.msg import*
 from geometry_msgs.msg import*
 from nav_msgs.msg import*
 from sensor_msgs.msg import*
+from tf.transformations import *
 import math
 
 
 def StageOdom_callback(msg):
-    px = 5+msg.pose.pose.position.x
+    px = msg.pose.pose.orientation.z
     py = 10+msg.pose.pose.position.y
     rospy.loginfo("Current x position is: %f", px)
     rospy.loginfo("Current y position is: %f",py)
     xpos = str(px)
     ypos = str(py)
     com_pub.publish("\n" + rospy.get_caller_id() +  " is at position x: " + xpos + "\nposition y: " + ypos)
-
+	(roll, pitch, yaw) = euler_from_quaternion((msg.pose.pose.orientation.x, msg.pose.pose.orientation.y, msg.pose.pose.orientation.z, msg.pose.pose.orientation.w))
+    print(yaw)
 def StageLaser_callback(msg):
     pass
 
@@ -35,6 +37,8 @@ def main():
 
     RobotNode_stage_pub = rospy.Publisher("robot_0/cmd_vel", geometry_msgs.msg.Twist, queue_size=10)
 
+    RobotQuaternionPub = rospy.Publisher("robot_0/odom", nav_msgs.msg.Odometry, queue_size=10)
+
     StageOdo_sub = rospy.Subscriber("robot_0/odom", nav_msgs.msg.Odometry, StageOdom_callback)
 
     StageLaser_sub = rospy.Subscriber("robot_0/base_scan",sensor_msgs.msg.LaserScan,StageLaser_callback)
@@ -42,25 +46,32 @@ def main():
     global com_pub
     com_pub = rospy.Publisher("communicate",String)
 
-    rospy.Rate(10)
+    rospy.Rate(100)
 
     count = 0
 
     RobotNode_cmdvel = geometry_msgs.msg.Twist()
     RobotNode_position = nav_msgs.msg.Odometry()
 
+    RobotQuaternion = nav_msgs.msg.Odometry()
+
 
 
     while not rospy.is_shutdown():
 
-        RobotNode_cmdvel.linear.x = linear_x
-        RobotNode_cmdvel.angular.z = angular_z
+        ()
 
-        RobotNode_cmdvel.linear.x = 10
-        RobotNode_cmdvel.angular.z  = 20
+
+
+
+        RobotNode_cmdvel.angular.z = 0
+
+        RobotNode_cmdvel.linear.x = 0
         RobotNode_stage_pub.publish(RobotNode_cmdvel)
 
+        RobotQuaternion.pose.pose.orientation.w = 0;
 
+      #  RobotQuaternionPub.publish(RobotQuaternion)
 
         #should be spin Once
         #rospy.spin()
@@ -69,7 +80,7 @@ def main():
 
 
 
-        rospy.sleep(0.01)
+        rospy.sleep(1)
         ++count
 
 if __name__ == '__main__':
