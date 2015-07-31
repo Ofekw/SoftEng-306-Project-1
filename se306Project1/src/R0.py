@@ -15,7 +15,15 @@ def StageOdom_callback(msg):
     rospy.loginfo("Current y position is: %f",py)
 
 def StageLaser_callback(msg):
-    pass
+    barCount = 0
+    found = False
+
+    for i in range(0,180):
+        if msg.ranges[i] != 5.0:
+            rospy.loginfo("Range at %f degree is: %f", i, msg.ranges[i])
+
+
+
 
 def main():
 
@@ -49,8 +57,8 @@ def main():
         RobotNode_cmdvel.linear.x = linear_x
         RobotNode_cmdvel.angular.z = angular_z
 
-        RobotNode_cmdvel.linear.x = 10
-        RobotNode_cmdvel.angular.z  = 20
+        RobotNode_cmdvel.linear.x = 0
+        RobotNode_cmdvel.angular.z  = 0
         RobotNode_stage_pub.publish(RobotNode_cmdvel)
 
         #should be spin Once
