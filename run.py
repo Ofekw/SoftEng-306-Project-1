@@ -9,4 +9,5 @@ subprocess.check_output("gnome-terminal -x bash -c 'sleep 3 && rosrun se306Proje
 #run robots listed in robotList.txt file
 with open("robotList.txt", "r") as f:
     for line in f:
-        subprocess.check_output("gnome-terminal -x bash -c 'sleep 3 && rosrun se306Project1 '"+line, shell=True)
+		command = "gnome-terminal -x bash -c 'sleep 3 && rosrun se306Project1 " +line+"'"
+       	subprocess.check_output(command, shell=True)
