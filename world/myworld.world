@@ -59,9 +59,10 @@ floorplan
   size [100.0 100.0 2]
   pose [ 0.000 0.000 0 0.000 ]
 )
+
 # throw in a robot
-myRobot( pose [ 8 10 0 180 ] name "r0" color "blue")
-myRobot( pose [ 8 0 0 0 ] name "r1" color "green")
+myRobot( pose [ 0 0 0 0 ] name "r0" color "blue")
+myRobot( pose [ -40 -40 0 0 ] name "r1" color "green")
 myRobot( pose [ 10 30 0 0 ] name "r2" color "black")
 myRobot( pose [ 25 16 0 0 ] name "r3" color "yellow")
 myRobot( pose [ 5 28 0 0 ] name "r4" color "brown")
