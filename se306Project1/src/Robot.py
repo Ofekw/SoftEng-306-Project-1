@@ -398,6 +398,13 @@ class Robot:
         return distance
 
 
+    """
+    @function
+
+    Error correction function that detects small differences in angle from the cardinal directions (NESW)
+    and rotates the robot back to the nearest cardinal direction.
+
+    """
     def correct_theta(self):
         current_direction="NoDirect"
         if (abs(self.theta-math.pi/2)<=0.4):
