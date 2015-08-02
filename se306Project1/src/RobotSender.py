@@ -47,8 +47,8 @@ class Robot:
     """
     def StageOdom_callback(self,msg):
 
-        self.px = msg.pose.pose.position.x
-        self.py = msg.pose.pose.position.y
+        self.px = 5+msg.pose.pose.position.x
+        self.py = 10+msg.pose.pose.position.y
 
         (roll, pitch, yaw) = euler_from_quaternion((msg.pose.pose.orientation.x, msg.pose.pose.orientation.y, msg.pose.pose.orientation.z, msg.pose.pose.orientation.w))
 

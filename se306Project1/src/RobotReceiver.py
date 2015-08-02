@@ -40,8 +40,8 @@ class Robot:
 
 
         self.RobotNode_cmdvel = geometry_msgs.msg.Twist()
-        self.goalx = self.px
-        self.goaly = self.py
+        self.goalx = 1
+        self.goaly = 1
 
     """
     @function
@@ -51,16 +51,16 @@ class Robot:
     """
     def StageOdom_callback(self,msg):
 
-        self.px = msg.pose.pose.position.x
-        self.py = msg.pose.pose.position.y
+        self.px = 15+msg.pose.pose.position.x
+        self.py = 20+msg.pose.pose.position.y
 
         (roll, pitch, yaw) = euler_from_quaternion((msg.pose.pose.orientation.x, msg.pose.pose.orientation.y, msg.pose.pose.orientation.z, msg.pose.pose.orientation.w))
 
         self.theta = yaw
 
-        #rospy.loginfo("Current x position: %f" , self.px)
-        #rospy.loginfo("Current y position: %f", self.py)
-        #rospy.loginfo("Current theta: %f", self.theta)
+        rospy.loginfo("Current x position: %f" , self.px)
+        rospy.loginfo("Current y position: %f", self.py)
+        rospy.loginfo("Current theta: %f", self.theta)
 
     """
     @function
@@ -224,12 +224,16 @@ class Robot:
         dy = float(self.goaly)
         if(self.isFacing(dx, dy) == True):
             rospy.loginfo("Setting!")
-            self.move_forward(10)
+            if(self.getDist(dx,dy) < 2):
+                rospy.loginfo("thats close enough " + str(self.getDist(dx,dy)))
+            else:
+                self.move_forward(self.getDist(dx,dy) - 0.2)
         else:
-            self.rotate(self.findAngle(dx, dy) - self.theta)
+            rospy.loginfo("roting" + str((360+self.findAngle(dx, dy))%360 - (360+math.degrees(self.theta))%360))
+            self.rotate((360+self.findAngle(dx, dy))%360 - (360+math.degrees(self.theta))%360)
 
     def isFacing(self, destx, desty):
-        if (abs(self.findAngle(destx, desty) - self.theta) < 0.1):
+        if ((abs(self.findAngle(destx, desty) - math.degrees(self.theta)) % 360) < 10 or (abs(self.findAngle(destx, desty) - math.degrees(self.theta)) % 360) > 350):
             return True
         else:
             return False
@@ -238,11 +242,20 @@ class Robot:
         return math.sqrt((desty-self.py)**2 + (destx - self.px)**2)
 
     def findAngle(self, destx, desty):
-        rospy.loginfo("Setting! -- " + str(math.atan(float(desty - self.py)/float(destx - self.px))))
-        if (destx - self.px < 0):
-            return math.atan(float(destx - self.px)/float(desty - self.py))
-        else:
-            return 0 - math.atan(float(destx - self.px)/float(desty - self.py))
+        # if ((destx - self.px) < 0) and ((desty - self.py) < 0):
+        #     rospy.loginfo("Setting!ll -- " + str(180) + " , " + str(math.degrees(math.atan2(float(desty - self.py), float(destx - self.px)))))
+        #     return 180 + math.degrees(math.atan2(float(desty - self.py), float(destx - self.px)))
+        # elif ((destx - self.px) > 0) and ((desty - self.py) > 0):
+        #     rospy.loginfo("Setting!gl -- " + str(0 + math.degrees(math.atan2(float(desty - self.py), float(destx - self.px)))))
+        #
+        #     return 0 + math.degrees(math.atan2(float(desty - self.py), float(destx - self.px)))
+        # elif ((destx - self.px) > 0) and ((desty - self.py) < 0):
+        #     rospy.loginfo("Setting!gg -- " + str(270 + math.degrees(math.atan2(float(destx - self.px), float(desty - self.py)))))
+        #
+        #     return 270 + math.degrees(math.atan2(float(destx - self.px), float(desty - self.py)))
+        # elif ((destx - self.px) < 0) and ((desty - self.py) > 0):
+        rospy.loginfo("Setting!lg -- -" + str((360 - 90 + math.degrees(math.atan2(float(destx - self.px), float(desty - self.py))))%360))
+        return 0 - (360 -90 + math.degrees(math.atan2(float(destx - self.px), float(desty - self.py)))%360)
 
     def setGoal(self, gx, gy):
         self.goalx = gx
