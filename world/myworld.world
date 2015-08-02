@@ -28,8 +28,8 @@ interval_sim 100  # simulation timestep in milliseconds. length of each simulati
 
 window
 ( 
-  size [ 1855 1056 ] #size of the window in pixels
-  scale 20.750 
+  size [ 800.000 800.000 ] #size of the window in pixels
+  scale 8 
   
 )
 
@@ -43,6 +43,7 @@ floorplan
   ranger_return 1.000
   laser_return 1
 )
+
 # throw in a robot
 picker( pose [ -20 -28 0.000 90 ] name "r0" color "yellow")
 picker( pose [ -10 -28 0.000 90. ] name "r1" color "yellow")

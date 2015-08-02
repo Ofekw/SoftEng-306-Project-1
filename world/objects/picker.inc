@@ -1,7 +1,7 @@
 define mylaser ranger
 (
   sensor(
-  range [ 0.0 30.0 ] # range
+  range [ 0.0 5.0 ] # range
   fov 180       # field of vision
   samples 180   # samples 
   )
