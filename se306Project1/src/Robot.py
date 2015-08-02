@@ -7,6 +7,7 @@ from nav_msgs.msg import*
 from sensor_msgs.msg import*
 from tf.transformations import *
 import math
+import numpy.testing
 
 
 """
@@ -38,6 +39,7 @@ class Robot:
         self.StageOdo_sub = rospy.Subscriber(self.robot_node_identifier+"/odom", nav_msgs.msg.Odometry, self.StageOdom_callback)
 
         self.RobotNode_cmdvel = geometry_msgs.msg.Twist()
+        self.RobotNode_odom = geometry_msgs.msg.Pose2D()
 
     """
     @function
@@ -108,6 +110,7 @@ class Robot:
             dist_gained = math.sqrt(xDiff * xDiff + yDiff * yDiff)
 
             print("Moving Forward: " + str(distToGo) + "m to go")
+            print("Current x pos = " + str(self.px) +"," +str(self.py))
 
         #Stop robot by setting forward velocity to 0 and then publish change
         self.RobotNode_cmdvel.linear.x = 0
@@ -140,19 +143,19 @@ class Robot:
         while (abs(self.theta - thetaTarg) > 0.01):
             thetaDiff = abs(self.theta - thetaTarg)
 
-        #Set the angular velocity to optimal values that don't overshoot pi/2
+            #Set the angular velocity to optimal values that don't overshoot pi/2
             if (thetaDiff > 0.5):
                 self.RobotNode_cmdvel.angular.z = 2.5 * dir
             elif (thetaDiff > 0.1):
-                self.RobotNode_cmdvel.angular.z = 0.4 * dir
+                self.RobotNode_cmdvel.angular.z = 0.3 * dir
             else:
-                self.RobotNode_cmdvel.angular.z = 0.04 * dir
+                self.RobotNode_cmdvel.angular.z = 0.02 * dir
 
             self.RobotNode_stage_pub.publish(self.RobotNode_cmdvel)
 
             rospy.sleep(0.0001)
 
-            print("Turning " + direction + " current theta is " + str(self.theta) +", target theta is " + str(thetaTarg))
+            #print("Turning " + direction + " current theta is " + str(self.theta) +", target theta is " + str(thetaTarg))
 
         self.RobotNode_cmdvel.angular.z = 0
         self.RobotNode_stage_pub.publish(self.RobotNode_cmdvel)
@@ -166,15 +169,20 @@ class Robot:
     Turn function which allows the robot to turn a specified number of degrees either left or right.
     A negative angle would denote a right rotation and vice-versa
     """
-    def rotate(self, angle_in_degrees):
+    def rotate_relative(self, angle, angle_type):
 
-        if (angle_in_degrees<0):
+
+        if (angle<0):
             dir = -1
         else:
             dir = 1
         pi=math.pi
         #convert degrees to radians
-        angle_in_radians = (math.pi/180) *angle_in_degrees
+        if (angle_type=="degrees"):
+            angle_in_radians = (math.pi/180) *angle
+        else:
+            angle_in_radians=angle
+
 
         thetaTarg = self.theta + angle_in_radians
 
@@ -183,16 +191,16 @@ class Robot:
         elif (thetaTarg < -pi):
             thetaTarg = pi + (thetaTarg + pi)
 
-        while (abs(self.theta - thetaTarg) > 0.01):
+        while (abs(self.theta - thetaTarg) > 0.005):
             thetaDiff = abs(self.theta - thetaTarg)
 
-        #Set the angular velocity to optimal values that don't overshoot pi/2
+            #Set the angular velocity to optimal values that don't overshoot pi/2
             if (thetaDiff > 0.5):
-                self.RobotNode_cmdvel.angular.z = 2.5  * dir
+                self.RobotNode_cmdvel.angular.z = 2.5 * dir
             elif (thetaDiff > 0.1):
-                self.RobotNode_cmdvel.angular.z = 0.4 * dir
+                self.RobotNode_cmdvel.angular.z = 0.3 * dir
             else:
-                self.RobotNode_cmdvel.angular.z = 0.04 * dir
+                self.RobotNode_cmdvel.angular.z = 0.02 * dir
 
             self.RobotNode_stage_pub.publish(self.RobotNode_cmdvel)
 
@@ -203,7 +211,218 @@ class Robot:
         self.RobotNode_cmdvel.angular.z = 0
         self.RobotNode_stage_pub.publish(self.RobotNode_cmdvel)
 
+    """
+     @function
 
+     @parameter:float angle
+
+      Turn function which allows the robot to turn a specified number of degrees either left or right.
+        A negative angle would denote a right rotation and vice-versa
+
+    """
+    def face_direction(self, direction_to_face):
+
+        current_direction = self.get_current_direction()
+
+        print("Currently facing:" + current_direction)
+        print("Turning to face: "+ direction_to_face)
+
+        if (current_direction== direction_to_face):
+            return
+        elif (current_direction=="north"):
+            if (direction_to_face=="east"):
+                self.turn("right")
+            elif(direction_to_face=="south"):
+                self.rotate_relative(180, "degrees")
+            elif(direction_to_face=="west"):
+                self.turn("left")
+            self.correct_theta()
+        elif (current_direction=="east"):
+            if (direction_to_face=="north"):
+                self.turn("left")
+            elif(direction_to_face=="south"):
+                self.turn("right")
+            elif(direction_to_face=="west"):
+                self.rotate_relative(180,"degrees")
+            self.correct_theta()
+        elif (current_direction=="south"):
+            if (direction_to_face=="east"):
+                self.turn("left")
+            elif(direction_to_face=="north"):
+                self.rotate_relative(180,"degrees")
+            elif(direction_to_face=="west"):
+                self.turn("right")
+            self.correct_theta()
+        elif (current_direction=="west"):
+            if (direction_to_face=="east"):
+                self.rotate_relative(180,"degrees")
+            elif(direction_to_face=="south"):
+                self.turn("left")
+            elif(direction_to_face=="north"):
+                self.turn("right")
+            self.correct_theta()
+        else:
+            print("Error: Face Direction")
+            return
+
+    """
+    @function
+
+    @parameter:double xCoord
+    @parameter:double yCoord
+
+
+    Goto function that moves the robot to a specified Cartesian Coordinate. Will move only at right angles towards target coordinate.
+
+    ie: from A to B
+
+                           B
+                           |
+                           |
+                           |
+    A----------------------|
+    """
+    def goto(self, x_coord, y_coord):
+
+        print("Current x pos = " + str(self.px))
+        print("Current y pos = " + str(self.py))
+
+        if (abs(x_coord-self.px)<=0.3 and abs(y_coord-self.py)<=0.2 ):
+            print("Already at coordinate!")
+            return
+
+        x_difference = x_coord - self.px
+        y_difference = y_coord - self.py
+
+        print("Xdiff" + str(x_difference))
+        print("Ydiff" + str(y_difference))
+
+        #error tolerance
+        tol = 0.5
+
+        if (x_difference<=-tol and y_difference<=-tol):
+            print(1)
+            if (x_difference<-tol):
+                self.face_direction("west")
+                self.move_forward(abs(x_difference))
+            if (y_difference<-tol):
+                self.face_direction("south")
+                self.move_forward(abs(y_difference))
+            return
+        elif (x_difference>=tol and y_difference>=tol):
+            print(2)
+            if (x_difference>tol):
+                self.face_direction("east")
+                self.move_forward(abs(x_difference))
+            if (y_difference>tol):
+                self.face_direction("north")
+                self.move_forward(abs(y_difference))
+            return
+        elif (x_difference>=tol and y_difference<=-tol):
+            print(3)
+            if (x_difference>tol):
+                self.face_direction("east")
+                self.move_forward(abs(x_difference))
+            if (y_difference<-tol):
+                self.face_direction("south")
+                self.move_forward(abs(y_difference))
+            return
+        elif (x_difference<=-tol and y_difference>=tol):
+            print(4)
+            if (x_difference<-tol):
+                self.face_direction("west")
+                self.move_forward(abs(x_difference))
+            if (y_difference>tol):
+                self.face_direction("north")
+                self.move_forward(abs(y_difference))
+
+        if (x_difference>tol):
+            print(5)
+            self.face_direction("east")
+            self.move_forward(abs(x_difference))
+            return
+        elif (x_difference<-tol):
+            print(6)
+            self.face_direction("west")
+            self.move_forward(abs(x_difference))
+            return
+        if (y_difference>tol):
+            print(7)
+            self.face_direction("north")
+            self.move_forward(abs(y_difference))
+            return
+        elif (y_difference<-tol):
+            print(8)
+            self.face_direction("south")
+            self.move_forward(abs(y_difference))
+            return
+
+
+    """
+    @function
+
+    @return current_direction
+
+    Gets the robots current compass direction, either north, south, east or west.
+
+    """
+    def get_current_direction(self):
+        if(abs(self.theta- math.pi/2)<=0.1):
+            current_direction = "north"
+        elif (abs(self.theta-0)<=0.1):
+            current_direction = "east"
+        elif (abs(self.theta+math.pi/2)<=0.1):
+            current_direction = "south"
+        elif (abs(self.theta- math.pi)<=0.1 or abs(self.theta+math.pi)<=0.1):
+            current_direction = "west"
+        else:
+            print("Current direction not one of the four cardinal directions")
+            current_direction = self.correct_theta()
+
+        return current_direction
+
+    """
+    @function
+
+    @parameter:double xCoord
+    @parameter:double yCoord
+
+
+    Gets distance (as the crow flies) that the given coordinate is away from the Robot
+
+    """
+    def get_distance(self, x_coord, y_coord):
+
+        distance = math.sqrt((x_coord - self.px)**2+(y_coord - self.py)**2)
+        print("Distance from cuurent position: (%.2f,%.2f) to (%.2f,%.2f) is %.2f units" %(self.px, self.py, x_coord,y_coord,distance))
+        return distance
+
+
+    def correct_theta(self):
+        current_direction="NoDirect"
+        if (abs(self.theta-math.pi/2)<=0.4):
+            print("North")
+            self.rotate_relative(math.pi/2-self.theta,"radians")
+            current_direction="north"
+        elif (abs(self.theta- math.pi)<=0.4 ):
+            print("west")
+            self.rotate_relative(math.pi-self.theta,"radians")
+            current_direction="west"
+        elif (abs(self.theta+math.pi)<=0.4):
+            print("west")
+            self.rotate_relative(-math.pi-self.theta,"radians")
+            current_direction="west"
+        elif (abs(self.theta+math.pi/2)<=0.4):
+            print("south")
+            print("Diff" + str(math.pi/2+self.theta))
+            self.rotate_relative(-math.pi/2-self.theta,"radians")
+            current_direction="south"
+        elif (abs(self.theta-0)<=0.4):
+            print("east")
+            self.rotate_relative(-self.theta,"radians")
+            current_direction="east"
+
+        return current_direction
 
 
 """
@@ -215,34 +434,40 @@ Main function that creates robot and sets path
 def main():
     #Construction of Robot objects take 3 params... Robot ID, Start X, Start Y. Start X and Start Y correlates to the myworld.world file
     #Can't create more than one robot per main() .... ie can't run more than one robot per terminal running
-    robot0 = Robot(0,5,10)
+
+    robot0 = Robot(0,0,0)
 
     rospy.Rate(100)
-
     rospy.sleep(0.1)
+
+    print("Current x pos = " + str(robot0.px))
+    print("Current y pos = " + str(robot0.py))
+
 
     #You can use RobotNode_cmdvel to simulate movements, place them in the while loop to try it out
     #RobotNode_cmdvel = geometry_msgs.msg.Twist()
 
-    while not rospy.is_shutdown():
+    # while not rospy.is_shutdown():
 
-    #A Zig zag motion that emulates the robots going through rows of trees in the orchard
-        for i in range(0,5):
-            robot0.move_forward(5)
-            robot0.turn("left")
-            robot0.move_forward(0.5)
-            robot0.turn("left")
-            robot0.move_forward(5)
-            robot0.turn("right")
-            robot0.move_forward(0.5)
-            robot0.turn("right")
+    robot0.get_distance(5,20)
+    robot0.goto(5,20)
+    print("Arrived at destination:", robot0.px, robot0.py)
+    robot0.get_distance(0,5)
+    robot0.goto(0,5)
+    print("Arrived at destination:", robot0.px, robot0.py)
+    robot0.get_distance(0,0)
+    robot0.goto(0,0)
+    print("Arrived at destination:", robot0.px, robot0.py)
+
+    # robot0.rotate_relative(80,"degrees")
+    # print("current theta:" + str(robot0.theta))
+    # robot0.correct_theta()
+    # print("current theta:" + str(robot0.theta))
 
 
-        # robot0.rotate(-180)
-        # rospy.sleep(1)
-        # robot0.move_forward(5)
-        # robot0.rotate(-90)
-        # robot0.move_forward(5)
+
+
+
 
 
 
