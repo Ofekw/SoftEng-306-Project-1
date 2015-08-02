@@ -73,9 +73,10 @@ class Robot:
     Displays info sent from another robot --- used for debugging
     """
     def comCallback(self, message):
-        rospy.loginfo(message.data.split(',')[0])
-        rospy.loginfo(message.data.split(',')[1])
-        self.setGoal(message.data.split(',')[0], message.data.split(',')[1])
+        print("Sending position " + message.data.split(',')[1] + "," + message.data.split(',')[2])
+        self.setGoal(message.data.split(',')[1], message.data.split(',')[2])
+        self.setOtherRobotPos(message.data.split(',')[0],message.data.split(',')[1], message.data.split(',')[2]) # Should add element 3 here which is theta
+
 
     """
     @function
@@ -251,6 +252,9 @@ class Robot:
         self.goalx = gx
         self.goaly = gy
 
+
+    def setOtherRobotPos(self, id, xpos, ypos):
+        self.other_robots[int(id)] = xpos + "," + ypos
 
     """
     @function

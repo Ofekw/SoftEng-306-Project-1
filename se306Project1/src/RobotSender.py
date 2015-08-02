@@ -58,7 +58,8 @@ class Robot:
         ypos = str(self.py)
         #com_pub.publish("\n" + rospy.get_caller_id() +  " is at position x: " + xpos + "\nposition y: " + ypos)
 
-        com_pub.publish(xpos + "," + ypos)
+        com_pub.publish(str(self.robot_id) + "," + xpos + "," + ypos+ "," + str(self.theta))
+        print(str(self.robot_id) + "," + xpos + "," + ypos+ "," + str(self.theta))
 
         #rospy.loginfo("Current x position: %f" , self.px)
         #rospy.loginfo("Current y position: %f", self.py)
