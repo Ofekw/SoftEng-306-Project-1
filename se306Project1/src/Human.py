@@ -13,21 +13,15 @@ from Entity import Entity
 """
 @class
 
-The Robot class used to represent a robot in the world stage.
+The Human class used to represent a human in the world stage.
 It inherits from the Entity class.
 
 """
-class Robot(Entity):
+class Human(Entity):
 
     def __init__(self,r_id,x_off,y_off):
-
-        self.max_load = 20;
-        self.current_load = 0;
+        #Insert human specific attirbutes here
         Entity.__init__(self,r_id,x_off,y_off)
 
-    def robot_specific_function(self):
-        pass
-
-    def start_picking(self):
-       #incomplete
+    def human_specific_function(self):
         pass
