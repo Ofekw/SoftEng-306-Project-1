@@ -70,9 +70,9 @@ class Robot:
     Displays info sent from another robot --- used for debugging
     """
     def comCallback(self, message):
-        rospy.loginfo(message.data.split(',')[0])
         rospy.loginfo(message.data.split(',')[1])
-        self.setGoal(message.data.split(',')[0], message.data.split(',')[1])
+        rospy.loginfo(message.data.split(',')[2])
+        self.setGoal(message.data.split(',')[1], message.data.split(',')[2])
 
     """
     @function
