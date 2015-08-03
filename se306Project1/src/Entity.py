@@ -37,6 +37,22 @@ class Entity:
         self.robot_node_name = ("RobotNode" +str(r_id))
         self.robot_node_identifier = ("robot_"+ str(r_id))
 
+        #array of methods of robot actions
+        self._actions_ = {
+            0: self.move_forward,
+            1: self.goto,
+            2: self.turn,
+            3: self.stop,
+        }
+
+        self._actionsStack_ = []
+
+        #stop current action used inside methods to check if there has been a call to run a new method
+        self._stopCurrentAction_ = False
+
+        #variable to track if action is running or not
+        self._actionRunning_ = False
+
         #Node Initiation
         rospy.init_node(self.robot_node_name)
 
@@ -490,18 +506,3 @@ class Entity:
         self.RobotNode_cmdvel.linear.x = 0.0
 
 
-    #array of methods of robot actions
-    _actions_ = {
-        0: move_forward,
-        1: goto,
-        2: turn,
-        3: stop,
-    }
-
-    _actionsStack_ = []
-
-    #stop current action used inside methods to check if there has been a call to run a new method
-    _stopCurrentAction_ = False
-
-    #variable to track if action is running or not
-    _actionRunning_ = False
