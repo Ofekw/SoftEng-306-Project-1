@@ -33,23 +33,22 @@ def main():
     #You can use RobotNode_cmdvel to simulate movements, place them in the while loop to try it out
     #RobotNode_cmdvel = geometry_msgs.msg.Twist()
 
-    # while not rospy.is_shutdown():
+    moveAction = robot0._actions_[1], [robot0, 40, 40]
+    robot0._actionsStack_.append(moveAction)
 
-    robot0.get_distance(5,20)
-    robot0.goto(5,20)
-    print("Arrived at destination:", robot0.px, robot0.py)
-    robot0.get_distance(0,5)
-    robot0.goto(0,5)
-    print("Arrived at destination:", robot0.px, robot0.py)
-    robot0.get_distance(0,0)
-    robot0.goto(0,0)
-    print("Arrived at destination:", robot0.px, robot0.py)
+    while not rospy.is_shutdown():
 
-    # robot0.rotate_relative(80,"degrees")
-    # print("current theta:" + str(robot0.theta))
-    # robot0.correct_theta()
-    # print("current theta:" + str(robot0.theta))
-
+    #check if there is an action on the stack or an action already running
+        if(robot0._actionsStack_.__len__() > 0 and not robot0._actionRunning_):
+            #get top action on stack
+            action = robot0._actionsStack_[-1]
+            #run action with parameter
+            robot0._actionRunning_ = True
+            result = action[0](*action[1])
+            robot0._actionRunning_=False
+            #if action completes succesfully pop it
+            if result == 0 or result == 1:
+                robot0._actionsStack_.pop()
 
 
 if __name__ == '__main__':
