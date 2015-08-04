@@ -69,7 +69,6 @@ class Robot:
     @function
     @parameter: message
 
-
     Displays info sent from another robot --- used for debugging
     """
     def comCallback(self, message):
