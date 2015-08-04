@@ -383,47 +383,60 @@ class Entity:
             #error tolerance
             tol = 0.5
 
-            if (x_difference<=-tol and y_difference<=-tol):
-                if (x_difference<-tol):
-                    self.face_direction(Direction.WEST)
-                    self.move_forward(abs(x_difference))
-                if (y_difference<-tol):
-                    self.face_direction(Direction.SOUTH)
-                    self.move_forward(abs(y_difference))
-            elif (x_difference>=tol and y_difference>=tol):
-                if (x_difference>tol):
-                    self.face_direction(Direction.EAST)
-                    self.move_forward(abs(x_difference))
-                if (y_difference>tol):
-                    self.face_direction(Direction.NORTH)
-                    self.move_forward(abs(y_difference))
-            elif (x_difference>=tol and y_difference<=-tol):
-                if (x_difference>tol):
-                    self.face_direction(Direction.EAST)
-                    self.move_forward(abs(x_difference))
-                if (y_difference<-tol):
-                    self.face_direction(Direction.SOUTH)
-                    self.move_forward(abs(y_difference))
-            elif (x_difference<=-tol and y_difference>=tol):
-                if (x_difference<-tol):
-                    self.face_direction(Direction.WEST)
-                    self.move_forward(abs(x_difference))
-                if (y_difference>tol):
-                    self.face_direction(Direction.NORTH)
-                    self.move_forward(abs(y_difference))
+            #If the robot needs to travel both directions
+            if (not((abs(x_difference)>tol and abs(y_difference)<tol) or(abs(y_difference)>tol and abs(x_difference)<tol))):
 
-            if (x_difference>tol):
-                self.face_direction(Direction.EAST)
-                self.move_forward(abs(x_difference))
-            elif (x_difference<-tol):
-                self.face_direction(Direction.WEST)
-                self.move_forward(abs(x_difference))
-            if (y_difference>tol):
-                self.face_direction(Direction.NORTH)
-                self.move_forward(abs(y_difference))
-            elif (y_difference<-tol):
-                self.face_direction(Direction.SOUTH)
-                self.move_forward(abs(y_difference))
+                if (x_difference<=-tol and y_difference<=-tol):
+                    if (y_difference<-tol):
+                        self.face_direction(Direction.SOUTH)
+                        self.move_forward(abs(y_difference))
+                    if (x_difference<-tol):
+                        self.face_direction(Direction.WEST)
+                        self.move_forward(abs(x_difference))
+                    return 0
+                elif (x_difference>=tol and y_difference>=tol):
+                    if (y_difference>tol):
+                        self.face_direction(Direction.NORTH)
+                        self.move_forward(abs(y_difference))
+                    if (x_difference>tol):
+                        self.face_direction(Direction.EAST)
+                        self.move_forward(abs(x_difference))
+                    return 0
+                elif (x_difference>=tol and y_difference<=-tol):
+                    if (y_difference<-tol):
+                        self.face_direction(Direction.SOUTH)
+                        self.move_forward(abs(y_difference))
+                    if (x_difference>tol):
+                        self.face_direction(Direction.EAST)
+                        self.move_forward(abs(x_difference))
+                    return 0
+                elif (x_difference<=-tol and y_difference>=tol):
+                    if (y_difference>tol):
+                        self.face_direction(Direction.NORTH)
+                        self.move_forward(abs(y_difference))
+                    if (x_difference<-tol):
+                        self.face_direction(Direction.WEST)
+                        self.move_forward(abs(x_difference))
+                    return 0
+            #If the robot only needs to travel one direction to reach its destination
+            else:
+                if (x_difference>tol):
+                    self.face_direction(Direction.EAST)
+                    self.move_forward(abs(x_difference))
+                    return 0
+                elif (x_difference<-tol):
+                    self.face_direction(Direction.WEST)
+                    self.move_forward(abs(x_difference))
+                    return 0
+                if (y_difference>tol):
+                    self.face_direction(Direction.NORTH)
+                    self.move_forward(abs(y_difference))
+                    return 0
+                elif (y_difference<-tol):
+                    self.face_direction(Direction.SOUTH)
+                    self.move_forward(abs(y_difference))
+                    return 0
+
         except ActionInterruptException.ActionInterruptException as e:
             print(e.message)
             return 1
