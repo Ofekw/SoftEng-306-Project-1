@@ -7,6 +7,7 @@ from nav_msgs.msg import*
 from sensor_msgs.msg import*
 from tf.transformations import *
 import math
+import ActionInterruptException
 import numpy.testing
 
 
@@ -36,6 +37,22 @@ class Entity:
         self.robot_node_name = ("RobotNode" +str(r_id))
         self.robot_node_identifier = ("robot_"+ str(r_id))
 
+        #array of methods of robot actions
+        self._actions_ = {
+            0: self.move_forward,
+            1: self.goto,
+            2: self.turn,
+            3: self.stop,
+        }
+
+        self._actionsStack_ = []
+
+        #stop current action used inside methods to check if there has been a call to run a new method
+        self._stopCurrentAction_ = False
+
+        #variable to track if action is running or not
+        self._actionRunning_ = False
+
         #Node Initiation
         rospy.init_node(self.robot_node_name)
 
@@ -45,6 +62,9 @@ class Entity:
 
         self.RobotNode_cmdvel = geometry_msgs.msg.Twist()
         self.RobotNode_odom = geometry_msgs.msg.Pose2D()
+
+        self.StageLaser_sub = rospy.Subscriber(self.robot_node_identifier+"/base_scan",sensor_msgs.msg.LaserScan,self.StageLaser_callback)
+        self.StageLaser_sub = rospy.Subscriber
 
     """
     @function
@@ -64,6 +84,20 @@ class Entity:
         #rospy.loginfo("Current x position: %f" , self.px)
         #rospy.loginfo("Current y position: %f", self.py)
         #rospy.loginfo("Current theta: %f", self.theta)
+
+
+    def StageLaser_callback(self, msg):
+        barCount = 0
+        found = False
+
+        #for i in range(0,180):
+        if msg.ranges[90] < 5.0:
+            #action = self._actions_[2], [self, "left"]
+            #check if action already exists in stack, otherwise laser will spam rotates
+            #if action != self._actionsStack_[-1]:
+            self._stopCurrentAction_ = True
+            #    self._actionsStack_.append(action)
+            #rospy.loginfo("Range at %f degree is: %f", i, msg.ranges[i])
 
     """
     @function
@@ -95,8 +129,9 @@ class Entity:
         previousX = self.px
         previousY = self.py
 
+
         #While the distance that the Entity has gained has not exceeded the given distance, continue to move the Entity forward
-        while (dist_gained < dist):
+        while (dist_gained < dist and not (self._stopCurrentAction_)):
 
             #Calculate remaining distance to travel
             distToGo = dist - dist_gained
@@ -127,9 +162,16 @@ class Entity:
             print("Moving Forward: " + str(distToGo) + "m to go")
             print("Current x pos = " + str(self.px) +"," +str(self.py))
 
-        #Stop Entity by setting forward velocity to 0 and then publish change
-        self.RobotNode_cmdvel.linear.x = 0
-        self.RobotNode_stage_pub.publish(self.RobotNode_cmdvel)
+
+        if self._stopCurrentAction_ == True:
+                raise ActionInterruptException.ActionInterruptException("Wall hit")
+        else:
+                #Stop robot by setting forward velocity to 0 and then publish change
+                self.RobotNode_cmdvel.linear.x = 0
+                self.RobotNode_stage_pub.publish(self.RobotNode_cmdvel)
+                #return 0 for succesful finish
+                #set action running tracker to false as method finished
+                return 0
 
 
     """
@@ -155,7 +197,7 @@ class Entity:
             if (thetaTarg < -pi):
                 thetaTarg = pi + (thetaTarg + pi)
 
-        while (abs(self.theta - thetaTarg) > 0.01):
+        while (abs(self.theta - thetaTarg) > 0.01 and not (self._stopCurrentAction_)):
             thetaDiff = abs(self.theta - thetaTarg)
 
             #Set the angular velocity to optimal values that don't overshoot pi/2
@@ -172,8 +214,16 @@ class Entity:
 
             #print("Turning " + direction + " current theta is " + str(self.theta) +", target theta is " + str(thetaTarg))
 
-        self.RobotNode_cmdvel.angular.z = 0
-        self.RobotNode_stage_pub.publish(self.RobotNode_cmdvel)
+        if self._stopCurrentAction_ == True:
+                raise ActionInterruptException.ActionInterruptException("Wall hit")
+        else:
+                #Stop robot by setting forward velocity to 0 and then publish change
+                self.RobotNode_cmdvel.angular.z = 0
+                self.RobotNode_stage_pub.publish(self.RobotNode_cmdvel)
+                #return 0 for succesful finish
+                return 0
+
+
 
 
     """
@@ -185,7 +235,6 @@ class Entity:
     A negative angle would denote a right rotation and vice-versa
     """
     def rotate_relative(self, angle, angle_type):
-
 
         if (angle<0):
             dir = -1
@@ -206,7 +255,7 @@ class Entity:
         elif (thetaTarg < -pi):
             thetaTarg = pi + (thetaTarg + pi)
 
-        while (abs(self.theta - thetaTarg) > 0.005):
+        while (abs(self.theta - thetaTarg) > 0.005 and not (self._stopCurrentAction_)):
             thetaDiff = abs(self.theta - thetaTarg)
 
             #Set the angular velocity to optimal values that don't overshoot pi/2
@@ -223,8 +272,14 @@ class Entity:
 
             print("Rotating - current theta is " + str(self.theta) +", target theta is " + str(thetaTarg))
 
-        self.RobotNode_cmdvel.angular.z = 0
-        self.RobotNode_stage_pub.publish(self.RobotNode_cmdvel)
+        if self._stopCurrentAction_ == True:
+                raise ActionInterruptException.ActionInterruptException("Wall hit")
+        else:
+                #Stop robot by setting forward velocity to 0 and then publish change
+                self.RobotNode_cmdvel.angular.z = 0
+                self.RobotNode_stage_pub.publish(self.RobotNode_cmdvel)
+                #return 0 for succesful finish
+                return 0
 
     """
      @function
@@ -299,79 +354,85 @@ class Entity:
     """
     def goto(self, x_coord, y_coord):
 
-        print("Current x pos = " + str(self.px))
-        print("Current y pos = " + str(self.py))
+        #try run the goto command
+        try:
+            print("Current x pos = " + str(self.px))
+            print("Current y pos = " + str(self.py))
 
-        if (abs(x_coord-self.px)<=0.3 and abs(y_coord-self.py)<=0.2 ):
-            print("Already at coordinate!")
-            return
+            if (abs(x_coord-self.px)<=0.3 and abs(y_coord-self.py)<=0.2 ):
+                print("Already at coordinate!")
+                return 0
 
-        x_difference = x_coord - self.px
-        y_difference = y_coord - self.py
+            x_difference = x_coord - self.px
+            y_difference = y_coord - self.py
 
-        print("Xdiff" + str(x_difference))
-        print("Ydiff" + str(y_difference))
+            print("Xdiff" + str(x_difference))
+            print("Ydiff" + str(y_difference))
 
-        #error tolerance
-        tol = 0.5
+            #error tolerance
+            tol = 0.5
 
-        if (x_difference<=-tol and y_difference<=-tol):
-            print(1)
-            if (x_difference<-tol):
-                self.face_direction("west")
-                self.move_forward(abs(x_difference))
-            if (y_difference<-tol):
-                self.face_direction("south")
-                self.move_forward(abs(y_difference))
-            return
-        elif (x_difference>=tol and y_difference>=tol):
-            print(2)
+            if (x_difference<=-tol and y_difference<=-tol):
+                print(1)
+                if (x_difference<-tol):
+                    self.face_direction("west")
+                    self.move_forward(abs(x_difference))
+                if (y_difference<-tol):
+                    self.face_direction("south")
+                    self.move_forward(abs(y_difference))
+                return 0
+            elif (x_difference>=tol and y_difference>=tol):
+                print(2)
+                if (x_difference>tol):
+                    self.face_direction("east")
+                    self.move_forward(abs(x_difference))
+                if (y_difference>tol):
+                    self.face_direction("north")
+                    self.move_forward(abs(y_difference))
+                return 0
+            elif (x_difference>=tol and y_difference<=-tol):
+                print(3)
+                if (x_difference>tol):
+                    self.face_direction("east")
+                    self.move_forward(abs(x_difference))
+                if (y_difference<-tol):
+                    self.face_direction("south")
+                    self.move_forward(abs(y_difference))
+                return 0
+            elif (x_difference<=-tol and y_difference>=tol):
+                print(4)
+                if (x_difference<-tol):
+                    self.face_direction("west")
+                    self.move_forward(abs(x_difference))
+                if (y_difference>tol):
+                    self.face_direction("north")
+                    self.move_forward(abs(y_difference))
+
             if (x_difference>tol):
+                print(5)
                 self.face_direction("east")
                 self.move_forward(abs(x_difference))
-            if (y_difference>tol):
-                self.face_direction("north")
-                self.move_forward(abs(y_difference))
-            return
-        elif (x_difference>=tol and y_difference<=-tol):
-            print(3)
-            if (x_difference>tol):
-                self.face_direction("east")
-                self.move_forward(abs(x_difference))
-            if (y_difference<-tol):
-                self.face_direction("south")
-                self.move_forward(abs(y_difference))
-            return
-        elif (x_difference<=-tol and y_difference>=tol):
-            print(4)
-            if (x_difference<-tol):
+                return 0
+            elif (x_difference<-tol):
+                print(6)
                 self.face_direction("west")
                 self.move_forward(abs(x_difference))
+                return 0
             if (y_difference>tol):
+                print(7)
                 self.face_direction("north")
                 self.move_forward(abs(y_difference))
-
-        if (x_difference>tol):
-            print(5)
-            self.face_direction("east")
-            self.move_forward(abs(x_difference))
-            return
-        elif (x_difference<-tol):
-            print(6)
-            self.face_direction("west")
-            self.move_forward(abs(x_difference))
-            return
-        if (y_difference>tol):
-            print(7)
-            self.face_direction("north")
-            self.move_forward(abs(y_difference))
-            return
-        elif (y_difference<-tol):
-            print(8)
-            self.face_direction("south")
-            self.move_forward(abs(y_difference))
-            return
-
+                return 0
+            elif (y_difference<-tol):
+                print(8)
+                self.face_direction("south")
+                self.move_forward(abs(y_difference))
+                return 0
+        except ActionInterruptException.ActionInterruptException as e:
+            print(e.message)
+            return 1
+        finally:
+            print("Arrived at destination:", self.px, self.py)
 
     """
     @function
@@ -445,3 +506,13 @@ class Entity:
             current_direction="east"
 
         return current_direction
+
+    """
+    @function
+
+    Stop the robot
+    """
+    def stop(self):
+        self.RobotNode_cmdvel.linear.x = 0.0
+
+
