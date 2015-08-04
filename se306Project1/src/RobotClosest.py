@@ -251,7 +251,12 @@ class Robot:
         self.goalx = gx
         self.goaly = gy
 
+    """
+    @function
 
+    Sets the x and y position of a robot into the other_robot array.
+    Uses the robot id as the position in the array
+    """
     def setOtherRobotPos(self, id, xpos, ypos):
         self.other_robots[int(id)] = xpos + "," + ypos
 
