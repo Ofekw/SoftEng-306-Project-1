@@ -36,9 +36,11 @@ def main():
     #moveAction = robot0._actions_[1], [40, 40]
     goToAction = robot0._actions_[1],[10,20]
     goToAction1 = robot0._actions_[1],[0,0]
+    goToAction2 = robot0._actions_[1],[10,5]
 
     robot0._actionsStack_.append(goToAction)
     robot0._actionsStack_.append(goToAction1)
+    robot0._actionsStack_.append(goToAction2)
 
 
     while not rospy.is_shutdown():
