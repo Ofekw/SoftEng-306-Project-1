@@ -33,8 +33,13 @@ def main():
     #You can use RobotNode_cmdvel to simulate movements, place them in the while loop to try it out
     #RobotNode_cmdvel = geometry_msgs.msg.Twist()
 
-    moveAction = robot0._actions_[1], [40, 40]
-    robot0._actionsStack_.append(moveAction)
+    #moveAction = robot0._actions_[1], [40, 40]
+    goToAction = robot0._actions_[1],[10,20]
+    goToAction1 = robot0._actions_[1],[0,0]
+
+    robot0._actionsStack_.append(goToAction)
+    robot0._actionsStack_.append(goToAction1)
+
 
     while not rospy.is_shutdown():
 
