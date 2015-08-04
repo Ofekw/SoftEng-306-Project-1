@@ -28,7 +28,7 @@ class Entity:
 
         #declaring the instance variables
         self.robot_id = 0
-        self.linearX = 0
+        self.linearX = 2
         self.angularZ = 0
         self.theta = 0
         self.px = x_off
@@ -101,8 +101,18 @@ class Entity:
 
     """
     @function
-    @parameter: int dist
+    @parameter: int velocity
 
+    Changes the self.linearX value to the specified velocity in m/s
+    """
+
+    def change_linear_x_to(self, velocity):
+        self.linearX = velocity
+
+
+    """
+    @function
+    @parameter: int dist
 
     Moves the Entity forward by a certain specified distance
     """
@@ -133,7 +143,7 @@ class Entity:
                 self.RobotNode_cmdvel.linear.x = 0.7
             else:
                 #Set forward velocity to 2.0m/s
-                self.RobotNode_cmdvel.linear.x = 2
+                self.RobotNode_cmdvel.linear.x = self.linearX
 
 
             #Publish the velocity change
