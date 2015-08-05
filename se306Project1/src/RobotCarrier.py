@@ -111,4 +111,4 @@ class RobotCarrier(Robot):
                     self.currentClosest = position
 
     def gotoRobotDemo(self):
-        self.goto(self.picker_robots[0].split(',')[0],self.picker_robots[0].split(',')[1])
+        self.goto(float(self.picker_robots[0].split(',')[0]), float(self.picker_robots[0].split(',')[1]))
