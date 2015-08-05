@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/python3.4
 
 import rospy
 from std_msgs.msg import*
@@ -9,7 +9,6 @@ from tf.transformations import *
 import math
 import ActionInterruptException
 import numpy.testing
-
 
 """
 @class
@@ -24,11 +23,21 @@ Can go forward and turn left or right or by a certain angle.
 """
 class Entity:
 
+    global Direction, Angle
+
+
+    def enum(**enums):
+        return type('Enum', (), enums)
+
+    Direction = enum(NORTH="north",EAST="east",SOUTH="south",WEST="west",LEFT="left",RIGHT="right")
+    Angle = enum(DEGREES="degrees",RADIANS="radians")
+
     def __init__(self,r_id,x_off,y_off):
+
 
         #declaring the instance variables
         self.robot_id = 0
-        self.linearX = 0
+        self.linearX = 2
         self.angularZ = 0
         self.theta = 0
         self.px = x_off
@@ -48,6 +57,8 @@ class Entity:
             2: self.turn,
             3: self.stop,
         }
+
+        #Enums for direction and angles
 
         self._actionsStack_ = []
 
@@ -105,8 +116,18 @@ class Entity:
 
     """
     @function
-    @parameter: int dist
+    @parameter: int velocity
 
+    Changes the self.linearX value to the specified velocity in m/s
+    """
+
+    def change_linear_x_to(self, velocity):
+        self.linearX = velocity
+
+
+    """
+    @function
+    @parameter: int dist
 
     Moves the Entity forward by a certain specified distance
     """
@@ -137,7 +158,7 @@ class Entity:
                 self.RobotNode_cmdvel.linear.x = 0.7
             else:
                 #Set forward velocity to 2.0m/s
-                self.RobotNode_cmdvel.linear.x = 2
+                self.RobotNode_cmdvel.linear.x = self.linearX
 
 
             #Publish the velocity change
@@ -158,14 +179,14 @@ class Entity:
 
 
         if self._stopCurrentAction_ == True:
-                raise ActionInterruptException.ActionInterruptException("Wall hit")
+            raise ActionInterruptException.ActionInterruptException("Wall hit")
         else:
-                #Stop robot by setting forward velocity to 0 and then publish change
-                self.RobotNode_cmdvel.linear.x = 0
-                self.RobotNode_stage_pub.publish(self.RobotNode_cmdvel)
-                #return 0 for succesful finish
-                #set action running tracker to false as method finished
-                return 0
+            #Stop robot by setting forward velocity to 0 and then publish change
+            self.RobotNode_cmdvel.linear.x = 0
+            self.RobotNode_stage_pub.publish(self.RobotNode_cmdvel)
+            #return 0 for succesful finish
+            #set action running tracker to false as method finished
+            return 0
 
 
     """
@@ -180,12 +201,12 @@ class Entity:
         pi = math.pi
 
 
-        if (direction == "left"):
+        if (direction == Direction.LEFT):
             thetaTarg = self.theta + pi/2
             dir = 1
             if (thetaTarg > pi):
                 thetaTarg = - pi + (thetaTarg - pi)
-        elif (direction == "right"):
+        elif (direction == Direction.RIGHT):
             thetaTarg = self.theta - pi/2
             dir = -1
             if (thetaTarg < -pi):
@@ -209,13 +230,13 @@ class Entity:
             #print("Turning " + direction + " current theta is " + str(self.theta) +", target theta is " + str(thetaTarg))
 
         if self._stopCurrentAction_ == True:
-                raise ActionInterruptException.ActionInterruptException("Wall hit")
+            raise ActionInterruptException.ActionInterruptException("Wall hit")
         else:
-                #Stop robot by setting forward velocity to 0 and then publish change
-                self.RobotNode_cmdvel.angular.z = 0
-                self.RobotNode_stage_pub.publish(self.RobotNode_cmdvel)
-                #return 0 for succesful finish
-                return 0
+            #Stop robot by setting forward velocity to 0 and then publish change
+            self.RobotNode_cmdvel.angular.z = 0
+            self.RobotNode_stage_pub.publish(self.RobotNode_cmdvel)
+            #return 0 for succesful finish
+            return 0
 
 
 
@@ -236,7 +257,7 @@ class Entity:
             dir = 1
         pi=math.pi
         #convert degrees to radians
-        if (angle_type=="degrees"):
+        if (angle_type==Angle.DEGREES):
             angle_in_radians = (math.pi/180) *angle
         else:
             angle_in_radians=angle
@@ -267,13 +288,13 @@ class Entity:
             print("Rotating - current theta is " + str(self.theta) +", target theta is " + str(thetaTarg))
 
         if self._stopCurrentAction_ == True:
-                raise ActionInterruptException.ActionInterruptException("Wall hit")
+            raise ActionInterruptException.ActionInterruptException("Wall hit")
         else:
-                #Stop robot by setting forward velocity to 0 and then publish change
-                self.RobotNode_cmdvel.angular.z = 0
-                self.RobotNode_stage_pub.publish(self.RobotNode_cmdvel)
-                #return 0 for succesful finish
-                return 0
+            #Stop robot by setting forward velocity to 0 and then publish change
+            self.RobotNode_cmdvel.angular.z = 0
+            self.RobotNode_stage_pub.publish(self.RobotNode_cmdvel)
+            #return 0 for succesful finish
+            return 0
 
     """
      @function
@@ -293,37 +314,37 @@ class Entity:
 
         if (current_direction== direction_to_face):
             return
-        elif (current_direction=="north"):
-            if (direction_to_face=="east"):
-                self.turn("right")
-            elif(direction_to_face=="south"):
-                self.rotate_relative(180, "degrees")
-            elif(direction_to_face=="west"):
-                self.turn("left")
+        elif (current_direction==Direction.NORTH):
+            if (direction_to_face==Direction.EAST):
+                self.turn(Direction.RIGHT)
+            elif(direction_to_face==Direction.SOUTH):
+                self.rotate_relative(180, Angle.DEGREES)
+            elif(direction_to_face==Direction.WEST):
+                self.turn(Direction.LEFT)
             self.correct_theta()
-        elif (current_direction=="east"):
-            if (direction_to_face=="north"):
-                self.turn("left")
-            elif(direction_to_face=="south"):
-                self.turn("right")
-            elif(direction_to_face=="west"):
-                self.rotate_relative(180,"degrees")
+        elif (current_direction==Direction.EAST):
+            if (direction_to_face==Direction.NORTH):
+                self.turn(Direction.LEFT)
+            elif(direction_to_face==Direction.SOUTH):
+                self.turn(Direction.RIGHT)
+            elif(direction_to_face==Direction.WEST):
+                self.rotate_relative(180,Angle.DEGREES)
             self.correct_theta()
-        elif (current_direction=="south"):
-            if (direction_to_face=="east"):
-                self.turn("left")
-            elif(direction_to_face=="north"):
-                self.rotate_relative(180,"degrees")
-            elif(direction_to_face=="west"):
-                self.turn("right")
+        elif (current_direction==Direction.SOUTH):
+            if (direction_to_face==Direction.EAST):
+                self.turn(Direction.LEFT)
+            elif(direction_to_face==Direction.NORTH):
+                self.rotate_relative(180,Angle.DEGREES)
+            elif(direction_to_face==Direction.WEST):
+                self.turn(Direction.RIGHT)
             self.correct_theta()
-        elif (current_direction=="west"):
-            if (direction_to_face=="east"):
-                self.rotate_relative(180,"degrees")
-            elif(direction_to_face=="south"):
-                self.turn("left")
-            elif(direction_to_face=="north"):
-                self.turn("right")
+        elif (current_direction==Direction.WEST):
+            if (direction_to_face==Direction.EAST):
+                self.rotate_relative(180,Angle.DEGREES)
+            elif(direction_to_face==Direction.SOUTH):
+                self.turn(Direction.LEFT)
+            elif(direction_to_face==Direction.NORTH):
+                self.turn(Direction.RIGHT)
             self.correct_theta()
         else:
             print("Error: Face Direction")
@@ -367,66 +388,52 @@ class Entity:
             tol = 0.5
 
             if (x_difference<=-tol and y_difference<=-tol):
-                print(1)
                 if (x_difference<-tol):
-                    self.face_direction("west")
+                    self.face_direction(Direction.WEST)
                     self.move_forward(abs(x_difference))
                 if (y_difference<-tol):
-                    self.face_direction("south")
+                    self.face_direction(Direction.SOUTH)
                     self.move_forward(abs(y_difference))
-                return 0
             elif (x_difference>=tol and y_difference>=tol):
-                print(2)
                 if (x_difference>tol):
-                    self.face_direction("east")
+                    self.face_direction(Direction.EAST)
                     self.move_forward(abs(x_difference))
                 if (y_difference>tol):
-                    self.face_direction("north")
+                    self.face_direction(Direction.NORTH)
                     self.move_forward(abs(y_difference))
-                return 0
             elif (x_difference>=tol and y_difference<=-tol):
-                print(3)
                 if (x_difference>tol):
-                    self.face_direction("east")
+                    self.face_direction(Direction.EAST)
                     self.move_forward(abs(x_difference))
                 if (y_difference<-tol):
-                    self.face_direction("south")
+                    self.face_direction(Direction.SOUTH)
                     self.move_forward(abs(y_difference))
-                return 0
             elif (x_difference<=-tol and y_difference>=tol):
-                print(4)
                 if (x_difference<-tol):
-                    self.face_direction("west")
+                    self.face_direction(Direction.WEST)
                     self.move_forward(abs(x_difference))
                 if (y_difference>tol):
-                    self.face_direction("north")
+                    self.face_direction(Direction.NORTH)
                     self.move_forward(abs(y_difference))
 
             if (x_difference>tol):
-                print(5)
-                self.face_direction("east")
+                self.face_direction(Direction.EAST)
                 self.move_forward(abs(x_difference))
-                return 0
             elif (x_difference<-tol):
-                print(6)
-                self.face_direction("west")
+                self.face_direction(Direction.WEST)
                 self.move_forward(abs(x_difference))
-                return 0
             if (y_difference>tol):
-                print(7)
-                self.face_direction("north")
+                self.face_direction(Direction.NORTH)
                 self.move_forward(abs(y_difference))
-                return 0
             elif (y_difference<-tol):
-                print(8)
-                self.face_direction("south")
+                self.face_direction(Direction.SOUTH)
                 self.move_forward(abs(y_difference))
-                return 0
         except ActionInterruptException.ActionInterruptException as e:
             print(e.message)
             return 1
         finally:
             print("Arrived at destination:", self.px, self.py)
+            return 0
 
     """
     @function
@@ -438,13 +445,13 @@ class Entity:
     """
     def get_current_direction(self):
         if(abs(self.theta- math.pi/2)<=0.1):
-            current_direction = "north"
+            current_direction = Direction.NORTH
         elif (abs(self.theta-0)<=0.1):
-            current_direction = "east"
+            current_direction = Direction.EAST
         elif (abs(self.theta+math.pi/2)<=0.1):
-            current_direction = "south"
+            current_direction = Direction.SOUTH
         elif (abs(self.theta- math.pi)<=0.1 or abs(self.theta+math.pi)<=0.1):
-            current_direction = "west"
+            current_direction = Direction.WEST
         else:
             print("Current direction not one of the four cardinal directions")
             current_direction = self.correct_theta()
@@ -478,26 +485,21 @@ class Entity:
     def correct_theta(self):
         current_direction="NoDirect"
         if (abs(self.theta-math.pi/2)<=0.4):
-            print("North")
-            self.rotate_relative(math.pi/2-self.theta,"radians")
-            current_direction="north"
+            self.rotate_relative(math.pi/2-self.theta,Angle.RADIANS)
+            current_direction=Direction.NORTH
         elif (abs(self.theta- math.pi)<=0.4 ):
-            print("west")
-            self.rotate_relative(math.pi-self.theta,"radians")
-            current_direction="west"
+            self.rotate_relative(math.pi-self.theta,Angle.RADIANS)
+            current_direction=Direction.WEST
         elif (abs(self.theta+math.pi)<=0.4):
-            print("west")
-            self.rotate_relative(-math.pi-self.theta,"radians")
-            current_direction="west"
+            self.rotate_relative(-math.pi-self.theta,Angle.RADIANS)
+            current_direction=Direction.WEST
         elif (abs(self.theta+math.pi/2)<=0.4):
-            print("south")
             print("Diff" + str(math.pi/2+self.theta))
-            self.rotate_relative(-math.pi/2-self.theta,"radians")
-            current_direction="south"
+            self.rotate_relative(-math.pi/2-self.theta,Angle.RADIANS)
+            current_direction=Direction.SOUTH
         elif (abs(self.theta-0)<=0.4):
-            print("east")
-            self.rotate_relative(-self.theta,"radians")
-            current_direction="east"
+            self.rotate_relative(-self.theta,Angle.RADIANS)
+            current_direction=Direction.EAST
 
         return current_direction
 
@@ -508,5 +510,6 @@ class Entity:
     """
     def stop(self):
         self.RobotNode_cmdvel.linear.x = 0.0
+
 
 
