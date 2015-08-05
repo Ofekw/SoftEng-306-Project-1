@@ -21,7 +21,7 @@ def main():
     #Construction of Robot objects take 3 params... Robot ID, Start X, Start Y. Start X and Start Y correlates to the myworld.world file
     #Can't create more than one robot per main() .... ie can't run more than one robot per terminal running
 
-    robot0 = RobotPicker(0,-20,-28)
+    robot0 = RobotPicker(0,-20,-28, 0)
 
     rospy.Rate(100)
     rospy.sleep(0.1)

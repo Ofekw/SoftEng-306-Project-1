@@ -19,13 +19,13 @@ It inherits from the Robot class.
 """
 class RobotPicker(Robot):
 
-    def __init__(self,r_id,x_off,y_off):
+    def __init__(self,r_id,x_off,y_off,theta_off):
         global picker_pub
         picker_pub = rospy.Publisher("pickerPosition",String, queue_size=10)
 
         self.max_load = 20;
         self.current_load = 0;
-        Robot.__init__(self,r_id,x_off,y_off)
+        Robot.__init__(self,r_id,x_off,y_off,theta_off)
 
     def robot_specific_function(self):
         pass

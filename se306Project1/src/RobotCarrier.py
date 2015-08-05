@@ -19,7 +19,7 @@ It inherits from the Entity class.
 """
 class RobotCarrier(Robot):
 
-    def __init__(self,r_id,x_off,y_off):
+    def __init__(self,r_id,x_off,y_off,theta_off):
         global carrier_pub
         carrier_pub = rospy.Publisher("carrierPosition",String, queue_size=10)
         self.carrier_sub = rospy.Subscriber("carrierPosition", String, self.carrierCallback)
@@ -31,7 +31,7 @@ class RobotCarrier(Robot):
 
         self.max_load = 100;
         self.current_load = 0;
-        Robot.__init__(self,r_id,x_off,y_off)
+        Robot.__init__(self,r_id,x_off,y_off,theta_off)
 
         self._actions_ = {
             0: self.move_forward,
