@@ -31,7 +31,8 @@ class Robot:
         self.robot_node_identifier = ("robot_"+ str(r_id))
 
         # Possibly fill array from a config file with id being the position and the element being the position
-        self.other_robots = []
+        self.other_robots = ["0,0", "0,0", "0,0"]
+        self.currentClosest = "1000,1000"
 
         #Node Initiation
         rospy.init_node(self.robot_node_name)
@@ -263,19 +264,16 @@ class Robot:
     """
     @function
 
-    Fuction which gets the closest position out of an array of robot positions
+    Gets the closest robot out of the array of robots
     """
     def getClosest(self):
-        current = "10000,10000"
         for index, position in enumerate(self.other_robots):
-            print("index" + str(index) + ") Current closest " + current)
+            current = self.currentClosest
             if (self.robot_id != index):
-                currentDist = self.getDist(int(current.split(',')[0]), int(current.split(',')[1]))
-                newDist = self.getDist(int(position.split(',')[0]), int(position.split(',')[1]))
+                currentDist = self.getDist(float(current.split(',')[0]), float(current.split(',')[1]))
+                newDist = self.getDist(float(position.split(',')[0]), float(position.split(',')[1]))
                 if (newDist < currentDist):
-                    current = position
-                    print("index" + str(index) + ") new closest at " + current)
-
+                    self.currentClosest = position
 
 """
 @MAIN
