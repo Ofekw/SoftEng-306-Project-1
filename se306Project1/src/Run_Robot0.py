@@ -21,7 +21,7 @@ def main():
     #Construction of Robot objects take 3 params... Robot ID, Start X, Start Y. Start X and Start Y correlates to the myworld.world file
     #Can't create more than one robot per main() .... ie can't run more than one robot per terminal running
 
-    robot0 = Robot(0,0,0)
+    robot0 = Robot(0, 0, 0, math.pi/2)
 
     rospy.Rate(100)
     rospy.sleep(0.1)
@@ -34,13 +34,9 @@ def main():
     #RobotNode_cmdvel = geometry_msgs.msg.Twist()
 
     #moveAction = robot0._actions_[1], [40, 40]
-    goToAction = robot0._actions_[1],[10,20]
-    goToAction1 = robot0._actions_[1],[0,0]
-    goToAction2 = robot0._actions_[1],[10,5]
+    goToAction = robot0._actions_[1],[5,5]
 
     robot0._actionsStack_.append(goToAction)
-    robot0._actionsStack_.append(goToAction1)
-    robot0._actionsStack_.append(goToAction2)
 
 
     while not rospy.is_shutdown():
