@@ -33,6 +33,7 @@ def main():
     #You can use RobotNode_cmdvel to simulate movements, place them in the while loop to try it out
     #RobotNode_cmdvel = geometry_msgs.msg.Twist()
 
+    # Add action here to go to position 1
     moveAction = robot0._actions_[1], [ 40, 40]
     robot0._actionsStack_.append(moveAction)
 

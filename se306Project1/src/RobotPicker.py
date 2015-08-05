@@ -20,8 +20,8 @@ It inherits from the Robot class.
 class RobotPicker(Robot):
 
     def __init__(self,r_id,x_off,y_off):
-        global com_pub
-        com_pub = rospy.Publisher("pickerPosition",String, queue_size=10)
+        global picker_pub
+        picker_pub = rospy.Publisher("pickerPosition",String, queue_size=10)
 
         self.max_load = 20;
         self.current_load = 0;
@@ -49,8 +49,8 @@ class RobotPicker(Robot):
         ypos = str(self.py)
         #com_pub.publish("\n" + rospy.get_caller_id() +  " is at position x: " + xpos + "\nposition y: " + ypos)
 
-        com_pub.publish(str(self.robot_id) + "," + xpos + "," + ypos+ "," + str(self.theta))
-        print(str(self.robot_id) + "," + xpos + "," + ypos+ "," + str(self.theta))
+        picker_pub.publish(str(self.robot_id) + "," + xpos + "," + ypos+ "," + str(self.theta))
+        print("I have sent " + str(self.robot_id) + "," + xpos + "," + ypos+ "," + str(self.theta))
 
         #rospy.loginfo("Current x position: %f" , self.px)
         #rospy.loginfo("Current y position: %f", self.py)

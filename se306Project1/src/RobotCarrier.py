@@ -20,11 +20,12 @@ It inherits from the Entity class.
 class RobotCarrier(Robot):
 
     def __init__(self,r_id,x_off,y_off):
-        global com_pub
-        com_pub = rospy.Publisher("carrierPosition",String, queue_size=10)
+        global carrier_pub
+        carrier_pub = rospy.Publisher("carrierPosition",String, queue_size=10)
         self.carrier_sub = rospy.Subscriber("carrierPosition", String, self.carrierCallback)
         self.picker_sub = rospy.Subscriber("pickerPosition", String, self.pickerCallback)
 
+        self.currentClosest = "100,100"
         self.carrier_robots = ["0,0","0,0"]
         self.picker_robots = ["0,0","0,0"]
 
@@ -62,8 +63,9 @@ class RobotCarrier(Robot):
         ypos = str(self.py)
         #com_pub.publish("\n" + rospy.get_caller_id() +  " is at position x: " + xpos + "\nposition y: " + ypos)
 
-        com_pub.publish(str(self.robot_id) + "," + xpos + "," + ypos+ "," + str(self.theta))
-        print(str(self.robot_id) + "," + xpos + "," + ypos+ "," + str(self.theta))
+        carrier_pub.publish(str(self.robot_id) + "," + xpos + "," + ypos+ "," + str(self.theta))
+        # print("I have sent " + str(self.robot_id) + "," + xpos + "," + ypos+ "," + str(self.theta))
+        print("I am at " + xpos + "," + ypos)
 
         #rospy.loginfo("Current x position: %f" , self.px)
         #rospy.loginfo("Current y position: %f", self.py)
@@ -76,8 +78,10 @@ class RobotCarrier(Robot):
     Displays info sent from another robot --- used for debugging
     """
     def carrierCallback(self, message):
-        print("Sending position " + message.data.split(',')[1] + "," + message.data.split(',')[2])
+        # print("Carrier callback position " + message.data.split(',')[1] + "," + message.data.split(',')[2])
         self.carrier_robots[int(message.data.split(',')[0])] = message.data.split(',')[1] + "," + message.data.split(',')[2]  # Should add element 3 here which is theta
+        print("Carrier array")
+        print ', '.join(self.carrier_robots)
 
     """
     @function
@@ -86,24 +90,25 @@ class RobotCarrier(Robot):
     Displays info sent from another robot --- used for debugging
     """
     def pickerCallback(self, message):
-        print("Sending position " + message.data.split(',')[1] + "," + message.data.split(',')[2])
+        # print("Picker callback position " + message.data.split(',')[1] + "," + message.data.split(',')[2])
         self.picker_robots[int(message.data.split(',')[0])] = message.data.split(',')[1] + "," + message.data.split(',')[2]  # Should add element 3 here which is theta
+        print("Picker array")
+        print ', '.join(self.picker_robots)
+
 
     """
     @function
 
-    Fuction which gets the closest position out of an array of robot positions
+    Gets the closest robot out of the array of robots
     """
     def getClosest(self):
-        current = "10000,10000"
-        for index, position in enumerate(self.other_robots):
-            print("index" + str(index) + ") Current closest " + current)
+        for index, position in enumerate(self.picker_robots):
+            current = self.currentClosest
             if (self.robot_id != index):
-                currentDist = self.getDist(int(current.split(',')[0]), int(current.split(',')[1]))
-                newDist = self.getDist(int(position.split(',')[0]), int(position.split(',')[1]))
+                currentDist = self.getDist(float(current.split(',')[0]), float(current.split(',')[1]))
+                newDist = self.getDist(float(position.split(',')[0]), float(position.split(',')[1]))
                 if (newDist < currentDist):
-                    current = position
-                    print("index" + str(index) + ") new closest at " + current)
+                    self.currentClosest = position
 
     def gotoRobotDemo(self):
         self.goto(self.picker_robots[0].split(',')[0],self.picker_robots[0].split(',')[1])
