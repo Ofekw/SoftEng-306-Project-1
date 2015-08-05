@@ -32,14 +32,14 @@ class Entity:
     Direction = enum(NORTH="north",EAST="east",SOUTH="south",WEST="west",LEFT="left",RIGHT="right")
     Angle = enum(DEGREES="degrees",RADIANS="radians")
 
-    def __init__(self,r_id,x_off,y_off):
+    def __init__(self,r_id,x_off,y_off, theta_off):
 
 
         #declaring the instance variables
         self.robot_id = 0
         self.linearX = 2
         self.angularZ = 0
-        self.theta = 0
+        self.theta = theta_off
         self.px = x_off
         self.py = y_off
         self.robot_id = r_id
@@ -94,7 +94,7 @@ class Entity:
 
         #rospy.loginfo("Current x position: %f" , self.px)
         #rospy.loginfo("Current y position: %f", self.py)
-        #rospy.loginfo("Current theta: %f", self.theta)
+        rospy.loginfo("Current theta: %f", self.theta)
 
 
     def StageLaser_callback(self, msg):
