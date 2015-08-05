@@ -35,10 +35,17 @@ class Entity:
     def __init__(self,r_id,x_off,y_off, theta_off):
 
 
+
         #declaring the instance variables
         self.robot_id = 0
         self.linearX = 2
         self.angularZ = 0
+
+        #initial pose of the robot
+        self.init_theta = theta_off
+        self.init_x = x_off
+        self.init_y = y_off
+
         self.theta = theta_off
         self.px = x_off
         self.py = y_off
@@ -85,12 +92,12 @@ class Entity:
     """
     def StageOdom_callback(self,msg):
 
-        self.px = msg.pose.pose.position.x
-        self.py = msg.pose.pose.position.y
+        self.px = self.init_x + msg.pose.pose.position.x
+        self.py = self.init_y + msg.pose.pose.position.y
 
         (roll, pitch, yaw) = euler_from_quaternion((msg.pose.pose.orientation.x, msg.pose.pose.orientation.y, msg.pose.pose.orientation.z, msg.pose.pose.orientation.w))
 
-        self.theta = yaw
+        self.theta = self.init_theta + yaw
 
         #rospy.loginfo("Current x position: %f" , self.px)
         #rospy.loginfo("Current y position: %f", self.py)

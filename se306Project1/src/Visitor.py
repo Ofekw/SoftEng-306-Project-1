@@ -20,8 +20,8 @@ of random movement around the orchard.
 
 class Visitor(Human):
 
-    def __init__(self, r_id, x_off, y_off):
-        Human.__init__(self, r_id, x_off, y_off)
+    def __init__(self, r_id, x_off, y_off, theta_offset):
+        Human.__init__(self, r_id, x_off, y_off, theta_offset)
 
     """
     @function
