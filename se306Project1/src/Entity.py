@@ -86,7 +86,8 @@ class Entity:
         self.RobotNode_odom = geometry_msgs.msg.Pose2D()
 
         self.StageLaser_sub = rospy.Subscriber(self.robot_node_identifier+"/base_scan",sensor_msgs.msg.LaserScan,self.StageLaser_callback)
-        self.StageLaser_sub = rospy.Subscriber
+        #self.StageLaser_sub = rospy.Subscriber
+        self.ReadLaser = False
 
     """
     @function
@@ -105,10 +106,18 @@ class Entity:
 
         #rospy.loginfo("Current x position: %f" , self.px)
         #rospy.loginfo("Current y position: %f", self.py)
-        rospy.loginfo("Current theta: %f", self.theta)
+        #rospy.loginfo("Current theta: %f", self.theta)
 
 
     def StageLaser_callback(self, msg):
+
+
+        if  not self.ReadLaser:
+            self.ReadLaser = True
+            return
+        else:
+            self.ReadLaser = False
+
         barCount = 0
         found = False
 
@@ -120,6 +129,10 @@ class Entity:
             self._stopCurrentAction_ = True
             #    self._actionsStack_.append(action)
             #rospy.loginfo("Range at %f degree is: %f", i, msg.ranges[i])
+        else:
+            self._stopCurrentAction_ = False
+
+        print self._stopCurrentAction_
 
     """
     @function
@@ -152,8 +165,9 @@ class Entity:
         previousY = self.py
 
 
+        print "STARTED~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
         #While the distance that the Entity has gained has not exceeded the given distance, continue to move the Entity forward
-        while (dist_gained < dist and not (self._stopCurrentAction_)):
+        while (dist_gained < dist and not (self._stopCurrentAction_)) and not self._stopCurrentAction_:
 
             #Calculate remaining distance to travel
             distToGo = dist - dist_gained
@@ -182,11 +196,12 @@ class Entity:
             dist_gained = math.sqrt(xDiff * xDiff + yDiff * yDiff)
 
             print("Moving Forward: " + str(distToGo) + "m to go")
-            print("Current x pos = " + str(self.px) +"," +str(self.py))
+            print("Current x pos = " + str(self.px) + "," +str(self.py))
 
 
         if self._stopCurrentAction_ == True:
-            raise ActionInterruptException.ActionInterruptException("Wall hit")
+            #raise ActionInterruptException.ActionInterruptException("Wall hit")
+            return 2
         else:
             #Stop robot by setting forward velocity to 0 and then publish change
             self.RobotNode_cmdvel.linear.x = 0

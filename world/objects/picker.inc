@@ -27,7 +27,7 @@ define picker position
   size [2.35 2.5 1.5]
   #origin [-0.25 -0.25 0 0 ]
 
-  mylaser(pose [ 0.000 0.000 0 0.000 ])
+  mylaser(pose [ 0.000 0.000 -1.0 0.000 ])
   velocity_bounds [-1000 1000 -1000 1000 -1000 1000 -90 90 ]
 
   # body bottom
