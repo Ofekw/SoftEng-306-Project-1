@@ -91,13 +91,32 @@ class Entity:
         found = False
 
         #for i in range(0,180):
-        if msg.ranges[90] < 5.0:
-            #action = self._actions_[2], [self, "left"]
+
+        for i in range(70, 110):
+            if msg.ranges[i]< 4.0:
+                action = self._actions_[2], ["right"]
+                #check if action already exists in stack, otherwise laser will spam rotates
+                if action != self._actionsStack_[-1]:
+                    print("adding right to stack")
+                    #stop moving foward and add turn action
+                    self._stopCurrentAction_ = True
+                    self._actionsStack_.append(action)
+        #check that all lasers in 0-20 range are not hitting object
+        rangeHitting = False
+        for i in range(160,180):
+            if msg.ranges[i] < 5.0:
+                rangeHitting = True
+
+        if not rangeHitting:
+            print("No Wall Left")
+            action = self._actions_[2], ["left"]
             #check if action already exists in stack, otherwise laser will spam rotates
-            #if action != self._actionsStack_[-1]:
-            self._stopCurrentAction_ = True
-            #    self._actionsStack_.append(action)
-            #rospy.loginfo("Range at %f degree is: %f", i, msg.ranges[i])
+            if action != self._actionsStack_[-1]:
+                #stop moving foward and add turn action
+                self._stopCurrentAction_ = True
+                self._actionsStack_.append(action)
+        else:
+            print("Wall Left")
 
     """
     @function
@@ -154,7 +173,11 @@ class Entity:
 
 
         if self._stopCurrentAction_ == True:
-                raise ActionInterruptException.ActionInterruptException("Wall hit")
+                #stop movement and throw exception
+                self.RobotNode_cmdvel.linear.x = 0
+                self.RobotNode_stage_pub.publish(self.RobotNode_cmdvel)
+                self._stopCurrentAction_ = False
+                raise ActionInterruptException.ActionInterruptException("Move Interrupted")
         else:
                 #Stop robot by setting forward velocity to 0 and then publish change
                 self.RobotNode_cmdvel.linear.x = 0
@@ -205,6 +228,7 @@ class Entity:
             #print("Turning " + direction + " current theta is " + str(self.theta) +", target theta is " + str(thetaTarg))
 
         if self._stopCurrentAction_ == True:
+                self._stopCurrentAction_ = False
                 raise ActionInterruptException.ActionInterruptException("Wall hit")
         else:
                 #Stop robot by setting forward velocity to 0 and then publish change
@@ -263,6 +287,7 @@ class Entity:
             print("Rotating - current theta is " + str(self.theta) +", target theta is " + str(thetaTarg))
 
         if self._stopCurrentAction_ == True:
+                self._stopCurrentAction_ = False
                 raise ActionInterruptException.ActionInterruptException("Wall hit")
         else:
                 #Stop robot by setting forward velocity to 0 and then publish change
