@@ -96,17 +96,65 @@ class Entity:
     """
     def StageOdom_callback(self,msg):
 
-        self.px = self.init_x + msg.pose.pose.position.x
-        self.py = self.init_y + msg.pose.pose.position.y
+        #Update the px and py values
+        self.update_position(msg.pose.pose.position.x, msg.pose.pose.position.y)
 
+        #Find the yaw from the quaternion values
         (roll, pitch, yaw) = euler_from_quaternion((msg.pose.pose.orientation.x, msg.pose.pose.orientation.y, msg.pose.pose.orientation.z, msg.pose.pose.orientation.w))
 
+        #Update the current theta vlue
         self.theta = self.init_theta + yaw
 
-        #rospy.loginfo("Current x position: %f" , self.px)
-        #rospy.loginfo("Current y position: %f", self.py)
+        rospy.loginfo("Current x position: %f" , self.px)
+        rospy.loginfo("Current y position: %f", self.py)
         rospy.loginfo("Current theta: %f", self.theta)
 
+    """
+    @function
+    @parameter: float x, float y
+
+    This function is used by the StageOdom_callback function to update the current px and py values. The paremeters passed
+    are the values given by the odom/msg.pose.pose.position values
+
+    """
+    def update_position(self, x, y):
+        """
+        This section of code calculates the absolute change in x and y positions, by combining the x and y components of
+        the given x and y displacements.
+        """
+
+        #Set x_theta to the initial theta. x_theta will be used to calculate the absolute x component of the given x and y displacements
+        x_theta = abs(self.init_theta)
+
+        #Keep track of what x_theta was initially set to
+        x_theta_init = x_theta
+
+        #If the entity is initally facing towards the west, then change the x_theta value to be the difference between pi and x_theta
+        if (abs(x_theta) > math.pi/2):
+            x_theta = math.pi - x_theta
+
+        #Set the y_theta variable, which is used to calculate the absolute y component of the given x and y displacements
+        y_theta = math.pi/2 - self.init_theta
+
+        #Calculate the overall change in x position by subtracting the x component of the y displacement from the x component of the
+        #x displacement
+        change_in_x = x * math.cos(x_theta) - y * math.cos(y_theta)
+
+        #If the entity was initially facing westerly, then the overall change in x position will need to subtract the x component of the
+        #x displacement as well
+        if (x_theta_init > math.pi/2):
+            change_in_x = - x * math.cos(x_theta) - y * math.cos(y_theta)
+
+        #Calculate the overall change in y position by adding both the y component of the x and y displacements
+        change_in_y = x * math.sin(x_theta) + y * math.sin(y_theta)
+
+        #If the entity was initially facing southerly, then the y component of the x displacement will need to be subtracted
+        if (self.init_theta < 0):
+            change_in_y = - x * math.sin(x_theta) + y * math.sin(y_theta)
+
+        #Update the current px and py values
+        self.px = self.init_x + change_in_x
+        self.py = self.init_y + change_in_y
 
     def StageLaser_callback(self, msg):
         barCount = 0
