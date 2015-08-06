@@ -57,6 +57,10 @@ class Entity:
         self.goalx = self.px
         self.goaly = self.py
 
+        #Used to determine how long we've waited for an element to pass by, if exceeds a threshold
+        #we will know it is a static element and we need to do something different
+        self.halt_counter = 0
+
         #array of methods of robot actions
         self._actions_ = {
             0: self.move_forward,
@@ -111,28 +115,39 @@ class Entity:
 
     def StageLaser_callback(self, msg):
 
+        #for some reason, ros is passing a value of 5 back every second call regardless if anything
+        #is in front of it, this bit of code is just to ignore that random value its passing through
 
-        if  not self.ReadLaser:
+        print msg.ranges[90]
+        if not self.ReadLaser:
             self.ReadLaser = True
             return
         else:
             self.ReadLaser = False
 
+        print "Reading : " + str(msg.ranges[90])
         barCount = 0
         found = False
 
         #for i in range(0,180):
-        if msg.ranges[90] < 5.0:
+        if msg.ranges[90] < 4.0:
             #action = self._actions_[2], [self, "left"]
             #check if action already exists in stack, otherwise laser will spam rotates
             #if action != self._actionsStack_[-1]:
             self._stopCurrentAction_ = True
+            self.halt_counter += 1
             #    self._actionsStack_.append(action)
             #rospy.loginfo("Range at %f degree is: %f", i, msg.ranges[i])
         else:
+            self.halt_counter = 0
             self._stopCurrentAction_ = False
 
-        print self._stopCurrentAction_
+        if self.halt_counter > 50:
+            print "ENCOUNTERED STATIC ELEMENT!!!!"
+        elif self.halt_counter > 30:
+            print "Checking if Entity in front is a static element..."
+
+        #print self._stopCurrentAction_
 
     """
     @function
@@ -165,7 +180,7 @@ class Entity:
         previousY = self.py
 
 
-        print "STARTED~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+        print "Moving Forward"
         #While the distance that the Entity has gained has not exceeded the given distance, continue to move the Entity forward
         while (dist_gained < dist and not (self._stopCurrentAction_)) and not self._stopCurrentAction_:
 
@@ -195,12 +210,13 @@ class Entity:
             #Find the distance gained by calculating sqrt(xDiff^2 + yDiff^2)
             dist_gained = math.sqrt(xDiff * xDiff + yDiff * yDiff)
 
-            print("Moving Forward: " + str(distToGo) + "m to go")
-            print("Current x pos = " + str(self.px) + "," +str(self.py))
+            #print("Moving Forward: " + str(distToGo) + "m to go")
+            #print("Current x pos = " + str(self.px) + "," +str(self.py))
 
 
         if self._stopCurrentAction_ == True:
             #raise ActionInterruptException.ActionInterruptException("Wall hit")
+            print "Move Forward: Stopped due to potential collision"
             return 2
         else:
             #Stop robot by setting forward velocity to 0 and then publish change
@@ -234,7 +250,7 @@ class Entity:
             if (thetaTarg < -pi):
                 thetaTarg = pi + (thetaTarg + pi)
 
-        while (abs(self.theta - thetaTarg) > 0.01 and not (self._stopCurrentAction_)):
+        while (abs(self.theta - thetaTarg) > 0.01):
             thetaDiff = abs(self.theta - thetaTarg)
 
             #Set the angular velocity to optimal values that don't overshoot pi/2
@@ -252,7 +268,8 @@ class Entity:
             #print("Turning " + direction + " current theta is " + str(self.theta) +", target theta is " + str(thetaTarg))
 
         if self._stopCurrentAction_ == True:
-            raise ActionInterruptException.ActionInterruptException("Wall hit")
+            #raise ActionInterruptException.ActionInterruptException("Wall hit")
+            return 2
         else:
             #Stop robot by setting forward velocity to 0 and then publish change
             self.RobotNode_cmdvel.angular.z = 0
@@ -307,7 +324,7 @@ class Entity:
 
             rospy.sleep(0.0001)
 
-            print("Rotating - current theta is " + str(self.theta) +", target theta is " + str(thetaTarg))
+            #print("Rotating - current theta is " + str(self.theta) +", target theta is " + str(thetaTarg))
 
         if self._stopCurrentAction_ == True:
             raise ActionInterruptException.ActionInterruptException("Wall hit")
@@ -390,7 +407,7 @@ class Entity:
     A----------------------|
     """
     def goto(self, x_coord, y_coord):
-
+        print "Going To : ("+str(x_coord)+","+str(y_coord)+")"
         #try run the goto command
         try:
             print("Current x pos = " + str(self.px))
@@ -467,8 +484,14 @@ class Entity:
             print(e.message)
             return 1
         finally:
-            print("Arrived at destination:", self.px, self.py)
-            return 0
+
+            if self._stopCurrentAction_:
+                print("Halted at destination:", self.px, self.py)
+                print "Go To: Stopped due to potential collision"
+                return 2
+            else:
+                print("Arrived at destination:", self.px, self.py)
+                return 0
 
     """
     @function

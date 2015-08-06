@@ -18,13 +18,14 @@ Main function that creates robot and sets a path
 """
 
 def main():
+
     #Construction of Robot objects take 3 params... Robot ID, Start X, Start Y. Start X and Start Y correlates to the myworld.world file
     #Can't create more than one robot per main() .... ie can't run more than one robot per terminal running
 
-    robot0 = Robot(0, 0, 0, 0)
+    robot0 = Robot(0, -20, 28, 0)
 
     rospy.Rate(100)
-    rospy.sleep(0.1)
+    rospy.sleep(0.001)
 
     print("Current x pos = " + str(robot0.px))
     print("Current y pos = " + str(robot0.py))
@@ -34,10 +35,9 @@ def main():
     #RobotNode_cmdvel = geometry_msgs.msg.Twist()
 
     #moveAction = robot0._actions_[1], [40, 40]
-    goToAction = robot0.move_forward, [15]
+    goToAction = robot0.goto, [-5,28]
 
     robot0._actionsStack_.append(goToAction)
-
 
     while not rospy.is_shutdown():
 
@@ -53,8 +53,9 @@ def main():
             if result == 0 or result == 1:
                 robot0._actionsStack_.pop()
         if robot0._actionsStack_.__len__() == 0:
+            #ends program once everything on stack is completed
             print "All actions on stack complete"
-
+            return
 
 
 
