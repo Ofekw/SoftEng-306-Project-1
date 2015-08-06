@@ -49,9 +49,13 @@ class Entity:
         self.theta = theta_off
         self.px = x_off
         self.py = y_off
+        self.x_off = x_off
+        self.y_off = y_off
         self.robot_id = r_id
         self.robot_node_name = ("RobotNode" +str(r_id))
         self.robot_node_identifier = ("robot_"+ str(r_id))
+        self.goalx = self.px
+        self.goaly = self.py
 
         #array of methods of robot actions
         self._actions_ = {
