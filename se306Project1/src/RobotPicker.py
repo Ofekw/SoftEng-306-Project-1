@@ -38,12 +38,14 @@ class RobotPicker(Robot):
     """
     def StageOdom_callback(self,msg):
 
-        self.px = self.x_off+msg.pose.pose.position.x
-        self.py = self.y_off+msg.pose.pose.position.y
+        #Update the px and py values
+        self.update_position(msg.pose.pose.position.x, msg.pose.pose.position.y)
 
+        #Find the yaw from the quaternion values
         (roll, pitch, yaw) = euler_from_quaternion((msg.pose.pose.orientation.x, msg.pose.pose.orientation.y, msg.pose.pose.orientation.z, msg.pose.pose.orientation.w))
 
-        self.theta = yaw
+        #Update the theta value
+        self.update_theta(yaw)
 
         xpos = str(self.px)
         ypos = str(self.py)

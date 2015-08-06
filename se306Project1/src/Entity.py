@@ -102,8 +102,8 @@ class Entity:
         #Find the yaw from the quaternion values
         (roll, pitch, yaw) = euler_from_quaternion((msg.pose.pose.orientation.x, msg.pose.pose.orientation.y, msg.pose.pose.orientation.z, msg.pose.pose.orientation.w))
 
-        #Update the current theta vlue
-        self.theta = self.init_theta + yaw
+        #Update the theta value
+        self.update_theta(yaw)
 
         rospy.loginfo("Current x position: %f" , self.px)
         rospy.loginfo("Current y position: %f", self.py)
@@ -155,6 +155,19 @@ class Entity:
         #Update the current px and py values
         self.px = self.init_x + change_in_x
         self.py = self.init_y + change_in_y
+
+    def update_theta(self, theta):
+
+        #Obtain current_theta value by adding initial theta + theta value published by stage
+        current_theta = self.init_theta + theta
+
+        #If current theta exceeds value of pi, means entity is facing southwards, so update value accordingly
+        if (current_theta > math.pi):
+            current_theta - 2 * math.pi
+
+        #Update the current theta vlue
+        self.theta = current_theta
+
 
     def StageLaser_callback(self, msg):
         barCount = 0
