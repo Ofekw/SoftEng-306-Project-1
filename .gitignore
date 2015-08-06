@@ -40,6 +40,10 @@
 se306Project1/bin/
 se306Project1/build/
 
+#python files
+
+*.pyc
+
 
 
 
