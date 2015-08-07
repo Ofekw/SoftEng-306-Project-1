@@ -53,6 +53,11 @@ class Entity:
         #variable to track if action is running or not
         self._actionRunning_ = False
 
+        self.disableLaser = False
+        self.noMoreTrees = 0
+        self.treeDetected = False
+        self.atOrchard = False
+
         #Node Initiation
         rospy.init_node(self.robot_node_name)
 
@@ -90,33 +95,38 @@ class Entity:
         barCount = 0
         found = False
 
-        #for i in range(0,180):
+        if not self.disableLaser:
+            for i in range(70, 110):
+                if msg.ranges[i]< 4.0:
+                    action = self._actions_[2], ["right"]
+                    #check if action already exists in stack, otherwise laser will spam rotates
+                    if action != self._actionsStack_[-1]:
+                        #stop moving foward and add turn action
+                        self._stopCurrentAction_ = True
+                        self._actionsStack_.append(action)
+            #check that all lasers in 0-20 range are not hitting object
 
-        for i in range(70, 110):
-            if msg.ranges[i]< 4.0:
-                action = self._actions_[2], ["right"]
-                #check if action already exists in stack, otherwise laser will spam rotates
-                if action != self._actionsStack_[-1]:
-                    print("adding right to stack")
-                    #stop moving foward and add turn action
-                    self._stopCurrentAction_ = True
-                    self._actionsStack_.append(action)
-        #check that all lasers in 0-20 range are not hitting object
-        rangeHitting = False
-        for i in range(160,180):
-            if msg.ranges[i] < 5.0:
-                rangeHitting = True
-
-        if not rangeHitting:
-            print("No Wall Left")
-            action = self._actions_[2], ["left"]
-            #check if action already exists in stack, otherwise laser will spam rotates
-            if action != self._actionsStack_[-1]:
-                #stop moving foward and add turn action
+            rangeCount = 0
+            for i in range(160,180):
+                if msg.ranges[i]<5.0:
+                    rangeCount += 1
+            #check if no tree and are waiting for new tree
+            if self.noMoreTrees>15 and self.atOrchard:
+                self.noMoreTrees = 0
+                #stop the robot moving forward
                 self._stopCurrentAction_ = True
-                self._actionsStack_.append(action)
-        else:
-            print("Wall Left")
+                turnAction = self._actions_[2], ["left"]
+                self._actionsStack_.append(turnAction)
+            elif rangeCount == 0:
+                self.noMoreTrees +=1
+                self.treeDetected = False
+            #check if new tree dected
+            elif 0 < rangeCount < 20 and not self.treeDetected:
+                self.atOrchard = True
+                self.treeDetected = True
+                self.noMoreTrees=0
+                print("Found Tree")
+
 
     """
     @function
@@ -168,8 +178,8 @@ class Entity:
             #Find the distance gained by calculating sqrt(xDiff^2 + yDiff^2)
             dist_gained = math.sqrt(xDiff * xDiff + yDiff * yDiff)
 
-            print("Moving Forward: " + str(distToGo) + "m to go")
-            print("Current x pos = " + str(self.px) +"," +str(self.py))
+            #print("Moving Forward: " + str(distToGo) + "m to go")
+            #print("Current x pos = " + str(self.px) +"," +str(self.py))
 
 
         if self._stopCurrentAction_ == True:
@@ -209,7 +219,9 @@ class Entity:
             dir = -1
             if (thetaTarg < -pi):
                 thetaTarg = pi + (thetaTarg + pi)
-
+        #disable laser as don't want to be checking for collisions when turning as
+        #robot will not cause collision while turning
+        self.disableLaser = True
         while (abs(self.theta - thetaTarg) > 0.01 and not (self._stopCurrentAction_)):
             thetaDiff = abs(self.theta - thetaTarg)
 
@@ -226,7 +238,8 @@ class Entity:
             rospy.sleep(0.0001)
 
             #print("Turning " + direction + " current theta is " + str(self.theta) +", target theta is " + str(thetaTarg))
-
+        #Turn complete, reenable laser
+        self.disableLaser = False
         if self._stopCurrentAction_ == True:
                 self._stopCurrentAction_ = False
                 raise ActionInterruptException.ActionInterruptException("Wall hit")
@@ -234,6 +247,7 @@ class Entity:
                 #Stop robot by setting forward velocity to 0 and then publish change
                 self.RobotNode_cmdvel.angular.z = 0
                 self.RobotNode_stage_pub.publish(self.RobotNode_cmdvel)
+                #self.correct_theta()
                 #return 0 for succesful finish
                 return 0
 

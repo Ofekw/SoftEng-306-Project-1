@@ -36,11 +36,13 @@ def main():
 
     moveAction = robot0._actions_[0], [1000]
     robot0._actionsStack_.append(moveAction)
+        # turnAction = robot0.actions[2], ["left"]
+        # robot0.actionsStack.append(turnAction)
+
 
     while not rospy.is_shutdown():
     #check if there is an action on the stack or an action already running
         if(robot0._actionsStack_.__len__() > 0 and not robot0._actionRunning_):
-            print("Running action")
             #get top action on stack
             action = robot0._actionsStack_[-1]
             #run action with parameter
