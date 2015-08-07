@@ -52,10 +52,3 @@ class Visitor(Human):
     def visitor_specific_function(self):
         self.random_nav
 
-def main():
-    visitor_1 = Visitor(5, 1, 1, 0)
-
-    for f in visitor_1._actions_:
-        print("hello")
-        print f
-
