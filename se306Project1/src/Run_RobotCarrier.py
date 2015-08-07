@@ -8,7 +8,7 @@ from sensor_msgs.msg import*
 from tf.transformations import *
 import math
 import numpy.testing
-from Robot import Robot
+from RobotCarrier import RobotCarrier
 
 """
 @MAIN
@@ -21,7 +21,7 @@ def main():
     #Construction of Robot objects take 3 params... Robot ID, Start X, Start Y. Start X and Start Y correlates to the myworld.world file
     #Can't create more than one robot per main() .... ie can't run more than one robot per terminal running
 
-    robot0 = Robot(0, 0, 0, math.pi/2)
+    robot0 = RobotCarrier(1,-10,-28, 0)
 
     rospy.Rate(100)
     rospy.sleep(0.1)
@@ -33,11 +33,9 @@ def main():
     #You can use RobotNode_cmdvel to simulate movements, place them in the while loop to try it out
     #RobotNode_cmdvel = geometry_msgs.msg.Twist()
 
-    #moveAction = robot0._actions_[1], [40, 40]
-    goToAction = robot0._actions_[1],[5,5]
-
-    robot0._actionsStack_.append(goToAction)
-
+    # Add action here to go to position 1
+    moveAction = robot0._actions_[4], []
+    robot0._actionsStack_.append(moveAction)
 
     while not rospy.is_shutdown():
 
