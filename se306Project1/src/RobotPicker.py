@@ -9,6 +9,7 @@ from tf.transformations import *
 import math
 import numpy.testing
 from Robot import Robot
+import os
 
 """
 @class
@@ -38,12 +39,14 @@ class RobotPicker(Robot):
     """
     def StageOdom_callback(self,msg):
 
-        self.px = self.x_off+msg.pose.pose.position.x
-        self.py = self.y_off+msg.pose.pose.position.y
+        #Update the px and py values
+        self.update_position(msg.pose.pose.position.x, msg.pose.pose.position.y)
 
+        #Find the yaw from the quaternion values
         (roll, pitch, yaw) = euler_from_quaternion((msg.pose.pose.orientation.x, msg.pose.pose.orientation.y, msg.pose.pose.orientation.z, msg.pose.pose.orientation.w))
 
-        self.theta = yaw
+        #Update the theta value
+        self.update_theta(yaw)
 
         xpos = str(self.px)
         ypos = str(self.py)
@@ -51,6 +54,14 @@ class RobotPicker(Robot):
 
         picker_pub.publish(str(self.robot_id) + "," + xpos + "," + ypos+ "," + str(self.theta))
         print("I have sent " + str(self.robot_id) + "," + xpos + "," + ypos+ "," + str(self.theta))
+
+        fn = os.path.join(os.path.dirname(__file__), "Picker"+str(self.robot_id)+".txt")
+        output_file = open(fn, "w")
+        output_file.write("Name:   "+str(self.robot_node_identifier)+ "\n")
+        output_file.write("Type: Picker\n")
+        output_file.write("X Position:   "+ str(self.px) + "\n")
+        output_file.write("Y Position:   " +str(self.py) + "\n")
+        output_file.write("Theta:   " +str(self.theta))
 
         #rospy.loginfo("Current x position: %f" , self.px)
         #rospy.loginfo("Current y position: %f", self.py)

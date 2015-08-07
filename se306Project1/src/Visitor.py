@@ -23,6 +23,9 @@ class Visitor(Human):
     def __init__(self, r_id, x_off, y_off, theta_offset):
         Human.__init__(self, r_id, x_off, y_off, theta_offset)
 
+        self._actions_.append(self.random_nav)
+        self._actions_.append(self.visitor_specific_function)
+
     """
     @function
     This function when called will cause the Visitor entity to turn a random cardinal direction, then move forward
@@ -48,4 +51,11 @@ class Visitor(Human):
 
     def visitor_specific_function(self):
         self.random_nav
+
+def main():
+    visitor_1 = Visitor(5, 1, 1, 0)
+
+    for f in visitor_1._actions_:
+        print("hello")
+        print f
 
