@@ -1,4 +1,4 @@
-#!/usr/bin/python3.4
+#!/usr/bin/env python
 
 import rospy
 from std_msgs.msg import*
@@ -75,6 +75,11 @@ class Entity:
         #variable to track if action is running or not
         self._actionRunning_ = False
 
+        self.disableLaser = False
+        self.noMoreTrees = 0
+        self.treeDetected = False
+        self.atOrchard = False
+
         #Node Initiation
         rospy.init_node(self.robot_node_name)
 
@@ -96,30 +101,117 @@ class Entity:
     """
     def StageOdom_callback(self,msg):
 
-        self.px = self.init_x + msg.pose.pose.position.x
-        self.py = self.init_y + msg.pose.pose.position.y
+        #Update the px and py values
+        self.update_position(msg.pose.pose.position.x, msg.pose.pose.position.y)
 
+        #Find the yaw from the quaternion values
         (roll, pitch, yaw) = euler_from_quaternion((msg.pose.pose.orientation.x, msg.pose.pose.orientation.y, msg.pose.pose.orientation.z, msg.pose.pose.orientation.w))
 
-        self.theta = self.init_theta + yaw
+        #Update the theta value
+        self.update_theta(yaw)
 
-        #rospy.loginfo("Current x position: %f" , self.px)
-        #rospy.loginfo("Current y position: %f", self.py)
-        rospy.loginfo("Current theta: %f", self.theta)
+        #output_file.close("Capacity:")
+
+        # rospy.loginfo("Current x position: %f" , self.px)
+        # rospy.loginfo("Current y position: %f", self.py)
+        # rospy.loginfo("Current theta: %f", self.theta)
+
+    """
+    @function
+    @parameter: float x, float y
+
+    This function is used by the StageOdom_callback function to update the current px and py values. The paremeters passed
+    are the values given by the odom/msg.pose.pose.position values
+
+    """
+    def update_position(self, x, y):
+        """
+        This section of code calculates the absolute change in x and y positions, by combining the x and y components of
+        the given x and y displacements.
+        """
+
+        #Set x_theta to the initial theta. x_theta will be used to calculate the absolute x component of the given x and y displacements
+        x_theta = abs(self.init_theta)
+
+        #Keep track of what x_theta was initially set to
+        x_theta_init = x_theta
+
+        #If the entity is initally facing towards the west, then change the x_theta value to be the difference between pi and x_theta
+        if (abs(x_theta) > math.pi/2):
+            x_theta = math.pi - x_theta
+
+        #Set the y_theta variable, which is used to calculate the absolute y component of the given x and y displacements
+        y_theta = math.pi/2 - self.init_theta
+
+        #Calculate the overall change in x position by subtracting the x component of the y displacement from the x component of the
+        #x displacement
+        change_in_x = x * math.cos(x_theta) - y * math.cos(y_theta)
+
+        #If the entity was initially facing westerly, then the overall change in x position will need to subtract the x component of the
+        #x displacement as well
+        if (x_theta_init > math.pi/2):
+            change_in_x = - x * math.cos(x_theta) - y * math.cos(y_theta)
+
+        #Calculate the overall change in y position by adding both the y component of the x and y displacements
+        change_in_y = x * math.sin(x_theta) + y * math.sin(y_theta)
+
+        #If the entity was initially facing southerly, then the y component of the x displacement will need to be subtracted
+        if (self.init_theta < 0):
+            change_in_y = - x * math.sin(x_theta) + y * math.sin(y_theta)
+
+        #Update the current px and py values
+        self.px = self.init_x + change_in_x
+        self.py = self.init_y + change_in_y
+
+    def update_theta(self, theta):
+
+        #Obtain current_theta value by adding initial theta + theta value published by stage
+        current_theta = self.init_theta + theta
+
+        #If current theta exceeds value of pi, means entity is facing southwards, so update value accordingly
+        if (current_theta > math.pi):
+            current_theta - 2 * math.pi
+
+        #Update the current theta vlue
+        self.theta = current_theta
 
 
     def StageLaser_callback(self, msg):
         barCount = 0
         found = False
 
-        #for i in range(0,180):
-        if msg.ranges[90] < 5.0:
-            #action = self._actions_[2], [self, "left"]
-            #check if action already exists in stack, otherwise laser will spam rotates
-            #if action != self._actionsStack_[-1]:
-            self._stopCurrentAction_ = True
-            #    self._actionsStack_.append(action)
-            #rospy.loginfo("Range at %f degree is: %f", i, msg.ranges[i])
+        if not self.disableLaser:
+            for i in range(70, 110):
+                if msg.ranges[i]< 4.0:
+                    action = self._actions_[2], [Direction.RIGHT]
+                    #check if action already exists in stack, otherwise laser will spam rotates
+                    if action != self._actionsStack_[-1]:
+                        #stop moving foward and add turn action
+                        self._stopCurrentAction_ = True
+                        self._actionsStack_.append(action)
+            #check that all lasers in 0-20 range are not hitting object
+
+            rangeCount = 0
+            for i in range(160,180):
+                if msg.ranges[i]<5.0:
+                    rangeCount += 1
+            #check if no tree and are waiting for new tree
+            if self.noMoreTrees>15 and self.atOrchard:
+                self.noMoreTrees = 0
+                #stop the robot moving forward
+                self._stopCurrentAction_ = True
+                turnAction = self._actions_[2], [Direction.LEFT]
+                self._actionsStack_.append(turnAction)
+            elif rangeCount == 0:
+                self.noMoreTrees +=1
+                self.treeDetected = False
+            #check if new tree dected
+            elif 0 < rangeCount < 20 and not self.treeDetected:
+                self.atOrchard = True
+                self.treeDetected = True
+                self.noMoreTrees=0
+                print("Found Tree")
+
 
     """
     @function
@@ -181,12 +273,16 @@ class Entity:
             #Find the distance gained by calculating sqrt(xDiff^2 + yDiff^2)
             dist_gained = math.sqrt(xDiff * xDiff + yDiff * yDiff)
 
-            print("Moving Forward: " + str(distToGo) + "m to go")
-            print("Current x pos = " + str(self.px) +"," +str(self.py))
+            #print("Moving Forward: " + str(distToGo) + "m to go")
+            #print("Current x pos = " + str(self.px) +"," +str(self.py))
 
 
         if self._stopCurrentAction_ == True:
-            raise ActionInterruptException.ActionInterruptException("Wall hit")
+                #stop movement and throw exception
+                self.RobotNode_cmdvel.linear.x = 0
+                self.RobotNode_stage_pub.publish(self.RobotNode_cmdvel)
+                self._stopCurrentAction_ = False
+                raise ActionInterruptException.ActionInterruptException("Move Interrupted")
         else:
             #Stop robot by setting forward velocity to 0 and then publish change
             self.RobotNode_cmdvel.linear.x = 0
@@ -218,7 +314,9 @@ class Entity:
             dir = -1
             if (thetaTarg < -pi):
                 thetaTarg = pi + (thetaTarg + pi)
-
+        #disable laser as don't want to be checking for collisions when turning as
+        #robot will not cause collision while turning
+        self.disableLaser = True
         while (abs(self.theta - thetaTarg) > 0.01 and not (self._stopCurrentAction_)):
             thetaDiff = abs(self.theta - thetaTarg)
 
@@ -235,15 +333,18 @@ class Entity:
             rospy.sleep(0.0001)
 
             #print("Turning " + direction + " current theta is " + str(self.theta) +", target theta is " + str(thetaTarg))
-
+        #Turn complete, reenable laser
+        self.disableLaser = False
         if self._stopCurrentAction_ == True:
-            raise ActionInterruptException.ActionInterruptException("Wall hit")
+                self._stopCurrentAction_ = False
+                raise ActionInterruptException.ActionInterruptException("Wall hit")
         else:
-            #Stop robot by setting forward velocity to 0 and then publish change
-            self.RobotNode_cmdvel.angular.z = 0
-            self.RobotNode_stage_pub.publish(self.RobotNode_cmdvel)
-            #return 0 for succesful finish
-            return 0
+                #Stop robot by setting forward velocity to 0 and then publish change
+                self.RobotNode_cmdvel.angular.z = 0
+                self.RobotNode_stage_pub.publish(self.RobotNode_cmdvel)
+                #self.correct_theta()
+                #return 0 for succesful finish
+                return 0
 
 
 
@@ -292,16 +393,17 @@ class Entity:
 
             rospy.sleep(0.0001)
 
-            print("Rotating - current theta is " + str(self.theta) +", target theta is " + str(thetaTarg))
+           # print("Rotating - current theta is " + str(self.theta) +", target theta is " + str(thetaTarg))
 
         if self._stopCurrentAction_ == True:
-            raise ActionInterruptException.ActionInterruptException("Wall hit")
+                self._stopCurrentAction_ = False
+                raise ActionInterruptException.ActionInterruptException("Wall hit")
         else:
-            #Stop robot by setting forward velocity to 0 and then publish change
-            self.RobotNode_cmdvel.angular.z = 0
-            self.RobotNode_stage_pub.publish(self.RobotNode_cmdvel)
-            #return 0 for succesful finish
-            return 0
+                #Stop robot by setting forward velocity to 0 and then publish change
+                self.RobotNode_cmdvel.angular.z = 0
+                self.RobotNode_stage_pub.publish(self.RobotNode_cmdvel)
+                #return 0 for succesful finish
+                return 0
 
     """
      @function
