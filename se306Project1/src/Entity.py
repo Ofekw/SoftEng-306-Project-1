@@ -92,6 +92,7 @@ class Entity:
         self.StageLaser_sub = rospy.Subscriber(self.robot_node_identifier+"/base_scan",sensor_msgs.msg.LaserScan,self.StageLaser_callback)
         #self.StageLaser_sub = rospy.Subscriber
         self.ReadLaser = False
+        self.FiveCounter = 0;
 
     """
     @function
@@ -118,33 +119,40 @@ class Entity:
         #for some reason, ros is passing a value of 5 back every second call regardless if anything
         #is in front of it, this bit of code is just to ignore that random value its passing through
 
-        print msg.ranges[90]
-        if not self.ReadLaser:
-            self.ReadLaser = True
-            return
-        else:
-            self.ReadLaser = False
+        #print "Header : " + str(msg.header)
+        # if not self.ReadLaser:
+        #     #print "Not Reading : " + str(msg.ranges[90])
+        #     self.ReadLaser = True
+        #     return
+        # else:
+        #     self.ReadLaser = False
 
-        print "Reading : " + str(msg.ranges[90])
+        #print "Reading : " + str(msg.ranges[90])
         barCount = 0
         found = False
 
         #for i in range(0,180):
+        #print(msg.ranges[90])
         if msg.ranges[90] < 4.0:
             #action = self._actions_[2], [self, "left"]
             #check if action already exists in stack, otherwise laser will spam rotates
             #if action != self._actionsStack_[-1]:
-            self._stopCurrentAction_ = True
+            #self._stopCurrentAction_ = True
             self.halt_counter += 1
+            self._stopCurrentAction_ = True
+            self.FiveCounter = 0
             #    self._actionsStack_.append(action)
             #rospy.loginfo("Range at %f degree is: %f", i, msg.ranges[i])
         else:
-            self.halt_counter = 0
-            self._stopCurrentAction_ = False
+            self.FiveCounter += 1
+            if self.FiveCounter == 5:
+                self.halt_counter = 0
+                self._stopCurrentAction_ = False
+                self.FiveCounter = 0
 
         if self.halt_counter > 50:
             print "ENCOUNTERED STATIC ELEMENT!!!!"
-        elif self.halt_counter > 30:
+        elif self.halt_counter == 30:
             print "Checking if Entity in front is a static element..."
 
         #print self._stopCurrentAction_

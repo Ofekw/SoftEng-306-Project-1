@@ -19,7 +19,7 @@ define picker position
   obstacle_return 1           	# Can hit things.
   laser_return 1                 # reflects laser beams
   ranger_return 1             	# reflects sonar beams
-  blobfinder_return 1         	# Seen by blobfinders  
+  blobfinder_return 1         	# Seen by blobfinders
   fiducial_return 1           	# Seen as "1" fiducial finders
 
   localization "gps"         	  
@@ -27,7 +27,7 @@ define picker position
   size [2.35 2.5 1.5]
   #origin [-0.25 -0.25 0 0 ]
 
-  mylaser(pose [ 0.000 0.000 -1.0 0.000 ])
+  mylaser(pose [ 0.000 0.000 -0.750 0.000 ])
   velocity_bounds [-1000 1000 -1000 1000 -1000 1000 -90 90 ]
 
   # body bottom
