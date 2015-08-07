@@ -65,6 +65,8 @@ class Entity:
             3: self.stop,
         }
 
+        #Enums for direction and angles
+
         self._actionsStack_ = []
 
         #stop current action used inside methods to check if there has been a call to run a new method

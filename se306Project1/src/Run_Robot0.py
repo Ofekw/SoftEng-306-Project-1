@@ -36,8 +36,8 @@ def main():
 
     moveAction = robot0._actions_[0], [1000]
     robot0._actionsStack_.append(moveAction)
-        # turnAction = robot0.actions[2], ["left"]
-        # robot0.actionsStack.append(turnAction)
+    # turnAction = robot0.actions[2], ["left"]
+    # robot0.actionsStack.append(turnAction)
 
 
     while not rospy.is_shutdown():
