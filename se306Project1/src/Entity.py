@@ -179,7 +179,7 @@ class Entity:
         if not self.disableLaser:
             for i in range(70, 110):
                 if msg.ranges[i]< 4.0:
-                    action = self._actions_[2], ["right"]
+                    action = self._actions_[2], [Direction.RIGHT]
                     #check if action already exists in stack, otherwise laser will spam rotates
                     if action != self._actionsStack_[-1]:
                         #stop moving foward and add turn action
@@ -196,7 +196,7 @@ class Entity:
                 self.noMoreTrees = 0
                 #stop the robot moving forward
                 self._stopCurrentAction_ = True
-                turnAction = self._actions_[2], ["left"]
+                turnAction = self._actions_[2], [Direction.LEFT]
                 self._actionsStack_.append(turnAction)
             elif rangeCount == 0:
                 self.noMoreTrees +=1
@@ -389,7 +389,7 @@ class Entity:
 
             rospy.sleep(0.0001)
 
-            print("Rotating - current theta is " + str(self.theta) +", target theta is " + str(thetaTarg))
+           # print("Rotating - current theta is " + str(self.theta) +", target theta is " + str(thetaTarg))
 
         if self._stopCurrentAction_ == True:
                 self._stopCurrentAction_ = False
