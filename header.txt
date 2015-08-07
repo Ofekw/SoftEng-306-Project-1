@@ -1,0 +1,24 @@
+#!/usr/bin/env python
+
+import rospy
+from std_msgs.msg import*
+from geometry_msgs.msg import*
+from nav_msgs.msg import*
+from sensor_msgs.msg import*
+from tf.transformations import *
+import math
+import numpy.testing
+from Robot import Robot
+
+def main():
+    rospy.Rate(100)
+    rospy.sleep(0.1)
+
+    new_robot = Robot(0,-20,-28)
+    new_robot.actions(rospy)
+
+if __name__ == '__main__':
+    try:
+        main()
+    except rospy.ROSInterruptException:
+        pass
