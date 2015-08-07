@@ -110,9 +110,11 @@ class Entity:
         #Update the theta value
         self.update_theta(yaw)
 
-        rospy.loginfo("Current x position: %f" , self.px)
-        rospy.loginfo("Current y position: %f", self.py)
-        rospy.loginfo("Current theta: %f", self.theta)
+        #output_file.close("Capacity:")
+
+        # rospy.loginfo("Current x position: %f" , self.px)
+        # rospy.loginfo("Current y position: %f", self.py)
+        # rospy.loginfo("Current theta: %f", self.theta)
 
     """
     @function
