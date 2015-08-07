@@ -1,0 +1,5 @@
+tree
+(
+  name "treeRight"
+  pose [ x y 0.000 0.000 ]
+)
