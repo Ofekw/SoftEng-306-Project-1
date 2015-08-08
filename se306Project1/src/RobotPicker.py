@@ -7,6 +7,7 @@ from nav_msgs.msg import*
 from sensor_msgs.msg import*
 from tf.transformations import *
 import math
+import time
 import numpy.testing
 from Robot import Robot
 import os
@@ -25,6 +26,17 @@ class RobotPicker(Robot):
 
         self.max_load = 20;
         self.current_load = 0;
+        self.timeLastAdded = time.clock()
+
+        self._actions_ = {
+            0: self.move_forward,
+            1: self.goto,
+            2: self.turn,
+            3: self.stop,
+            4: self.gotoClosestRobot,
+            5: self.waitForCollection,
+        }
+
         Robot.__init__(self,r_id,x_off,y_off,theta_off)
 
     def robot_specific_function(self):
@@ -51,8 +63,9 @@ class RobotPicker(Robot):
         ypos = str(self.py)
         #com_pub.publish("\n" + rospy.get_caller_id() +  " is at position x: " + xpos + "\nposition y: " + ypos)
 
-        self.picker_pub.publish(str(self.robot_id) + "," + xpos + "," + ypos+ "," + str(self.theta))
-        print("I have sent " + str(self.robot_id) + "," + xpos + "," + ypos+ "," + str(self.theta))
+        #publish:- id xpos ypos kiwimunber
+        self.picker_pub.publish(str(self.robot_id) + "," + xpos + "," + ypos+ "," + str(self.theta) + "," + str(self.current_load))
+        print("I have sent " + str(self.robot_id) + "," + xpos + "," + ypos+ "," + str(self.theta) + "," + str(self.current_load))
 
         fn = os.path.join(os.path.dirname(__file__), "Picker"+str(self.robot_id)+".txt")
         output_file = open(fn, "w")
@@ -65,3 +78,18 @@ class RobotPicker(Robot):
         #rospy.loginfo("Current x position: %f" , self.px)
         #rospy.loginfo("Current y position: %f", self.py)
         #rospy.loginfo("Current theta: %f", self.theta)
+
+    def addKiwi(self, clockTime):
+        if(self.current_load >= self.max_load):
+            self.waitForCollection()
+            return
+        if(clockTime < (self.timeLastAdded + 1)):
+            self.current_load = self.current_load + 1
+
+    def waitForCollection(self):
+        while(self.current_load > self.max_load):
+            #make the robot stop moving until collected from
+            pass
+
+    def gotoClosestRobot(self):
+        pass

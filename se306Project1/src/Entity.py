@@ -7,6 +7,7 @@ from nav_msgs.msg import*
 from sensor_msgs.msg import*
 from tf.transformations import *
 import math
+import time
 import ActionInterruptException
 import numpy.testing
 
@@ -211,6 +212,7 @@ class Entity:
                 self.treeDetected = True
                 self.noMoreTrees=0
                 print("Found Tree")
+                self.addKiwi(time.clock())
 
 
     """
@@ -633,5 +635,5 @@ class Entity:
     def stop(self):
         self.RobotNode_cmdvel.linear.x = 0.0
 
-
-
+    def addKiwi(self, clockTime):
+        pass

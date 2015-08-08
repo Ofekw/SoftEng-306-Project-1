@@ -102,7 +102,7 @@ class RobotCarrier(Robot):
         # print("Picker callback position " + message.data.split(',')[1] + "," + message.data.split(',')[2])
         self.picker_robots[int(message.data.split(',')[0])] = message.data.split(',')[1] + "," + message.data.split(',')[2]  # Should add element 3 here which is theta
         print("Picker array")
-        print ', '.join(self.picker_robots)
+        print(', '.join(self.picker_robots))
 
 
     """
@@ -126,4 +126,5 @@ class RobotCarrier(Robot):
     def gotoClosestRobot(self):
             self.getClosest()
             print("Closest robot at: " + self.closestRobot)
-            self.goto(float(self.closestRobot.split(',')[0]), float(self.closestRobot.split(',')[1]))
+            while(0 == self.goto(float(self.closestRobot.split(',')[0]), float(self.closestRobot.split(',')[1]))):
+                self.getClosest()
