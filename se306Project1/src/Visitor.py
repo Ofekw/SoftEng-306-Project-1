@@ -23,8 +23,13 @@ class Visitor(Human):
     def __init__(self, r_id, x_off, y_off, theta_offset):
         Human.__init__(self, r_id, x_off, y_off, theta_offset)
 
-        self._actions_.append(self.random_nav)
-        self._actions_.append(self.visitor_specific_function)
+        self._actions_ = {
+            0: self.move_forward,
+            1: self.goto,
+            2: self.turn,
+            3: self.stop,
+            4: self.random_nav
+        }
 
     """
     @function
@@ -36,13 +41,13 @@ class Visitor(Human):
         cardinal_directions = ["north", "south", "west", "east"]
 
         #Randomly select a direction
-        rand_direction = random.randint(0, 3)
+        rand_direction = cardinal_directions[random.randint(0, 3)]
 
         #Random select a distance to move forward
-        rand_dist = random.randint(5, 10)
+        rand_dist = random.randint(15, 30)
 
         #Randomly select a velocity
-        rand_velocity = random.randint(2, 4)
+        rand_velocity = random.randint(5, 8)
 
         #Perform movement functions
         self.change_linear_x_to(rand_velocity)
@@ -51,11 +56,4 @@ class Visitor(Human):
 
     def visitor_specific_function(self):
         self.random_nav
-
-def main():
-    visitor_1 = Visitor(5, 1, 1, 0)
-
-    for f in visitor_1._actions_:
-        print("hello")
-        print f
 

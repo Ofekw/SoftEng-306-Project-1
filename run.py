@@ -38,4 +38,3 @@ def delete_files():
 atexit.register(delete_files)
 
 while True:
-    pass
