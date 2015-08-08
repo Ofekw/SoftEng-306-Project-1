@@ -58,6 +58,10 @@ class Entity:
         self.goalx = self.px
         self.goaly = self.py
 
+        #Used to determine how long we've waited for an element to pass by, if exceeds a threshold
+        #we will know it is a static element and we need to do something different
+        self.halt_counter = 0
+
         #array of methods of robot actions
         self._actions_ = {
             0: self.move_forward,
@@ -93,6 +97,7 @@ class Entity:
 
         self.StageLaser_sub = rospy.Subscriber(self.robot_node_identifier+"/base_scan",sensor_msgs.msg.LaserScan,self.StageLaser_callback)
         self.StageLaser_sub = rospy.Subscriber
+
 
     """
     @function
@@ -177,44 +182,6 @@ class Entity:
         self.theta = current_theta
 
 
-    def StageLaser_callback(self, msg):
-        barCount = 0
-        found = False
-
-        if not self.disableLaser:
-            for i in range(70, 110):
-                if msg.ranges[i]< 4.0:
-                    action = self._actions_[2], [Direction.RIGHT]
-                    #check if action already exists in stack, otherwise laser will spam rotates
-                    if action != self._actionsStack_[-1]:
-                        #stop moving foward and add turn action
-                        self._stopCurrentAction_ = True
-                        self._actionsStack_.append(action)
-            #check that all lasers in 0-20 range are not hitting object
-
-            rangeCount = 0
-            for i in range(160,180):
-                if msg.ranges[i]<5.0:
-                    rangeCount += 1
-            #check if no tree and are waiting for new tree
-            if self.noMoreTrees>15 and self.atOrchard:
-                self.noMoreTrees = 0
-                #stop the robot moving forward
-                self._stopCurrentAction_ = True
-                turnAction = self._actions_[2], [Direction.LEFT]
-                self._actionsStack_.append(turnAction)
-            elif rangeCount == 0:
-                self.noMoreTrees +=1
-                self.treeDetected = False
-            #check if new tree dected
-            elif 0 < rangeCount < 20 and not self.treeDetected:
-                self.atOrchard = True
-                self.treeDetected = True
-                self.noMoreTrees=0
-                print("Found Tree")
-                self.addKiwi(time.clock())
-
-
     """
     @function
     @parameter: int velocity
@@ -246,8 +213,9 @@ class Entity:
         previousY = self.py
 
 
+        print("Moving Forward")
         #While the distance that the Entity has gained has not exceeded the given distance, continue to move the Entity forward
-        while (dist_gained < dist and not (self._stopCurrentAction_)):
+        while (dist_gained < dist and not self._stopCurrentAction_):
 
             #Calculate remaining distance to travel
             distToGo = dist - dist_gained
@@ -283,8 +251,10 @@ class Entity:
                 #stop movement and throw exception
                 self.RobotNode_cmdvel.linear.x = 0
                 self.RobotNode_stage_pub.publish(self.RobotNode_cmdvel)
-                self._stopCurrentAction_ = False
-                raise ActionInterruptException.ActionInterruptException("Move Interrupted")
+                #self._stopCurrentAction_ = False
+            #raise ActionInterruptException.ActionInterruptException("Wall hit")
+                print("Move Forward: Stopped due to potential collision")
+                return 2
         else:
             #Stop robot by setting forward velocity to 0 and then publish change
             self.RobotNode_cmdvel.linear.x = 0
@@ -302,7 +272,7 @@ class Entity:
     Turn function which allows the Entity to turn 90 degrees ( a right angle) either left or right.
     """
     def turn(self, direction):
-
+        print("Turning "+ direction)
         pi = math.pi
 
 
@@ -338,8 +308,8 @@ class Entity:
         #Turn complete, reenable laser
         self.disableLaser = False
         if self._stopCurrentAction_ == True:
-                self._stopCurrentAction_ = False
-                raise ActionInterruptException.ActionInterruptException("Wall hit")
+            #raise ActionInterruptException.ActionInterruptException("Wall hit")
+            return 2
         else:
                 #Stop robot by setting forward velocity to 0 and then publish change
                 self.RobotNode_cmdvel.angular.z = 0
@@ -479,7 +449,7 @@ class Entity:
     A----------------------|
     """
     def goto(self, x_coord, y_coord):
-
+        print("Going To : ("+str(x_coord)+","+str(y_coord)+")")
         #try run the goto command
         try:
             print("Current x pos = " + str(self.px))
@@ -556,8 +526,14 @@ class Entity:
             print(e.message)
             return 1
         finally:
-            print("Arrived at destination:", self.px, self.py)
-            return 0
+
+            if self._stopCurrentAction_:
+                print("Halted at destination:", self.px, self.py)
+                print("Go To: Stopped due to potential collision")
+                return 2
+            else:
+                print("Arrived at destination:", self.px, self.py)
+                return 0
 
     """
     @function
