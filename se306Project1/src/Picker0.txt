@@ -1,5 +1,5 @@
 Name:   robot_0
 Type: Picker
-X Position:   26.4008429393
-Y Position:   18.81951873
-Theta:   1.60787595947
+X Position:   0.0
+Y Position:   22.4
+Theta:   1.57079632679
