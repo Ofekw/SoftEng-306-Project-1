@@ -35,7 +35,7 @@ def main():
 
     while not rospy.is_shutdown():
     #check if there is an action on the stack or an action already running
-        if(robot._actionsStack_.__len__() > 0 and not robot._actionRunning_):
+        if(robot0._actionsStack_.__len__() > 0 and not robot0._actionRunning_) and not robot0._stopCurrentAction_:
             #get top action on stack
             action = robot._actionsStack_[-1]
             #run action with parameter

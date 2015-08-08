@@ -34,13 +34,13 @@ def main():
     #RobotNode_cmdvel = geometry_msgs.msg.Twist()
 
     # Add action here to go to position 1
-    moveAction = robot0._actions_[4], []
+    moveAction = robot0.goto, [5,-28]
     robot0._actionsStack_.append(moveAction)
 
     while not rospy.is_shutdown():
 
     #check if there is an action on the stack or an action already running
-        if(robot0._actionsStack_.__len__() > 0 and not robot0._actionRunning_):
+        if(robot0._actionsStack_.__len__() > 0 and not robot0._actionRunning_) and not robot0._stopCurrentAction_:
             #get top action on stack
             action = robot0._actionsStack_[-1]
             #run action with parameter
@@ -50,6 +50,9 @@ def main():
             #if action completes succesfully pop it
             if result == 0 or result == 1:
                 robot0._actionsStack_.pop()
+        if robot0._actionsStack_.__len__() == 0:
+            print "All actions on stack complete!"
+            return
 
 
 if __name__ == '__main__':
