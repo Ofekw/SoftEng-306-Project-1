@@ -29,14 +29,14 @@ class RobotPicker(Robot):
         self.current_load = 0;
         self.timeLastAdded = time.clock()
 
-        self._actions_ = {
-            0: self.move_forward,
-            1: self.goto,
-            2: self.turn,
-            3: self.stop,
-            4: self.gotoClosestRobot,
-            5: self.waitForCollection,
-        }
+        # self._actions_ = {
+        #     0: self.move_forward,
+        #     1: self.goto,
+        #     2: self.turn,
+        #     3: self.stop,
+        #     4: self.gotoClosestRobot,
+        #     5: self.wait,
+        # }
 
         Robot.__init__(self,r_id,x_off,y_off,theta_off)
 
@@ -88,8 +88,14 @@ class RobotPicker(Robot):
             self.current_load = self.current_load + 1
 
     def waitForCollection(self):
-        self._stopCurrentAction_ = True
         #while(self.current_load >= self.max_load):
+            self._stopCurrentAction_ = True
+            action = self._actions_[4],[]
+            if action != self._actionsStack_[-1]:
+                #stop moving foward and add turn action
+                self._stopCurrentAction_ = True
+                self._actionsStack_.append(action)
+
             #self.goto(self.px,self.py)
         #    print("ohdera")
             #make the robot stop moving until collected from
@@ -133,3 +139,10 @@ class RobotPicker(Robot):
                 self.treeDetected = True
                 self.noMoreTrees=0
                 print("Found Tree")
+                self.addKiwi(time.clock())
+
+    def wait(self):
+        #until unloaded
+        #while(self.current_load >= self.max_load):
+            #do nothing
+            time.sleep(1)

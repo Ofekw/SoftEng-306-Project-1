@@ -68,6 +68,7 @@ class Entity:
             1: self.goto,
             2: self.turn,
             3: self.stop,
+            4: self.wait,
         }
 
         #Enums for direction and angles
