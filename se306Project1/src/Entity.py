@@ -69,6 +69,7 @@ class Entity:
             2: self.turn,
             3: self.stop,
             4: self.wait,
+            5: self.waitForPicker,
         }
 
         #Enums for direction and angles
@@ -612,5 +613,27 @@ class Entity:
     def stop(self):
         self.RobotNode_cmdvel.linear.x = 0.0
 
-    def addKiwi(self, clockTime):
+    """
+    @function
+
+    Function to be overridden in subclasses
+    """
+    def addKiwi(self):
+        pass
+
+    """
+    @function
+
+    Function to be overridden in subclasses
+    """
+    def wait(self):
+        pass
+
+
+    """
+    @function
+
+    Function to be overridden in subclasses
+    """
+    def waitForPicker(self):
         pass

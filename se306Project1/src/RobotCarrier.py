@@ -33,13 +33,13 @@ class RobotCarrier(Robot):
         self.current_load = 0;
         Robot.__init__(self,r_id,x_off,y_off,theta_off)
 
-        self._actions_ = {
-            0: self.move_forward,
-            1: self.goto,
-            2: self.turn,
-            3: self.stop,
-            4: self.gotoClosestRobot,
-        }
+        # self._actions_ = {
+        #     0: self.move_forward,
+        #     1: self.goto,
+        #     2: self.turn,
+        #     3: self.stop,
+        #     4: self.gotoClosestRobot,
+        # }
 
 
         #these variables are used to help the laser callback, it will help in dealing with entities/debris on
@@ -99,7 +99,7 @@ class RobotCarrier(Robot):
     """
     def carrierCallback(self, message):
         # print("Carrier callback position " + message.data.split(',')[1] + "," + message.data.split(',')[2])
-        self.carrier_robots[int(message.data.split(',')[0])] = message.data.split(',')[1] + "," + message.data.split(',')[2]  # Should add element 3 here which is theta
+        self.carrier_robots[int(message.data.split(',')[0])] = message.data.split(',')[1] + "," + message.data.split(',')[2] #+ "," + message.data.split(',')[4]  # Should add element 4 here which is theta
         # print("Carrier array")
         # print ', '.join(self.carrier_robots)
 
@@ -111,7 +111,7 @@ class RobotCarrier(Robot):
     """
     def pickerCallback(self, message):
         # print("Picker callback position " + message.data.split(',')[1] + "," + message.data.split(',')[2])
-        self.picker_robots[int(message.data.split(',')[0])] = message.data.split(',')[1] + "," + message.data.split(',')[2]  # Should add element 3 here which is theta
+        self.picker_robots[int(message.data.split(',')[0])] = message.data.split(',')[1] + "," + message.data.split(',')[2] + "," + message.data.split(',')[4]  # Should add element 3 here which is theta
         print("Picker array")
         print(', '.join(self.picker_robots))
 
@@ -161,8 +161,8 @@ class RobotCarrier(Robot):
 
         if self.halt_counter == 50:
             if not self._divertingPath_:
-                print "ENCOUNTERED STATIC ELEMENT!!!!"
-                print "Diverting Path Now..."
+                print("ENCOUNTERED STATIC ELEMENT!!!!")
+                print("Diverting Path Now...")
 
                 move_action = self.move_forward, [10]
                 turn_action = self.turn, ["left"]
@@ -184,7 +184,7 @@ class RobotCarrier(Robot):
     Gets the closest robot out of the array of robots
     """
     def getClosest(self):
-        print("Getting closest robot.....")
+        #print("Getting closest robot.....")
         for index, position in enumerate(self.picker_robots):
             current = self.closestRobot
             if (self.robot_id != index):
@@ -196,8 +196,19 @@ class RobotCarrier(Robot):
     # It is supposed to get the closest robot and then go to that location
     # This doesn't work right as it only calls the getClosest() once and then just continues to call goto()
     # Need a better understanding of how the actions stack works to get this to work correctly
-    def gotoClosestRobot(self):
+    def waitForPicker(self):
             self.getClosest()
             print("Closest robot at: " + self.closestRobot)
-            while(0 == self.goto(float(self.closestRobot.split(',')[0]), float(self.closestRobot.split(',')[1]))):
-                self.getClosest()
+            if(int(self.closestRobot.split(',')[2]) == 20):
+                self.goToClosest()
+
+    def goToClosest(self):
+        self._stopCurrentAction_ = True
+        action = self._actions_[1], [float(self.closestRobot.split(',')[0]), float(self.closestRobot.split(',')[1])]
+            #goto(float(self.closestRobot.split(',')[0]), float(self.closestRobot.split(',')[1]))
+        if action != self._actionsStack_[-1]:
+            #stop moving foward and add turn action
+            #self._stopCurrentAction_ = True
+            self._actionsStack_.append(action)
+
+

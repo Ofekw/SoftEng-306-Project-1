@@ -84,7 +84,7 @@ class RobotPicker(Robot):
         if(self.current_load >= self.max_load):
             self.waitForCollection()
             return
-        if(clockTime < (self.timeLastAdded + 1)):
+        if(clockTime <= (self.timeLastAdded + 1)):
             self.current_load = self.current_load + 1
 
     def waitForCollection(self):
