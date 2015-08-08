@@ -87,9 +87,12 @@ class RobotPicker(Robot):
             self.current_load = self.current_load + 1
 
     def waitForCollection(self):
-        while(self.current_load > self.max_load):
+        self._stopCurrentAction_ = True
+        #while(self.current_load >= self.max_load):
+            #self.goto(self.px,self.py)
+        #    print("ohdera")
             #make the robot stop moving until collected from
-            pass
+        #pass
 
     def gotoClosestRobot(self):
         pass
