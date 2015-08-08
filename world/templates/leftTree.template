@@ -1,0 +1,5 @@
+tree
+(
+  name "treeLeft"
+  pose [ x y 0.000 180.000 ]
+)

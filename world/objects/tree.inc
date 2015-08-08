@@ -11,7 +11,7 @@ define tree position
 
   localization "gps"         	  
 
-  size [5 5 5]
+  size [5 4 5]
   #origin [-0.25 -0.25 0 0 ]
 
   # body bottom

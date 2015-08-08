@@ -1,4 +1,4 @@
-#!/usr/bin/python3.4
+#!/usr/bin/env python
 
 import rospy
 from std_msgs.msg import*
@@ -78,6 +78,11 @@ class Entity:
 
         #variable to track if action is running or not
         self._actionRunning_ = False
+
+        self.disableLaser = False
+        self.noMoreTrees = 0
+        self.treeDetected = False
+        self.atOrchard = False
 
         #Node Initiation
         rospy.init_node(self.robot_node_name)
@@ -295,10 +300,14 @@ class Entity:
             dist_gained = math.sqrt(xDiff * xDiff + yDiff * yDiff)
 
             #print("Moving Forward: " + str(distToGo) + "m to go")
-            #print("Current x pos = " + str(self.px) + "," +str(self.py))
+            #print("Current x pos = " + str(self.px) +"," +str(self.py))
 
 
         if self._stopCurrentAction_ == True:
+                #stop movement and throw exception
+                self.RobotNode_cmdvel.linear.x = 0
+                self.RobotNode_stage_pub.publish(self.RobotNode_cmdvel)
+                self._stopCurrentAction_ = False
             #raise ActionInterruptException.ActionInterruptException("Wall hit")
             print "Move Forward: Stopped due to potential collision"
             return 2
@@ -333,8 +342,10 @@ class Entity:
             dir = -1
             if (thetaTarg < -pi):
                 thetaTarg = pi + (thetaTarg + pi)
-
-        while (abs(self.theta - thetaTarg) > 0.01):
+        #disable laser as don't want to be checking for collisions when turning as
+        #robot will not cause collision while turning
+        self.disableLaser = True
+        while (abs(self.theta - thetaTarg) > 0.01 and not (self._stopCurrentAction_)):
             thetaDiff = abs(self.theta - thetaTarg)
 
             #Set the angular velocity to optimal values that don't overshoot pi/2
@@ -350,16 +361,18 @@ class Entity:
             rospy.sleep(0.0001)
 
             #print("Turning " + direction + " current theta is " + str(self.theta) +", target theta is " + str(thetaTarg))
-
+        #Turn complete, reenable laser
+        self.disableLaser = False
         if self._stopCurrentAction_ == True:
             #raise ActionInterruptException.ActionInterruptException("Wall hit")
             return 2
         else:
-            #Stop robot by setting forward velocity to 0 and then publish change
-            self.RobotNode_cmdvel.angular.z = 0
-            self.RobotNode_stage_pub.publish(self.RobotNode_cmdvel)
-            #return 0 for succesful finish
-            return 0
+                #Stop robot by setting forward velocity to 0 and then publish change
+                self.RobotNode_cmdvel.angular.z = 0
+                self.RobotNode_stage_pub.publish(self.RobotNode_cmdvel)
+                #self.correct_theta()
+                #return 0 for succesful finish
+                return 0
 
 
 
@@ -408,16 +421,17 @@ class Entity:
 
             rospy.sleep(0.0001)
 
-            #print("Rotating - current theta is " + str(self.theta) +", target theta is " + str(thetaTarg))
+           # print("Rotating - current theta is " + str(self.theta) +", target theta is " + str(thetaTarg))
 
         if self._stopCurrentAction_ == True:
-            raise ActionInterruptException.ActionInterruptException("Wall hit")
+                self._stopCurrentAction_ = False
+                raise ActionInterruptException.ActionInterruptException("Wall hit")
         else:
-            #Stop robot by setting forward velocity to 0 and then publish change
-            self.RobotNode_cmdvel.angular.z = 0
-            self.RobotNode_stage_pub.publish(self.RobotNode_cmdvel)
-            #return 0 for succesful finish
-            return 0
+                #Stop robot by setting forward velocity to 0 and then publish change
+                self.RobotNode_cmdvel.angular.z = 0
+                self.RobotNode_stage_pub.publish(self.RobotNode_cmdvel)
+                #return 0 for succesful finish
+                return 0
 
     """
      @function
