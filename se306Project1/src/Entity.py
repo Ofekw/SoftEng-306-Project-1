@@ -94,11 +94,7 @@ class Entity:
         self.RobotNode_cmdvel = geometry_msgs.msg.Twist()
         self.RobotNode_odom = geometry_msgs.msg.Pose2D()
 
-        self.StageLaser_sub = rospy.Subscriber(self.robot_node_identifier+"/base_scan",sensor_msgs.msg.LaserScan,self.StageLaser_callback)
-        #self.StageLaser_sub = rospy.Subscriber
-        self.ReadLaser = False
-        self.FiveCounter = 0
-        self._divertingPath_ = False
+
 
     """
     @function
@@ -183,61 +179,6 @@ class Entity:
         self.theta = current_theta
 
 
-    def StageLaser_callback(self, msg):
-
-        #for some reason, ros is passing a value of 5 back every second call regardless if anything
-        #is in front of it, this bit of code is just to ignore that random value its passing through
-
-        #print "Header : " + str(msg.header)
-        # if not self.ReadLaser:
-        #     #print "Not Reading : " + str(msg.ranges[90])
-        #     self.ReadLaser = True
-        #     return
-        # else:
-        #     self.ReadLaser = False
-
-        #print "Reading : " + str(msg.ranges[90])
-        barCount = 0
-        found = False
-
-        #for i in range(0,180):
-        #print(msg.ranges[90])
-        if msg.ranges[90] < 4.0:
-            #action = self._actions_[2], [self, "left"]
-            #check if action already exists in stack, otherwise laser will spam rotates
-            #if action != self._actionsStack_[-1]:
-            #self._stopCurrentAction_ = True
-            self.halt_counter += 1
-            self._stopCurrentAction_ = True
-            self.FiveCounter = 0
-            #    self._actionsStack_.append(action)
-            #rospy.loginfo("Range at %f degree is: %f", i, msg.ranges[i])
-        else:
-            self.FiveCounter += 1
-            if self.FiveCounter == 5:
-                self.halt_counter = 0
-                self._stopCurrentAction_ = False
-                self.FiveCounter = 0
-
-        if self.halt_counter == 50:
-            if not self._divertingPath_:
-                print "ENCOUNTERED STATIC ELEMENT!!!!"
-                turn_action = self.turn, ["right"]
-                move_action = self.move_forward, [5]
-                turn_action2 = self.turn, ["left"]
-                move_forward2 = self.move_forward, [5]
-                self._actionsStack_.append(move_action)
-                self._actionsStack_.append(turn_action)
-                self._actionsStack_.append(move_forward2)
-                self._actionsStack_.append(turn_action2)
-                self._stopCurrentAction_ = False
-            self._divertingPath_ = True
-        elif self.halt_counter == 30:
-            print "Checking if Entity in front is a static element..."
-
-
-        #print self._stopCurrentAction_
-
     """
     @function
     @parameter: int velocity
@@ -271,7 +212,7 @@ class Entity:
 
         print "Moving Forward"
         #While the distance that the Entity has gained has not exceeded the given distance, continue to move the Entity forward
-        while (dist_gained < dist and not (self._stopCurrentAction_)) and not self._stopCurrentAction_:
+        while (dist_gained < dist and not self._stopCurrentAction_):
 
             #Calculate remaining distance to travel
             distToGo = dist - dist_gained
@@ -307,10 +248,10 @@ class Entity:
                 #stop movement and throw exception
                 self.RobotNode_cmdvel.linear.x = 0
                 self.RobotNode_stage_pub.publish(self.RobotNode_cmdvel)
-                self._stopCurrentAction_ = False
+                #self._stopCurrentAction_ = False
             #raise ActionInterruptException.ActionInterruptException("Wall hit")
-            print "Move Forward: Stopped due to potential collision"
-            return 2
+                print "Move Forward: Stopped due to potential collision"
+                return 2
         else:
             #Stop robot by setting forward velocity to 0 and then publish change
             self.RobotNode_cmdvel.linear.x = 0
@@ -328,7 +269,7 @@ class Entity:
     Turn function which allows the Entity to turn 90 degrees ( a right angle) either left or right.
     """
     def turn(self, direction):
-
+        print "Turning "+ direction
         pi = math.pi
 
 
