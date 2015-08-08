@@ -1,6 +1,10 @@
 #!/usr/bin/python
 import subprocess
 
+#run the config related scripts
+subprocess.check_output("gnome-terminal -x bash -c 'python generateWorldFile.py'", shell=True)
+
+
 print subprocess.check_output("rosmake se306Project1", shell=True)
 subprocess.check_output("gnome-terminal -x bash -c 'roscore'", shell=True)
 subprocess.check_output("gnome-terminal -x bash -c 'sleep 2 && rosrun stage_ros stageros world/myworld.world'", shell=True)
