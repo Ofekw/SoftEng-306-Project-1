@@ -1,5 +1,6 @@
 include "objects/picker.inc"
 include "objects/tree.inc"
+include "objects/visitor.inc"
 
 define floorplan model
 (
@@ -50,6 +51,8 @@ picker( pose [ -10 -28 0.000 90 ] name "r1" color "yellow")
 picker( pose [ 0 -28 0.000 90 ] name "r2" color "yellow")
 picker( pose [ 10 -28 0.000 90 ] name "r3" color "yellow")
 picker( pose [ 20 -28 0.000 90 ] name "r4" color "yellow")
+
+visitor( pose [0 -15 0 0] name "v0" color "white")
 
 
 #load all the kiwifruit trees

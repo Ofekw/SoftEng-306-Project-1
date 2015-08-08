@@ -29,7 +29,7 @@ class Visitor(Human):
             2: self.turn,
             3: self.stop,
             4: self.random_nav,
-            5: go_to_rand_location
+            5: self.go_to_rand_location
         }
 
     """
