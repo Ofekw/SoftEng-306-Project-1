@@ -175,44 +175,6 @@ class Entity:
         #Update the current theta vlue
         self.theta = current_theta
 
-
-    def StageLaser_callback(self, msg):
-        barCount = 0
-        found = False
-
-        if not self.disableLaser:
-            for i in range(70, 110):
-                if msg.ranges[i]< 4.0:
-                    action = self._actions_[2], [Direction.RIGHT]
-                    #check if action already exists in stack, otherwise laser will spam rotates
-                    if action != self._actionsStack_[-1]:
-                        #stop moving foward and add turn action
-                        self._stopCurrentAction_ = True
-                        self._actionsStack_.append(action)
-            #check that all lasers in 0-20 range are not hitting object
-
-            rangeCount = 0
-            for i in range(160,180):
-                if msg.ranges[i]<5.0:
-                    rangeCount += 1
-            #check if no tree and are waiting for new tree
-            if self.noMoreTrees>15 and self.atOrchard:
-                self.noMoreTrees = 0
-                #stop the robot moving forward
-                self._stopCurrentAction_ = True
-                turnAction = self._actions_[2], [Direction.LEFT]
-                self._actionsStack_.append(turnAction)
-            elif rangeCount == 0:
-                self.noMoreTrees +=1
-                self.treeDetected = False
-            #check if new tree dected
-            elif 0 < rangeCount < 20 and not self.treeDetected:
-                self.atOrchard = True
-                self.treeDetected = True
-                self.noMoreTrees=0
-                print("Found Tree")
-
-
     """
     @function
     @parameter: int velocity
