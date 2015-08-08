@@ -92,7 +92,8 @@ class Entity:
         self.StageLaser_sub = rospy.Subscriber(self.robot_node_identifier+"/base_scan",sensor_msgs.msg.LaserScan,self.StageLaser_callback)
         #self.StageLaser_sub = rospy.Subscriber
         self.ReadLaser = False
-        self.FiveCounter = 0;
+        self.FiveCounter = 0
+        self._divertingPath_ = False
 
     """
     @function
@@ -213,10 +214,22 @@ class Entity:
                 self._stopCurrentAction_ = False
                 self.FiveCounter = 0
 
-        if self.halt_counter > 50:
-            print "ENCOUNTERED STATIC ELEMENT!!!!"
+        if self.halt_counter == 50:
+            if not self._divertingPath_:
+                print "ENCOUNTERED STATIC ELEMENT!!!!"
+                turn_action = self.turn, ["right"]
+                move_action = self.move_forward, [5]
+                turn_action2 = self.turn, ["left"]
+                move_forward2 = self.move_forward, [5]
+                self._actionsStack_.append(move_action)
+                self._actionsStack_.append(turn_action)
+                self._actionsStack_.append(move_forward2)
+                self._actionsStack_.append(turn_action2)
+                self._stopCurrentAction_ = False
+            self._divertingPath_ = True
         elif self.halt_counter == 30:
             print "Checking if Entity in front is a static element..."
+
 
         #print self._stopCurrentAction_
 
