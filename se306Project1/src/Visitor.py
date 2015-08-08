@@ -28,7 +28,8 @@ class Visitor(Human):
             1: self.goto,
             2: self.turn,
             3: self.stop,
-            4: self.random_nav
+            4: self.random_nav,
+            5: go_to_rand_location
         }
 
     """
@@ -53,6 +54,22 @@ class Visitor(Human):
         self.change_linear_x_to(rand_velocity)
         self.face_direction(rand_direction)
         self.move_forward(rand_dist)
+
+    def go_to_rand_location(self):
+        random_x = random.randint(-40, 40)
+        random_y = random.randint(-40, 40)
+
+        move_to_empty_area = self._actions_.goto, [self.px, -18]
+
+        move_to_x = self._actions_.goton, [random_x, self.py]
+
+        move_to_y = self._actions_.goto, [self.px, random_y]
+
+        self._actionsStack_.append(move_to_y)
+        self._actionsStack_.append(move_to_x)
+        self._actionsStack_.append(move_to_empty_area)
+
+
 
     def visitor_specific_function(self):
         self.random_nav
