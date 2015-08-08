@@ -29,5 +29,3 @@ width_between_rows = WORLD_WIDTH/(rows)
 
 #Always start from middle (0,0) and branch out if odd number else start from
 
-if rows % 2 == 0:  #even
-    for i in range(width_between_rows/2,WORLD_WIDTH - width_between_rows/2, width_between_rows): #x co-cordinates step size

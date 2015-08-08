@@ -8,16 +8,15 @@ print subprocess.check_output("rosmake se306Project1", shell=True)
 subprocess.Popen("bash -c 'roscore'", shell=True)
 subprocess.Popen("bash -c 'sleep 2 && rosrun stage_ros stageros world/myworld.world'", shell=True)
 
-number = 0
-colors = []
-#run robots listed in robotList.txt file
-file = open("robotList.txt", "r")
-line = file.readline()
-while line not in ['\n', '\n\r']:
-    args = line.split()
-    line = file.readline()
+config = {}
+left_tree = open('world')
 
-
+with open("config.properties", "r") as f:
+    for line in f:
+        print(line)
+        property = line.split('=')
+        config[property[0]] = property[1]
+number = config.get('robot.number')
 
 string = ""
 with open("header.txt", "r") as f:
