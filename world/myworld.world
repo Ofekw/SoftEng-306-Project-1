@@ -52,7 +52,7 @@ picker( pose [ 0 -28 0.000 90 ] name "r2" color "yellow")
 picker( pose [ 10 -28 0.000 90 ] name "r3" color "yellow")
 picker( pose [ 20 -28 0.000 90 ] name "r4" color "yellow")
 
-visitor( pose [0 -15 0 0] name "v0" color "white")
+visitor( pose [5 -15 0 0] name "v0" color "white")
 
 
 #load all the kiwifruit trees
