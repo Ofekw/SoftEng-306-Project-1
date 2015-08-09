@@ -53,7 +53,7 @@ class RobotPicker(Robot):
         #com_pub.publish("\n" + rospy.get_caller_id() +  " is at position x: " + xpos + "\nposition y: " + ypos)
 
         picker_pub.publish(str(self.robot_id) + "," + xpos + "," + ypos+ "," + str(self.theta))
-        print("I have sent " + str(self.robot_id) + "," + xpos + "," + ypos+ "," + str(self.theta))
+        #print("I have sent " + str(self.robot_id) + "," + xpos + "," + ypos+ "," + str(self.theta))
 
         fn = os.path.join(os.path.dirname(__file__), "Picker"+str(self.robot_id)+".sta")
         output_file = open(fn, "w")
@@ -72,7 +72,6 @@ class RobotPicker(Robot):
     def StageLaser_callback(self, msg):
         barCount = 0
         found = False
-
         if not self.disableLaser:
             for i in range(70, 110):
                 if msg.ranges[i]< 4.0:

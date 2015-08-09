@@ -17,6 +17,7 @@ def main():
 
 @@@
 
+    debugger = Debugger(robot)
     rospy.Rate(100)
     rospy.sleep(0.1)
 

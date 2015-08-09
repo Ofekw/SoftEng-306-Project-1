@@ -10,12 +10,15 @@ import math
 import numpy.testing
 from RobotPicker import RobotPicker
 import ActionInterruptException
+from Debugger import Debugger
 
 def main():
     #Construction of Robot objects take 3 params... Robot ID, Start X, Start Y. Start X and Start Y correlates to the myworld.world file
     #Can't create more than one robot per main() .... ie can't run more than one robot per terminal running
 
     robot = RobotPicker(0, 0, 0, math.pi/2)
+    debugger = Debugger(robot)
+    debugger.start()
 
     rospy.Rate(100)
     rospy.sleep(0.1)

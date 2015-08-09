@@ -274,7 +274,6 @@ class Entity:
         print "Turning "+ direction
         pi = math.pi
 
-
         if (direction == Direction.LEFT):
             thetaTarg = self.theta + pi/2
             dir = 1
@@ -283,7 +282,7 @@ class Entity:
         elif (direction == Direction.RIGHT):
             thetaTarg = self.theta - pi/2
             dir = -1
-            if (thetaTarg < -pi):
+            if (thetaTarg < -pi/2):
                 thetaTarg = pi + (thetaTarg + pi)
         #disable laser as don't want to be checking for collisions when turning as
         #robot will not cause collision while turning
@@ -570,7 +569,7 @@ class Entity:
     def get_distance(self, x_coord, y_coord):
 
         distance = math.sqrt((x_coord - self.px)**2+(y_coord - self.py)**2)
-        print("Distance from cuurent position: (%.2f,%.2f) to (%.2f,%.2f) is %.2f units" %(self.px, self.py, x_coord,y_coord,distance))
+        #print("Distance from cuurent position: (%.2f,%.2f) to (%.2f,%.2f) is %.2f units" %(self.px, self.py, x_coord,y_coord,distance))
         return distance
 
 
