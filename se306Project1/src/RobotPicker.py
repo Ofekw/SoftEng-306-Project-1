@@ -81,11 +81,12 @@ class RobotPicker(Robot):
         #rospy.loginfo("Current theta: %f", self.theta)
 
     def addKiwi(self, clockTime):
+        print("looking to add " + str(self.max_load) + " " + str(self.current_load))
         if(self.current_load >= self.max_load):
             self.waitForCollection()
-            return
-        if(clockTime <= (self.timeLastAdded + 1)):
+        elif(clockTime <= (self.timeLastAdded + 1)):
             self.current_load = self.current_load + 1
+            print("kiwi added")
 
     def waitForCollection(self):
         #while(self.current_load >= self.max_load):

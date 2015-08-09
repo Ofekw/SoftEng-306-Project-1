@@ -25,9 +25,9 @@ class RobotCarrier(Robot):
         self.carrier_sub = rospy.Subscriber("carrierPosition", String, self.carrierCallback)
         self.picker_sub = rospy.Subscriber("pickerPosition", String, self.pickerCallback)
 
-        self.closestRobot = "100,100"
-        self.carrier_robots = ["0,0","0,0"]
-        self.picker_robots = ["0,0","0,0"]
+        self.closestRobotID = 0
+        self.carrier_robots = ["0,0,0","0,0,0"]
+        self.picker_robots = ["0,0,0","0,0,0"]
 
         self.max_load = 100;
         self.current_load = 0;
@@ -99,9 +99,10 @@ class RobotCarrier(Robot):
     """
     def carrierCallback(self, message):
         # print("Carrier callback position " + message.data.split(',')[1] + "," + message.data.split(',')[2])
-        self.carrier_robots[int(message.data.split(',')[0])] = message.data.split(',')[1] + "," + message.data.split(',')[2] #+ "," + message.data.split(',')[4]  # Should add element 4 here which is theta
+        #self.carrier_robots[int(message.data.split(',')[0])] = message.data.split(',')[1] + "," + message.data.split(',')[2] #+ "," + message.data.split(',')[4]  # Should add element 4 here which is theta
         # print("Carrier array")
         # print ', '.join(self.carrier_robots)
+        pass
 
     """
     @function
@@ -185,26 +186,29 @@ class RobotCarrier(Robot):
     """
     def getClosest(self):
         #print("Getting closest robot.....")
-        for index, position in enumerate(self.picker_robots):
-            current = self.closestRobot
-            if (self.robot_id != index):
-                currentDist = self.get_distance(float(current.split(',')[0]), float(current.split(',')[1]))
-                newDist = self.get_distance(float(position.split(',')[0]), float(position.split(',')[1]))
-                if (newDist < currentDist):
-                    self.closestRobot = position
+        # for index, position in enumerate(self.picker_robots):
+        #     current = self.closestRobot
+        #     if (self.robot_id != index):
+        #         currentDist = self.get_distance(float(current.split(',')[0]), float(current.split(',')[1]))
+        #         newDist = self.get_distance(float(position.split(',')[0]), float(position.split(',')[1]))
+        #         if (newDist < currentDist):
+        #             self.closestRobot = position
+
+        #return robot ID 0
+        return 0
 
     # It is supposed to get the closest robot and then go to that location
     # This doesn't work right as it only calls the getClosest() once and then just continues to call goto()
     # Need a better understanding of how the actions stack works to get this to work correctly
     def waitForPicker(self):
-            self.getClosest()
-            print("Closest robot at: " + self.closestRobot)
-            if(int(self.closestRobot.split(',')[2]) == 20):
-                self.goToClosest()
+        self.getClosest()
+        print("Closest robot is: " + str(self.closestRobotID))
+        if(int(self.picker_robots[self.closestRobotID].split(',')[2]) == 20):
+            self.goToClosest()
 
     def goToClosest(self):
         self._stopCurrentAction_ = True
-        action = self._actions_[1], [float(self.closestRobot.split(',')[0]), float(self.closestRobot.split(',')[1])]
+        action = self._actions_[1], [float(self.picker_robots[self.closestRobotID].split(',')[0]), float(self.picker_robots[self.closestRobotID].split(',')[1])]
             #goto(float(self.closestRobot.split(',')[0]), float(self.closestRobot.split(',')[1]))
         if action != self._actionsStack_[-1]:
             #stop moving foward and add turn action
