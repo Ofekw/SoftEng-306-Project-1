@@ -79,14 +79,16 @@ class RobotCarrier(Robot):
         # print("I have sent " + str(self.robot_id) + "," + xpos + "," + ypos+ "," + str(self.theta))
         #print("I am at " + xpos + "," + ypos)
 
-        fn = os.path.join(os.path.dirname(__file__), "Carrier"+str(self.robot_id)+"txt")
+        fn = os.path.join(os.path.dirname(__file__), "Carrier"+str(self.robot_id)+".sta")
         output_file = open(fn, "w")
-        output_file.write("Name:   "+str(self.robot_node_identifier)+ "\n")
-        output_file.write("Type: Carrier\n")
-        output_file.write("X Position:   "+ str(round(self.px,2)) + "\n")
-        output_file.write("Y Position:   " +str(round(self.py,2)) + "\n")
-        output_file.write("Theta:   " +str(round(self.theta,2)) + "\n")
-        output_file.write("Capacity:   " + str(self.current_load)+ "/" + str(self.max_load))
+        output_file.write(str(self.robot_node_identifier)+ "\n")
+        output_file.write("Carrier\n")
+        output_file.write("..........\n")
+        output_file.write(str(round(self.px,2)) + "\n")
+        output_file.write(str(round(self.py,2)) + "\n")
+        output_file.write(str(round(self.theta,2)) + "\n")
+        output_file.write(str(self.current_load)+ "/" + str(self.max_load))
+
 
         #rospy.loginfo("Current x position: %f" , self.px)
         #rospy.loginfo("Current y position: %f", self.py)
