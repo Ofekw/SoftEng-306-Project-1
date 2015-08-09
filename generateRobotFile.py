@@ -27,7 +27,7 @@ string = open('world/templates/robot.template').read()
 file_name = []
 directory = "./se306Project1/src/"
 for i in range(0, int(number)):
-    replace = "    robot = RobotPicker(" + str(i) + ", 0, 0, math.pi/2)"
+    replace = "    robot = RobotPicker(" + str(initial_x+(i*10)) + ", -28, 0, math.pi/2)"
     name = "r" + str(i) + ".py"
     file_name.append(name)
     temp = open(os.path.join(directory, name),'w')
