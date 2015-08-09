@@ -13,7 +13,6 @@ with open("config.properties", "r") as f:
 number = config.get('robot.number')
 
 robot = ""
-world = open('world/myworld.world').read()
 for i in range(0, int(number)):
     robot = robot + "picker( pose [ " + str(initial_x+(i*10))  + " -28 0.000 90 ] name \"r" + str(i) + "\" color \"yellow\")" + "\n"
 robot = robot + "\n"
@@ -41,6 +40,7 @@ for name in file_name:
     subprocess.Popen(command, shell=True)
 
 def delete_files():
+    os.remove('world/myworld.world')
     for name in file_name:
         os.remove(directory+name)
 
