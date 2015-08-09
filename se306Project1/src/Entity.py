@@ -91,6 +91,8 @@ class Entity:
         self.RobotNode_stage_pub = rospy.Publisher(self.robot_node_identifier+"/cmd_vel", geometry_msgs.msg.Twist, queue_size=10)
         self.StageOdo_sub = rospy.Subscriber(self.robot_node_identifier+"/odom", nav_msgs.msg.Odometry, self.StageOdom_callback)
 
+        self.StageLaser_sub = rospy.Subscriber(self.robot_node_identifier+"/base_scan",sensor_msgs.msg.LaserScan,self.StageLaser_callback)
+
         self.RobotNode_cmdvel = geometry_msgs.msg.Twist()
         self.RobotNode_odom = geometry_msgs.msg.Pose2D()
 
@@ -248,10 +250,10 @@ class Entity:
                 #stop movement and throw exception
                 self.RobotNode_cmdvel.linear.x = 0
                 self.RobotNode_stage_pub.publish(self.RobotNode_cmdvel)
-                #self._stopCurrentAction_ = False
-            #raise ActionInterruptException.ActionInterruptException("Wall hit")
-                print "Move Forward: Stopped due to potential collision"
-                return 2
+                self._stopCurrentAction_ = False
+                raise ActionInterruptException.ActionInterruptException("Wall hit")
+                #print "Move Forward: Stopped due to potential collision"
+                #return 2
         else:
             #Stop robot by setting forward velocity to 0 and then publish change
             self.RobotNode_cmdvel.linear.x = 0
@@ -305,8 +307,8 @@ class Entity:
         #Turn complete, reenable laser
         self.disableLaser = False
         if self._stopCurrentAction_ == True:
-            #raise ActionInterruptException.ActionInterruptException("Wall hit")
-            return 2
+            raise ActionInterruptException.ActionInterruptException("Wall hit")
+            #return 2
         else:
                 #Stop robot by setting forward velocity to 0 and then publish change
                 self.RobotNode_cmdvel.angular.z = 0

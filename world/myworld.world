@@ -8,7 +8,7 @@ define floorplan model
 
   # most maps will need a bounding box
   boundary 1
-
+  
   ranger_return 1
   laser_return 1
 )
