@@ -56,20 +56,45 @@ class Visitor(Human):
         self.move_forward(rand_dist)
 
     def go_to_rand_location(self):
+
+        if (self._actionsStack_.__len__() == 1):
+            self._actionsStack_.pop()
+
         random_x = random.randint(-40, 40)
         random_y = random.randint(-40, 40)
 
-        move_to_empty_area = self._actions_.goto, [self.px, -18]
+        move_to_empty_area = self.goto, [self.px, -12]
 
-        move_to_x = self._actions_.goton, [random_x, self.py]
+        move_to_x = self.goto, [random_x, self.py]
 
-        move_to_y = self._actions_.goto, [self.px, random_y]
+        move_to_y = self.goto, [self.px, random_y]
 
         self._actionsStack_.append(move_to_y)
         self._actionsStack_.append(move_to_x)
         self._actionsStack_.append(move_to_empty_area)
 
+        print(str(len(self._actionsStack_)))
 
+        while (len(self._actionsStack_) > 0 and not self._actionRunning_):
+            #get top action on stack
+            action = self._actionsStack_[-1]
+            #run action with parameter
+            self._actionRunning_ = True
+
+            try:
+                result = action[0](*action[1])
+                #if action completes succesfully pop it
+                self._actionsStack_.pop()
+
+                self._actionRunning_ = False
+            except:
+                self._actionsStack_ = []
+                self.go_to_rand_location()
+
+            if (self._actionsStack_.__len__() == 0):
+                go_to_rand_location_action = self.go_to_rand_location, []
+
+                self._actionsStack_.append(go_to_rand_location_action)
 
     def visitor_specific_function(self):
         self.random_nav
