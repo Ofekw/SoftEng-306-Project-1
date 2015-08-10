@@ -22,6 +22,12 @@ It inherits from the Robot class.
 """
 class RobotPicker(Robot):
 
+    def enum(**enums):
+        return type('Enum', (), enums)
+
+    PickerState = enum(PICKING="Picking Fruit",
+                              FINDING="Finding Orchard")
+
     def __init__(self,r_id,x_off,y_off,theta_off):
         self.picker_pub = rospy.Publisher("pickerPosition",String, queue_size=10)
 
@@ -72,7 +78,7 @@ class RobotPicker(Robot):
         output_file = open(fn, "w")
         output_file.write(str(self.robot_node_identifier)+ "\n")
         output_file.write("Picker\n")
-        output_file.write("..........\n")
+        output_file.write(self.state+"\n")
         output_file.write(str(round(self.px,2)) + "\n")
         output_file.write(str(round(self.py,2)) + "\n")
         output_file.write(str(round(self.theta,2)) + "\n")
@@ -80,7 +86,7 @@ class RobotPicker(Robot):
 
         #rospy.loginfo("Current x position: %f" , self.px)
         #rospy.loginfo("Current y position: %f", self.py)
-        #rospy.loginfo("Current theta: %f", self.theta)
+        #rospy.loginfo("Current theta: %f", self.theta)s
 
     def addKiwi(self, clockTime):
         print("looking to add " + str(self.max_load) + " " + str(self.current_load))
@@ -126,7 +132,7 @@ class RobotPicker(Robot):
                 if msg.ranges[i]<5.0:
                     rangeCount += 1
             #check if no tree and are waiting for new tree
-            if self.noMoreTrees>15 and self.atOrchard:
+            if self.noMoreTrees>15 and self.state == self.PickerState.PICKING:
                 self.noMoreTrees = 0
                 #stop the robot moving forward
                 self._stopCurrentAction_ = True
@@ -137,7 +143,7 @@ class RobotPicker(Robot):
                 self.treeDetected = False
             #check if new tree dected
             elif 0 < rangeCount < 20 and not self.treeDetected:
-                self.atOrchard = True
+                self.state = self.PickerState.PICKING
                 self.treeDetected = True
                 self.noMoreTrees=0
                 print("Found Tree")

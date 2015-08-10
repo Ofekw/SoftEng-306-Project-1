@@ -32,6 +32,7 @@ def main():
 
     moveAction = robot._actions_[0], [1000]
     robot._actionsStack_.append(moveAction)
+    robot.state = robot.PickerState.FINDING
     # turnAction = robot.actions[2], ["left"]
     # robot.actionsStack.append(turnAction)
 

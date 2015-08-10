@@ -9,7 +9,6 @@ from tf.transformations import *
 import math
 import time
 import ActionInterruptException
-import numpy.testing
 
 """
 @class
@@ -31,8 +30,8 @@ class Entity:
         return type('Enum', (), enums)
 
     Direction = enum(NORTH="north",EAST="east",SOUTH="south",WEST="west",LEFT="left",RIGHT="right")
-    Angle = enum(DEGREES="degrees",RADIANS="radians")
-
+    Angle = enum(DEGREES="degrees", RADIANS="radians")
+    State = enum(STOPPED="Stopped", TURNING="Turning")
     def __init__(self,r_id,x_off,y_off, theta_off):
 
 
@@ -57,6 +56,7 @@ class Entity:
         self.robot_node_identifier = ("robot_"+ str(r_id))
         self.goalx = self.px
         self.goaly = self.py
+        self.state = self.State.STOPPED
 
         #Used to determine how long we've waited for an element to pass by, if exceeds a threshold
         #we will know it is a static element and we need to do something different
@@ -292,6 +292,7 @@ class Entity:
         #disable laser as don't want to be checking for collisions when turning as
         #robot will not cause collision while turning
         self.disableLaser = True
+        self.state=self.State.TURNING
         while (abs(self.theta - thetaTarg) > 0.01 and not (self._stopCurrentAction_)):
             thetaDiff = abs(self.theta - thetaTarg)
 
@@ -315,9 +316,9 @@ class Entity:
             #return 2
         else:
                 #Stop robot by setting forward velocity to 0 and then publish change
+                # #self.correct_theta()
                 self.RobotNode_cmdvel.angular.z = 0
                 self.RobotNode_stage_pub.publish(self.RobotNode_cmdvel)
-                #self.correct_theta()
                 #return 0 for succesful finish
                 return 0
 
