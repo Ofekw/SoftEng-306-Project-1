@@ -57,6 +57,10 @@ class Entity:
         self.goalx = self.px
         self.goaly = self.py
 
+        #Used to determine how long we've waited for an element to pass by, if exceeds a threshold
+        #we will know it is a static element and we need to do something different
+        self.halt_counter = 0
+
         #array of methods of robot actions
         self._actions_ = {
             0: self.move_forward,
@@ -87,11 +91,12 @@ class Entity:
         self.RobotNode_stage_pub = rospy.Publisher(self.robot_node_identifier+"/cmd_vel", geometry_msgs.msg.Twist, queue_size=10)
         self.StageOdo_sub = rospy.Subscriber(self.robot_node_identifier+"/odom", nav_msgs.msg.Odometry, self.StageOdom_callback)
 
+        self.StageLaser_sub = rospy.Subscriber(self.robot_node_identifier+"/base_scan",sensor_msgs.msg.LaserScan,self.StageLaser_callback)
+
         self.RobotNode_cmdvel = geometry_msgs.msg.Twist()
         self.RobotNode_odom = geometry_msgs.msg.Pose2D()
 
-        self.StageLaser_sub = rospy.Subscriber(self.robot_node_identifier+"/base_scan",sensor_msgs.msg.LaserScan,self.StageLaser_callback)
-        self.StageLaser_sub = rospy.Subscriber
+
 
     """
     @function
@@ -175,6 +180,7 @@ class Entity:
         #Update the current theta vlue
         self.theta = current_theta
 
+
     """
     @function
     @parameter: int velocity
@@ -206,8 +212,9 @@ class Entity:
         previousY = self.py
 
 
+        print "Moving Forward"
         #While the distance that the Entity has gained has not exceeded the given distance, continue to move the Entity forward
-        while (dist_gained < dist and not (self._stopCurrentAction_)):
+        while (dist_gained < dist and not self._stopCurrentAction_):
 
             #Calculate remaining distance to travel
             distToGo = dist - dist_gained
@@ -244,7 +251,9 @@ class Entity:
                 self.RobotNode_cmdvel.linear.x = 0
                 self.RobotNode_stage_pub.publish(self.RobotNode_cmdvel)
                 self._stopCurrentAction_ = False
-                raise ActionInterruptException.ActionInterruptException("Move Interrupted")
+                raise ActionInterruptException.ActionInterruptException("Wall hit")
+                #print "Move Forward: Stopped due to potential collision"
+                #return 2
         else:
             #Stop robot by setting forward velocity to 0 and then publish change
             self.RobotNode_cmdvel.linear.x = 0
@@ -262,9 +271,8 @@ class Entity:
     Turn function which allows the Entity to turn 90 degrees ( a right angle) either left or right.
     """
     def turn(self, direction):
-
+        print "Turning "+ direction
         pi = math.pi
-
 
         if (direction == Direction.LEFT):
             thetaTarg = self.theta + pi/2
@@ -274,7 +282,7 @@ class Entity:
         elif (direction == Direction.RIGHT):
             thetaTarg = self.theta - pi/2
             dir = -1
-            if (thetaTarg < -pi):
+            if (thetaTarg < -pi/2):
                 thetaTarg = pi + (thetaTarg + pi)
         #disable laser as don't want to be checking for collisions when turning as
         #robot will not cause collision while turning
@@ -298,8 +306,8 @@ class Entity:
         #Turn complete, reenable laser
         self.disableLaser = False
         if self._stopCurrentAction_ == True:
-                self._stopCurrentAction_ = False
-                raise ActionInterruptException.ActionInterruptException("Wall hit")
+            raise ActionInterruptException.ActionInterruptException("Wall hit")
+            #return 2
         else:
                 #Stop robot by setting forward velocity to 0 and then publish change
                 self.RobotNode_cmdvel.angular.z = 0
@@ -439,7 +447,7 @@ class Entity:
     A----------------------|
     """
     def goto(self, x_coord, y_coord):
-
+        print "Going To : ("+str(x_coord)+","+str(y_coord)+")"
         #try run the goto command
         try:
             print("Current x pos = " + str(self.px))
@@ -516,8 +524,14 @@ class Entity:
             print(e.message)
             return 1
         finally:
-            print("Arrived at destination:", self.px, self.py)
-            return 0
+
+            if self._stopCurrentAction_:
+                print("Halted at destination:", self.px, self.py)
+                print "Go To: Stopped due to potential collision"
+                return 2
+            else:
+                print("Arrived at destination:", self.px, self.py)
+                return 0
 
     """
     @function
@@ -555,7 +569,7 @@ class Entity:
     def get_distance(self, x_coord, y_coord):
 
         distance = math.sqrt((x_coord - self.px)**2+(y_coord - self.py)**2)
-        print("Distance from cuurent position: (%.2f,%.2f) to (%.2f,%.2f) is %.2f units" %(self.px, self.py, x_coord,y_coord,distance))
+        #print("Distance from cuurent position: (%.2f,%.2f) to (%.2f,%.2f) is %.2f units" %(self.px, self.py, x_coord,y_coord,distance))
         return distance
 
 
