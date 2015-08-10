@@ -44,6 +44,10 @@ se306Project1/build/
 
 *.pyc
 
+#GUI
+
+*.sta
+
 
 
 

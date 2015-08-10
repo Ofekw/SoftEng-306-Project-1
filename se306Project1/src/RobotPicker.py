@@ -68,13 +68,15 @@ class RobotPicker(Robot):
         self.picker_pub.publish(str(self.robot_id) + "," + xpos + "," + ypos+ "," + str(self.theta) + "," + str(self.current_load))
         print("I have sent " + str(self.robot_id) + "," + xpos + "," + ypos+ "," + str(self.theta) + "," + str(self.current_load))
 
-        fn = os.path.join(os.path.dirname(__file__), "Picker"+str(self.robot_id)+".txt")
+        fn = os.path.join(os.path.dirname(__file__), "Picker"+str(self.robot_id)+".sta")
         output_file = open(fn, "w")
-        output_file.write("Name:   "+str(self.robot_node_identifier)+ "\n")
-        output_file.write("Type: Picker\n")
-        output_file.write("X Position:   "+ str(self.px) + "\n")
-        output_file.write("Y Position:   " +str(self.py) + "\n")
-        output_file.write("Theta:   " +str(self.theta))
+        output_file.write(str(self.robot_node_identifier)+ "\n")
+        output_file.write("Picker\n")
+        output_file.write("..........\n")
+        output_file.write(str(round(self.px,2)) + "\n")
+        output_file.write(str(round(self.py,2)) + "\n")
+        output_file.write(str(round(self.theta,2)) + "\n")
+        output_file.write(str(self.current_load)+ "/" + str(self.max_load))
 
         #rospy.loginfo("Current x position: %f" , self.px)
         #rospy.loginfo("Current y position: %f", self.py)
@@ -108,7 +110,6 @@ class RobotPicker(Robot):
     def StageLaser_callback(self, msg):
         barCount = 0
         found = False
-
         if not self.disableLaser:
             for i in range(70, 110):
                 if msg.ranges[i]< 4.0:

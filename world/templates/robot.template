@@ -7,7 +7,6 @@ from nav_msgs.msg import*
 from sensor_msgs.msg import*
 from tf.transformations import *
 import math
-import numpy.testing
 from RobotPicker import RobotPicker
 import ActionInterruptException
 
@@ -35,7 +34,7 @@ def main():
 
     while not rospy.is_shutdown():
     #check if there is an action on the stack or an action already running
-        if(robot0._actionsStack_.__len__() > 0 and not robot0._actionRunning_) and not robot0._stopCurrentAction_:
+        if(robot._actionsStack_.__len__() > 0 and not robot._actionRunning_):
             #get top action on stack
             action = robot._actionsStack_[-1]
             #run action with parameter
