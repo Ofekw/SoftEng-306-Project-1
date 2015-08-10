@@ -35,6 +35,9 @@ class RobotPicker(Robot):
         self.current_load = 0;
         self.timeLastAdded = time.clock()
 
+        self.kiwi_sub = rospy.Subscriber("kiwiTransfer", String, self.kiwi_callback)
+        self.kiwi_pub = rospy.Publisher("kiwiTransfer",String, queue_size=10)
+
         # self._actions_ = {
         #     0: self.move_forward,
         #     1: self.goto,
@@ -87,6 +90,16 @@ class RobotPicker(Robot):
         #rospy.loginfo("Current x position: %f" , self.px)
         #rospy.loginfo("Current y position: %f", self.py)
         #rospy.loginfo("Current theta: %f", self.theta)s
+
+    def kiwi_callback(self, message):
+        if (message != str(self.robot_id)):
+            print("transfer load")
+            self.current_load = 0
+            self.kiwi_pub.publish(str(self.robot_id))
+            time.sleep(5)
+            self._actionsStack_.pop(-1)
+            self._stopCurrentAction_ = False
+
 
     def addKiwi(self, clockTime):
         print("looking to add " + str(self.max_load) + " " + str(self.current_load))

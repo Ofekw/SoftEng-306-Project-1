@@ -7,6 +7,7 @@ from nav_msgs.msg import*
 from sensor_msgs.msg import*
 from tf.transformations import *
 import math
+import time
 import numpy.testing
 from Robot import Robot
 import os
@@ -24,6 +25,9 @@ class RobotCarrier(Robot):
         self.carrier_pub = rospy.Publisher("carrierPosition",String, queue_size=10)
         self.carrier_sub = rospy.Subscriber("carrierPosition", String, self.carrierCallback)
         self.picker_sub = rospy.Subscriber("pickerPosition", String, self.pickerCallback)
+        self.kiwi_sub = rospy.Subscriber("kiwiTransfer", String, self.kiwi_callback)
+        self.kiwi_pub = rospy.Publisher("kiwiTransfer",String, queue_size=10)
+
 
         self.closestRobotID = 0
         self.carrier_robots = ["0,0,0","0,0,0"]
@@ -91,7 +95,7 @@ class RobotCarrier(Robot):
         output_file.write(str(self.current_load)+ "/" + str(self.max_load))
 
 
-        #rospy.loginfo("Current x position: %f" , self.px)
+        #rospy.loginfo("Current x position: %f"picker , self.px)
         #rospy.loginfo("Current y position: %f", self.py)
         #rospy.loginfo("Current theta: %f", self.theta)
 
@@ -120,6 +124,17 @@ class RobotCarrier(Robot):
         print("Picker array")
         print(', '.join(self.picker_robots))
 
+    def kiwi_callback(self, message):
+        if (message != str(self.robot_id)):
+            self.current_load = 20
+            print("going to dropoff zone")
+            # goto dropoff zone
+            time.sleep(10)
+        pass
+
+    def intiate_transfer(self):
+        self.kiwi_pub.publish(str(self.robot_id))
+        print("intitate transfer")
 
     """
     @function
@@ -219,7 +234,15 @@ class RobotCarrier(Robot):
             #self._stopCurrentAction_ = True
             self._actionsStack_.append(action)
 
+    def arrivedAtPoint(self):
+        xgoal = float(self.picker_robots[self.closestRobotID].split(',')[0])
+        ygoal = float(self.picker_robots[self.closestRobotID].split(',')[1])
+        xabsolute = abs(xgoal - self.px)
+        yabsolute = abs(ygoal - self.py)
+        if (xabsolute < 1 and yabsolute < 1):
+            print (str(xabsolute) + "  " + str(yabsolute))
+            self.intiate_transfer()
+
     def returnToOrigin(self):
         self.goto(self.px, self.init_y)
         self.goto(self.init_y, self.py)
-        pass
