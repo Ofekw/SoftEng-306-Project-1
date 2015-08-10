@@ -227,7 +227,7 @@ class RobotCarrier(Robot):
 
     def goToClosest(self):
         self._stopCurrentAction_ = True
-        action = self._actions_[1], [float(self.picker_robots[self.closestRobotID].split(',')[0]), float(self.picker_robots[self.closestRobotID].split(',')[1])]
+        action = self._actions_[1], [float(self.picker_robots[self.closestRobotID].split(',')[0]), float(self.picker_robots[self.closestRobotID].split(',')[1])-4.0]
             #goto(float(self.closestRobot.split(',')[0]), float(self.closestRobot.split(',')[1]))
         if action != self._actionsStack_[-1]:
             #stop moving foward and add turn action
@@ -239,7 +239,7 @@ class RobotCarrier(Robot):
         ygoal = float(self.picker_robots[self.closestRobotID].split(',')[1])
         xabsolute = abs(xgoal - self.px)
         yabsolute = abs(ygoal - self.py)
-        if (xabsolute < 1 and yabsolute < 1):
+        if (xabsolute < 0.5 and yabsolute < 4):
             print (str(xabsolute) + "  " + str(yabsolute))
             self.intiate_transfer()
 

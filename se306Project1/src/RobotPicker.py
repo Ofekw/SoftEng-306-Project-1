@@ -97,7 +97,7 @@ class RobotPicker(Robot):
             self.current_load = 0
             self.kiwi_pub.publish(str(self.robot_id))
             time.sleep(5)
-            self._actionsStack_.pop(-1)
+            self._actionsStack_.pop()
             self._stopCurrentAction_ = False
 
 
