@@ -30,9 +30,7 @@ def main():
 
     moveAction = robot._actions_[0], [1000]
     robot._actionsStack_.append(moveAction)
-    # turnAction = robot.actions[2], ["left"]
-    # robot.actionsStack.append(turnAction)
-
+    robot.state = robot.PickerState.FINDING
 
     while not rospy.is_shutdown():
     #check if there is an action on the stack or an action already running

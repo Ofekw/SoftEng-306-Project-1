@@ -1,6 +1,6 @@
+#!/usr/bin/env python
 __author__ = 'patrick'
 import threading
-import thread
 
 
 class Debugger:
