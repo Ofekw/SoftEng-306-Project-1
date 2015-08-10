@@ -31,7 +31,7 @@ class Entity:
 
     Direction = enum(NORTH="north",EAST="east",SOUTH="south",WEST="west",LEFT="left",RIGHT="right")
     Angle = enum(DEGREES="degrees", RADIANS="radians")
-    State = enum(STOPPED="Stopped", TURNING="Turning")
+    State = enum(STOPPED="Stopped", TURNING="Turning", CORRECTING="Aligning to cardinal direction")
     def __init__(self,r_id,x_off,y_off, theta_off):
 
 
@@ -313,9 +313,10 @@ class Entity:
             #return 2
         else:
             #Stop robot by setting forward velocity to 0 and then publish change
+            self.correct_theta()
             self.RobotNode_cmdvel.angular.z = 0
             self.RobotNode_stage_pub.publish(self.RobotNode_cmdvel)
-            #self.correct_theta()
+
             #return 0 for succesful finish
             return 0
 
@@ -584,6 +585,7 @@ class Entity:
 
     """
     def correct_theta(self):
+        self.state = self.State.CORRECTING
         current_direction="NoDirect"
         if (abs(self.theta-math.pi/2)<=0.4):
             self.rotate_relative(math.pi/2-self.theta,Angle.RADIANS)
