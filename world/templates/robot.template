@@ -7,7 +7,6 @@ from nav_msgs.msg import*
 from sensor_msgs.msg import*
 from tf.transformations import *
 import math
-import numpy.testing
 from RobotPicker import RobotPicker
 import ActionInterruptException
 
@@ -17,7 +16,6 @@ def main():
 
 @@@
 
-    debugger = Debugger(robot)
     rospy.Rate(100)
     rospy.sleep(0.1)
 
