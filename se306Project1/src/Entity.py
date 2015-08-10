@@ -117,9 +117,9 @@ class Entity:
 
         #output_file.close("Capacity:")
 
-        # rospy.loginfo("Current x position: %f" , self.px)
-        # rospy.loginfo("Current y position: %f", self.py)
-        # rospy.loginfo("Current theta: %f", self.theta)
+        #rospy.loginfo("Current x position: %f" , self.px)
+        #rospy.loginfo("Current y position: %f", self.py)
+        #rospy.loginfo("Current theta: %f", self.theta)
 
     """
     @function
@@ -282,12 +282,12 @@ class Entity:
         elif (direction == Direction.RIGHT):
             thetaTarg = self.theta - pi/2
             dir = -1
-            if (thetaTarg < -pi/2):
+            if (thetaTarg < -pi):
                 thetaTarg = pi + (thetaTarg + pi)
         #disable laser as don't want to be checking for collisions when turning as
         #robot will not cause collision while turning
         self.disableLaser = True
-        while (abs(self.theta - thetaTarg) > 0.01 and not (self._stopCurrentAction_)):
+        while (abs(self.theta - thetaTarg) > 0.01 and not self._stopCurrentAction_):
             thetaDiff = abs(self.theta - thetaTarg)
 
             #Set the angular velocity to optimal values that don't overshoot pi/2
@@ -306,15 +306,16 @@ class Entity:
         #Turn complete, reenable laser
         self.disableLaser = False
         if self._stopCurrentAction_ == True:
+            self._stopCurrentAction_ = False
             raise ActionInterruptException.ActionInterruptException("Wall hit")
             #return 2
         else:
-                #Stop robot by setting forward velocity to 0 and then publish change
-                self.RobotNode_cmdvel.angular.z = 0
-                self.RobotNode_stage_pub.publish(self.RobotNode_cmdvel)
-                #self.correct_theta()
-                #return 0 for succesful finish
-                return 0
+            #Stop robot by setting forward velocity to 0 and then publish change
+            self.RobotNode_cmdvel.angular.z = 0
+            self.RobotNode_stage_pub.publish(self.RobotNode_cmdvel)
+            #self.correct_theta()
+            #return 0 for succesful finish
+            return 0
 
 
 
@@ -366,14 +367,14 @@ class Entity:
            # print("Rotating - current theta is " + str(self.theta) +", target theta is " + str(thetaTarg))
 
         if self._stopCurrentAction_ == True:
-                self._stopCurrentAction_ = False
-                raise ActionInterruptException.ActionInterruptException("Wall hit")
+            self._stopCurrentAction_ = False
+            raise ActionInterruptException.ActionInterruptException("Wall hit")
         else:
-                #Stop robot by setting forward velocity to 0 and then publish change
-                self.RobotNode_cmdvel.angular.z = 0
-                self.RobotNode_stage_pub.publish(self.RobotNode_cmdvel)
-                #return 0 for succesful finish
-                return 0
+            #Stop robot by setting forward velocity to 0 and then publish change
+            self.RobotNode_cmdvel.angular.z = 0
+            self.RobotNode_stage_pub.publish(self.RobotNode_cmdvel)
+            #return 0 for succesful finish
+            return 0
 
     """
      @function

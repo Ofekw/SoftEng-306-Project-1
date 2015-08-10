@@ -50,7 +50,7 @@ define visitor position
 	point[1] [0 1]
 	point[2] [0.6 1]
 	point[3] [0.6 0]
-	z [0.05 0.3]
+	z [0.05 0.4]
 	color "blue"
   )
 
@@ -62,19 +62,30 @@ define visitor position
 	point[1] [0 1]
 	point[2] [0.6 1]
 	point[3] [0.6 0]
-	z [0.3 0.7]
+	z [0.4 0.8]
 	color "red"
   )
 
-  # head
-  block
+  # neck
   (
 	points 4
 	point[0] [0 0.33]
 	point[1] [0 0.66]
 	point[2] [0.6 0.66]
 	point[3] [0.6 0.33]
-	z [0.7 1]
+	z [0.8 0.85]
+	color "pink"
+  )
+
+  # head
+  block
+  (
+	points 4
+	point[0] [0 0.23]
+	point[1] [0 0.76]
+	point[2] [0.6 0.76]
+	point[3] [0.6 0.23]
+	z [0.85 1]
 	color "pink"
   )
 )
