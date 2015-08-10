@@ -1,1 +1,1 @@
-__author__ = 'carvrooom'
+#!/usr/bin/env python
