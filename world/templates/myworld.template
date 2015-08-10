@@ -1,5 +1,6 @@
 include "objects/picker.inc"
 include "objects/tree.inc"
+include "objects/visitor.inc"
 
 define floorplan model
 (

@@ -8,6 +8,7 @@ from sensor_msgs.msg import*
 from tf.transformations import *
 import math
 import ActionInterruptException
+import numpy.testing
 
 """
 @class
@@ -117,9 +118,9 @@ class Entity:
 
         #output_file.close("Capacity:")
 
-        # rospy.loginfo("Current x position: %f" , self.px)
-        # rospy.loginfo("Current y position: %f", self.py)
-        # rospy.loginfo("Current theta: %f", self.theta)
+        #rospy.loginfo("Current x position: %f" , self.px)
+        #rospy.loginfo("Current y position: %f", self.py)
+        #rospy.loginfo("Current theta: %f", self.theta)
 
     """
     @function
@@ -307,15 +308,16 @@ class Entity:
         #Turn complete, reenable laser
         self.disableLaser = False
         if self._stopCurrentAction_ == True:
+            self._stopCurrentAction_ = False
             raise ActionInterruptException.ActionInterruptException("Wall hit")
             #return 2
         else:
-                #Stop robot by setting forward velocity to 0 and then publish change
-                # #self.correct_theta()
-                self.RobotNode_cmdvel.angular.z = 0
-                self.RobotNode_stage_pub.publish(self.RobotNode_cmdvel)
-                #return 0 for succesful finish
-                return 0
+            #Stop robot by setting forward velocity to 0 and then publish change
+            self.RobotNode_cmdvel.angular.z = 0
+            self.RobotNode_stage_pub.publish(self.RobotNode_cmdvel)
+            #self.correct_theta()
+            #return 0 for succesful finish
+            return 0
 
 
 
@@ -367,14 +369,14 @@ class Entity:
            # print("Rotating - current theta is " + str(self.theta) +", target theta is " + str(thetaTarg))
 
         if self._stopCurrentAction_ == True:
-                self._stopCurrentAction_ = False
-                raise ActionInterruptException.ActionInterruptException("Wall hit")
+            self._stopCurrentAction_ = False
+            raise ActionInterruptException.ActionInterruptException("Wall hit")
         else:
-                #Stop robot by setting forward velocity to 0 and then publish change
-                self.RobotNode_cmdvel.angular.z = 0
-                self.RobotNode_stage_pub.publish(self.RobotNode_cmdvel)
-                #return 0 for succesful finish
-                return 0
+            #Stop robot by setting forward velocity to 0 and then publish change
+            self.RobotNode_cmdvel.angular.z = 0
+            self.RobotNode_stage_pub.publish(self.RobotNode_cmdvel)
+            #return 0 for succesful finish
+            return 0
 
     """
      @function
