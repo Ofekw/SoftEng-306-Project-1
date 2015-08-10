@@ -65,32 +65,46 @@ class Visitor(Human):
         self.face_direction(rand_direction)
         self.move_forward(rand_dist)
 
+    """
+    @function
+    This function involves random selecting a coordinate between -40 to 40 x, and -40 to 40 y, then having the entity
+    attempt to navigate towards the coordinate. The navigation works by using a goto function to move vertically towards
+    an area with no trees or robots (y = -15), then another goto function to move horizontally so the px value lines up to the random
+    x value, then finally moving vertically towards the y coordinate.
+    """
     def go_to_rand_location(self):
 
+        #Generate random coordinates
         random_x = random.randint(-40, 40)
         random_y = random.randint(-40, 40)
 
         print("Attempting to go to " + str(random_x) + ", " + str(random_y))
 
-        move_to_empty_area = self.goto(self.px, -15)
+        #Create action that will move vertically to empty area
+        move_to_empty_area = self._actions_[1], [self.px, -15]
 
-        move_to_x = self.goto(random_x, self.py)
+        #Create action that will move horizontally to line up to x coordinate
+        move_to_x = self._actions_[1], [random_x, -15]
 
-        move_to_y = self.goto(self.px, random_y)
+        #Create action that will move to random coordinate
+        move_to_y = self._actions_[1], [random_x, random_y]
 
+        #Append actions to stack
         self._actionsStack_.append(move_to_y)
         self._actionsStack_.append(move_to_x)
         self._actionsStack_.append(move_to_empty_area)
 
+        #While there are actions on the stack and no action is currently running
         while (len(self._actionsStack_) > 0 and not self._actionRunning_):
 
             #get top action on stack
             action = self._actionsStack_[-1]
 
-            #run action with parameter
+            #set to true
             self._actionRunning_ = True
 
-            result = action
+            #run aciton with paremeter
+            result = action[0](*action[1])
             self._stopCurrentAction_ = False
 
             #if action completes succesfully pop it
@@ -98,7 +112,6 @@ class Visitor(Human):
                 self._actionsStack_.pop()
 
             self._actionRunning_ = False
-
 
     def visitor_specific_function(self):
         if (len(self._actionsStack_) == 0):
