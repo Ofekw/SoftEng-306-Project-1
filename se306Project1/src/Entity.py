@@ -176,7 +176,7 @@ class Entity:
 
         #If current theta exceeds value of pi, means entity is facing southwards, so update value accordingly
         if (current_theta > math.pi):
-            current_theta - 2 * math.pi
+            current_theta = current_theta - 2 * math.pi
 
         #Update the current theta vlue
         self.theta = current_theta
@@ -254,7 +254,7 @@ class Entity:
                 self._stopCurrentAction_ = False
                 raise ActionInterruptException.ActionInterruptException("Wall hit")
                 #print "Move Forward: Stopped due to potential collision"
-                #return 2
+                return 2
         else:
             #Stop robot by setting forward velocity to 0 and then publish change
             self.RobotNode_cmdvel.linear.x = 0
@@ -280,11 +280,17 @@ class Entity:
             dir = 1
             if (thetaTarg > pi):
                 thetaTarg = - pi + (thetaTarg - pi)
+
+            if (thetaTarg < -pi):
+                thetaTarg = thetaTarg + 2 * pi
         elif (direction == Direction.RIGHT):
             thetaTarg = self.theta - pi/2
             dir = -1
             if (thetaTarg < -pi/2):
                 thetaTarg = pi + (thetaTarg + pi)
+
+            if (thetaTarg > pi):
+                thetaTarg = thetaTarg - 2 * pi
         #disable laser as don't want to be checking for collisions when turning as
         #robot will not cause collision while turning
         self.disableLaser = True
@@ -310,13 +316,13 @@ class Entity:
         if self._stopCurrentAction_ == True:
             self._stopCurrentAction_ = False
             raise ActionInterruptException.ActionInterruptException("Wall hit")
-            #return 2
+            return 2
         else:
             #Stop robot by setting forward velocity to 0 and then publish change
             self.correct_theta()
             self.RobotNode_cmdvel.angular.z = 0
             self.RobotNode_stage_pub.publish(self.RobotNode_cmdvel)
-
+            self.correct_theta()
             #return 0 for succesful finish
             return 0
 
@@ -378,6 +384,7 @@ class Entity:
             self.RobotNode_stage_pub.publish(self.RobotNode_cmdvel)
             #return 0 for succesful finish
             return 0
+
 
     """
      @function

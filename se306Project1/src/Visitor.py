@@ -37,7 +37,7 @@ class Visitor(Human):
 
     def StageLaser_callback(self, msg):
         for i in range(80, 120):
-            if msg.ranges[i] < 3 and self.disableLaser == False:
+            if msg.ranges[i] < 2 and self.disableLaser == False:
                 self._stopCurrentAction_ = True
                 return
 
@@ -72,25 +72,30 @@ class Visitor(Human):
 
         print("Attempting to go to " + str(random_x) + ", " + str(random_y))
 
-        move_to_empty_area = self.goto, [self.px, -15]
+        move_to_empty_area = self.goto(self.px, -15)
 
-        move_to_x = self.goto, [random_x, self.py]
+        move_to_x = self.goto(random_x, self.py)
 
-        move_to_y = self.goto, [self.px, random_y]
+        move_to_y = self.goto(self.px, random_y)
 
         self._actionsStack_.append(move_to_y)
         self._actionsStack_.append(move_to_x)
         self._actionsStack_.append(move_to_empty_area)
 
         while (len(self._actionsStack_) > 0 and not self._actionRunning_):
+
             #get top action on stack
             action = self._actionsStack_[-1]
+
             #run action with parameter
             self._actionRunning_ = True
 
-            result = action[0](*action[1])
+            result = action
+            self._stopCurrentAction_ = False
+
             #if action completes succesfully pop it
-            self._actionsStack_.pop()
+            if (result == 0):
+                self._actionsStack_.pop()
 
             self._actionRunning_ = False
 
