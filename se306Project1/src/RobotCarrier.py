@@ -220,5 +220,6 @@ class RobotCarrier(Robot):
             self._actionsStack_.append(action)
 
     def returnToOrigin(self):
-        self.goto(self.init_x, self.init_y)
+        self.goto(self.px, self.init_y)
+        self.goto(self.init_y, self.py)
         pass
