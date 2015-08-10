@@ -7,7 +7,6 @@ from nav_msgs.msg import*
 from sensor_msgs.msg import*
 from tf.transformations import *
 import math
-import numpy.testing
 from RobotPicker import RobotPicker
 import ActionInterruptException
 
@@ -17,7 +16,6 @@ def main():
 
 @@@
 
-    debugger = Debugger(robot)
     rospy.Rate(100)
     rospy.sleep(0.1)
 
@@ -30,9 +28,7 @@ def main():
 
     moveAction = robot._actions_[0], [1000]
     robot._actionsStack_.append(moveAction)
-    # turnAction = robot.actions[2], ["left"]
-    # robot.actionsStack.append(turnAction)
-
+    robot.state = robot.PickerState.FINDING
 
     while not rospy.is_shutdown():
     #check if there is an action on the stack or an action already running

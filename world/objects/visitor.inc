@@ -67,6 +67,7 @@ define visitor position
   )
 
   # neck
+  block
   (
 	points 4
 	point[0] [0 0.33]
