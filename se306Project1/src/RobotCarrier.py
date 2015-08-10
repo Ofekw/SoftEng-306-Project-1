@@ -31,6 +31,7 @@ class RobotCarrier(Robot):
 
         self.max_load = 100;
         self.current_load = 0;
+
         Robot.__init__(self,r_id,x_off,y_off,theta_off)
 
         # self._actions_ = {
@@ -218,4 +219,6 @@ class RobotCarrier(Robot):
             #self._stopCurrentAction_ = True
             self._actionsStack_.append(action)
 
-
+    def returnToOrigin(self):
+        self.goto(self.init_x, self.init_y)
+        pass
