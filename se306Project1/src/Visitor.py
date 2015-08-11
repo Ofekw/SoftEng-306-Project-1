@@ -48,7 +48,7 @@ class Visitor(Human):
             5: self.go_to_rand_location
         }
 
-        self.linearX = 4
+        self.linearX = 3
 
     def StageOdom_callback(self, msg):
         #Update the px and py values
@@ -62,6 +62,8 @@ class Visitor(Human):
 
         self.pub_to_dog.publish(str(self.robot_id) + ":" + str(self.px) + ":" + str(self.py))
 
+        print(self.state)
+
         fn = os.path.join(os.path.dirname(__file__), "Visitor"+str(self.robot_id)+".sta")
         output_file = open(fn, "w")
         output_file.write(str(self.robot_node_identifier)+ "\n")
@@ -70,9 +72,6 @@ class Visitor(Human):
         output_file.write(str(round(self.px,2)) + "\n")
         output_file.write(str(round(self.py,2)) + "\n")
         output_file.write(str(round(self.theta,2)) + "\n")
-
-        print(self.state)
-
 
     def StageLaser_callback(self, msg):
         for i in range(75, 105):
@@ -105,12 +104,6 @@ class Visitor(Human):
         #random_nav[0] = rand_direction
         #random_nav[1] = str(rand_dist)
         self.state = self.VisitorState.MOVING_RANDOM
-
-        #Randomly select a velocity
-        rand_velocity = random.randint(5, 8)
-
-        #Perform movement functions
-        self.change_linear_x_to(rand_velocity)
 
         self.face_direction(rand_direction)
         self.move_forward(rand_dist)
@@ -163,6 +156,7 @@ class Visitor(Human):
             action_init = self.go_to_rand_location, []
             self._actionsStack_.append(action_init)
 
+        #While there are actions on the stack and no action is currently running
         while (len(self._actionsStack_) > 0 and not self._actionRunning_):
 
             #get top action on stack
