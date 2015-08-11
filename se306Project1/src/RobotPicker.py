@@ -92,13 +92,13 @@ class RobotPicker(Robot):
         #rospy.loginfo("Current theta: %f", self.theta)s
 
     def kiwi_callback(self, message):
-        if (message != str(self.robot_id)):
+        if (message.data != str(self.robot_id)):
             print("transfer load")
-            self.current_load = 0
             self.kiwi_pub.publish(str(self.robot_id))
-            time.sleep(5)
-            self._actionsStack_.pop()
-            self._stopCurrentAction_ = False
+            self.disableLaser = False
+            self.current_load = 0
+            # self._actionsStack_.pop()
+            # self._stopCurrentAction_ = False
 
 
     def addKiwi(self, clockTime):
@@ -112,6 +112,7 @@ class RobotPicker(Robot):
     def waitForCollection(self):
         #while(self.current_load >= self.max_load):
             self._stopCurrentAction_ = True
+            self.disableLaser = True
             action = self._actions_[4],[]
             if action != self._actionsStack_[-1]:
                 #stop moving foward and add turn action
@@ -134,7 +135,8 @@ class RobotPicker(Robot):
                 if msg.ranges[i]< 4.0:
                     action = self._actions_[2], [Entity.Direction.RIGHT]
                     #check if action already exists in stack, otherwise laser will spam rotates
-                    if action != self._actionsStack_[-1]:
+
+                    if action != self._actionsStack_[-1] :
                         #stop moving foward and add turn action
                         self._stopCurrentAction_ = True
                         self._actionsStack_.append(action)
@@ -166,4 +168,10 @@ class RobotPicker(Robot):
         #until unloaded
         #while(self.current_load >= self.max_load):
             #do nothing
-            time.sleep(1)
+        time.sleep(1)
+        print("waiting")
+
+        if(self.current_load == 0):
+            time.sleep(10)
+            return 0
+

@@ -125,11 +125,10 @@ class RobotCarrier(Robot):
         print(', '.join(self.picker_robots))
 
     def kiwi_callback(self, message):
-        if (message != str(self.robot_id)):
+        if (message.data != str(self.robot_id)):
             self.current_load = 20
             print("going to dropoff zone")
-            # goto dropoff zone
-            time.sleep(10)
+            self.returnToOrigin()
         pass
 
     def intiate_transfer(self):
@@ -221,13 +220,12 @@ class RobotCarrier(Robot):
     # Need a better understanding of how the actions stack works to get this to work correctly
     def waitForPicker(self):
         self.getClosest()
-        print("Closest robot is: " + str(self.closestRobotID))
         if(int(self.picker_robots[self.closestRobotID].split(',')[2]) == 20):
             self.goToClosest()
 
     def goToClosest(self):
         self._stopCurrentAction_ = True
-        action = self._actions_[1], [float(self.picker_robots[self.closestRobotID].split(',')[0]), float(self.picker_robots[self.closestRobotID].split(',')[1])-4.0]
+        action = self._actions_[1], [float(self.picker_robots[self.closestRobotID].split(',')[0]), float(self.picker_robots[self.closestRobotID].split(',')[1])-5.0]
             #goto(float(self.closestRobot.split(',')[0]), float(self.closestRobot.split(',')[1]))
         if action != self._actionsStack_[-1]:
             #stop moving foward and add turn action
@@ -239,10 +237,10 @@ class RobotCarrier(Robot):
         ygoal = float(self.picker_robots[self.closestRobotID].split(',')[1])
         xabsolute = abs(xgoal - self.px)
         yabsolute = abs(ygoal - self.py)
-        if (xabsolute < 0.5 and yabsolute < 4):
+        if (xabsolute < 0.5 and yabsolute < 5):
             print (str(xabsolute) + "  " + str(yabsolute))
-            self.intiate_transfer()
+            if (int(self.picker_robots[self.closestRobotID].split(',')[2]) == 20):
+                self.intiate_transfer()
 
     def returnToOrigin(self):
-        self.goto(self.px, self.init_y)
-        self.goto(self.init_y, self.py)
+        self.goto(self.init_x, self.init_y)
