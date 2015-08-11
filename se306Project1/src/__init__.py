@@ -1,1 +1,1 @@
-__author__ = 'ros-industrial'
+#Needed to make python recognise this directory as a module
