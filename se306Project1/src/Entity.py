@@ -317,7 +317,7 @@ class Entity:
         self.disableLaser = False
         if self._stopCurrentAction_ == True:
             self._stopCurrentAction_ = False
-            raise ActionInterruptException.ActionInterruptException("Wall hit")
+            #raise ActionInterruptException.ActionInterruptException("Wall hit")
             return 2
         else:
             #Stop robot by setting forward velocity to 0 and then publish change
@@ -379,7 +379,7 @@ class Entity:
 
         if self._stopCurrentAction_ == True:
             self._stopCurrentAction_ = False
-            raise ActionInterruptException.ActionInterruptException("Wall hit")
+            #raise ActionInterruptException.ActionInterruptException("Wall hit")
         else:
             #Stop robot by setting forward velocity to 0 and then publish change
             self.RobotNode_cmdvel.angular.z = 0
