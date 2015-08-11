@@ -16,7 +16,7 @@ from TestModule import TestModule
 import inspect
 
 
-class TestRobotGoTo(unittest.TestCase,TestModule):
+class Test_Robot_goto(unittest.TestCase,TestModule):
 
     #Not in 'setUp' because it will be called every time, and that will mean the node will restart its in instantiation
     #since we can't reset the stage, we have to work with the same robot.

@@ -11,7 +11,7 @@ import logging
 from TestModule import TestModule
 import inspect
 
-class TestRobotFaceDirection(unittest.TestCase,TestModule):
+class Test_Robot_face_direction(unittest.TestCase,TestModule):
 
     robot0 = RobotPicker(0,-20,-28, math.pi/2)
 
