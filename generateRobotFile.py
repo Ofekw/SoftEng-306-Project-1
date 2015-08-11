@@ -6,7 +6,7 @@ import atexit
 
 initial_x = -20
 #Types of robots that the script reads the config file for
-robot_type = ["Picker", "Carrier"]
+robot_type = ["Picker", "Carrier", "Visitor"]
 #Loads the fields in the config file
 config = {}
 with open("config.properties", "r") as f:
@@ -29,8 +29,10 @@ total_robots = 0;
 for type in robot_type:
     if type == "Picker":
         initial_y = "-28"
-    else:
+    elif type == "Carrier":
         initial_y = "-32"
+    else:
+        initial_y = "-35"
     #Loads the corresponding robot template
     string = open('world/templates/' + type + '.template').read()
     number = config.get(type + '.number')
@@ -40,7 +42,10 @@ for type in robot_type:
         #Appends to the myworld file the robot model of each robot
         robot = robot + type.lower() + "( pose [ " + str(initial_x+(i*10))  +  " " + initial_y + " 0.000 90 ] name \"r" + str(total_robots) + "\")" + "\n"
         #The constructor of that robot type with the robot_id and the x y positions
-        constructor = "    robot = Robot" + type + "(" + str(total_robots) + ", " + str(initial_x+(i*10)) + ", -28, math.pi/2)"
+        constructor_name = "Robot" + type
+        if type == "Visitor":
+            constructor_name = constructor_name.replace("Robot", "")
+        constructor = "    robot = " + constructor_name + "(" + str(total_robots) + ", " + str(initial_x+(i*10)) + ", -28, math.pi/2)"
         name = "r" + str(total_robots) + ".py" #Name of the robot files
         file_name.append(name)
         temp = open(os.path.join(directory, name),'w')
