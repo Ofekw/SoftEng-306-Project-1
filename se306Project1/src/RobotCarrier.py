@@ -79,7 +79,7 @@ class RobotCarrier(Robot):
         # print("I have sent " + str(self.robot_id) + "," + xpos + "," + ypos+ "," + str(self.theta))
         #print("I am at " + xpos + "," + ypos)
 
-        fn = os.path.join(os.path.dirname(__file__), "Carrier"+str(self.robot_id)+".sta")
+        fn = os.path.join(os.path.dirname(__file__), str(self.robot_id)+"car.sta")
         output_file = open(fn, "w")
         output_file.write(str(self.robot_node_identifier)+ "\n")
         output_file.write("Carrier\n")

@@ -64,7 +64,7 @@ class Visitor(Human):
 
         print(self.state)
 
-        fn = os.path.join(os.path.dirname(__file__), "Visitor"+str(self.robot_id)+".sta")
+        fn = os.path.join(os.path.dirname(__file__), str(self.robot_id)+"vis.sta")
         output_file = open(fn, "w")
         output_file.write(str(self.robot_node_identifier)+ "\n")
         output_file.write("Visitor\n")
