@@ -1,2 +1,0 @@
-Run_RobotPicker.py
-Run_Visitor_0.py
