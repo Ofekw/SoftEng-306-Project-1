@@ -1,26 +1,46 @@
 # SoftEng-306-Project Group 8 (FloppyDisk)
 A simulation tool for testing harvesting robots in kiwifruit orchards
 
-Install instructions. 
+##Prerequisites
 
-1)Create a file named .#setupConfig in your home directory.
-2)Add the path to your workspace containing the se306Project1 package as the first line of the .#setupConfig file.
-  e.g default folder should is (if your git repo is in your home directory): SoftEng-306-Project-1/
+* Ubuntu 14.04
+* ROS Indigo
 
-Run Instructions.
+##Getting the Software
 
-Run build script.
+git clone 
 
-From commandline in your workspace run:
-python run.py
+		https://github.com/Ofekw/SoftEng-306-Project-1.git
 
-Adding Robots.
+##Configuring the application (optional)
+  In the root directory you will find a "config.properties".Open it with any text editor and edit only the values (do not      change the variable names).
+  
+  Anything that is updated in here will be generated and updated when calling the run.py script.
 
-A robotList.txt file has been added at the project root directory. To add a new robot, simply add <robotsName>.py on a new line in the file.
 
-Update ROS_PACKAGE_PATH
+##Running the program 
 
-Run: gedit ~/.bashrc
-Scroll to the bottom of the file.
-Add: source ~/<path to workspace>/setup.bash (Leave the other source commands)
-Update the export to: export ROS_PACKAGE_PATH=$ROS_PACKAGE_PATH:$HOME/<path to workspace>/se306Project1
+1. In terminal navigate to the home directory
+
+		cd se306-project-1
+	
+2. Run the project
+
+	 	./run.py
+
+
+##Troubleshooting 
+Update	ROS_PACKAGE_PATH
+
+* in terminal call
+
+		gedit ~/.bashrc
+
+* Scroll to the bottom of the file
+* Add 
+
+		source ~/<path to workspace>/setup.bash (Leave the other source commands)
+		
+* Update the export to 
+
+		export ROS_PACKAGE_PATH=$ROS_PACKAGE_PATH:$HOME/<path to workspace>/se306Project1
