@@ -38,7 +38,7 @@ for type in robot_type:
     for i in range(0, int(number)):
         #Have to change the picker name when there's a model for the other types
         #Appends to the myworld file the robot model of each robot
-        robot = robot + "picker" + "( pose [ " + str(initial_x+(i*10))  +  " " + initial_y + " 0.000 90 ] name \"r" + str(total_robots) + "\" color \"random\")" + "\n"
+        robot = robot + type.lower() + "( pose [ " + str(initial_x+(i*10))  +  " " + initial_y + " 0.000 90 ] name \"r" + str(total_robots) + "\")" + "\n"
         #The constructor of that robot type with the robot_id and the x y positions
         constructor = "    robot = Robot" + type + "(" + str(total_robots) + ", " + str(initial_x+(i*10)) + ", -28, math.pi/2)"
         name = "r" + str(total_robots) + ".py" #Name of the robot files
