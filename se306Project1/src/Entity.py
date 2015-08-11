@@ -721,7 +721,6 @@ class Entity:
             self.rotate_relative(-math.pi-self.theta,Angle.RADIANS)
             current_direction=Direction.WEST
         elif (abs(self.theta+math.pi/2)<=0.4):
-            print("Diff" + str(math.pi/2+self.theta))
             self.rotate_relative(-math.pi/2-self.theta,Angle.RADIANS)
             current_direction=Direction.SOUTH
         elif (abs(self.theta-0)<=0.4):

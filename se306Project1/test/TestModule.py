@@ -2,8 +2,7 @@
 
 import rospy
 import time
-from se306Project1.src.RobotCarrier import RobotCarrier
-
+import inspect
 
 class TestModule():
 
@@ -45,3 +44,8 @@ class TestModule():
         else:
             return False
 
+    def print_function_name(self,name):
+        print ""
+        print "================================================="
+        print name
+        print "================================================="

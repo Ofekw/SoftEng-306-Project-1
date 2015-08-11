@@ -9,25 +9,27 @@ import rospy
 from std_msgs.msg import *
 import sensor_msgs.msg
 import time
-from se306Project1.src.RobotCarrier import RobotCarrier
+from se306Project1.src.RobotPicker import RobotPicker
 import math
 import logging
 from TestModule import TestModule
+import inspect
 
 
 class TestRobotGoTo(unittest.TestCase,TestModule):
 
     #Not in 'setUp' because it will be called every time, and that will mean the node will restart its in instantiation
     #since we can't reset the stage, we have to work with the same robot.
-    robot0 = RobotCarrier(1,-10,-28, math.pi/2)
-
+    robot0 = RobotPicker(0,-20,-28, math.pi/2)
 
     def test_goto_move_right(self):
 
-        end_x = -5
+        self.print_function_name(inspect.stack()[0][3])
+
+        end_x = -15
         end_y = -28
 
-        moveAction = self.robot0.goto, [end_x,end_y]
+        moveAction = self.robot0.goto_xy, [end_x,end_y]
 
         self.run_robot(self.robot0,moveAction,15)
 
@@ -36,10 +38,12 @@ class TestRobotGoTo(unittest.TestCase,TestModule):
 
     def test_goto_move_left(self):
 
-        end_x = -15
+        self.print_function_name(inspect.stack()[0][3])
+
+        end_x = -30
         end_y = -28
 
-        moveAction = self.robot0.goto, [end_x,end_y]
+        moveAction = self.robot0.goto_xy, [end_x,end_y]
 
         self.run_robot(self.robot0,moveAction,15)
 
@@ -49,4 +53,4 @@ class TestRobotGoTo(unittest.TestCase,TestModule):
 if __name__ == '__main__':
     unittest.main()
     # import rostest
-    # rostest.rosrun(PKG, NAME, TestRobotGoTo)
+    # rostest.rosrun("se306Project1", "test_robot_goto", TestRobotGoTo)

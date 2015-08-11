@@ -9,19 +9,22 @@ import rospy
 from std_msgs.msg import *
 import sensor_msgs.msg
 import time
-from se306Project1.src.RobotCarrier import RobotCarrier
+from se306Project1.src.RobotPicker import RobotPicker
 import math
 import logging
 from TestModule import TestModule
+import inspect
 
 # A sample python unit test
 class TestRobotTurn(unittest.TestCase,TestModule):
 
     #Not in 'setUp' because it will be called every time, and that will mean the node will restart its in instantiation
     #since we can't reset the stage, we have to work with the same robot.
-    robot0 = RobotCarrier(1,-10,-28, math.pi/2)
+    robot0 = RobotPicker(0,-20,-28, math.pi/2)
 
     def test_turn_right(self):
+
+        self.print_function_name(inspect.stack()[0][3])
 
         moveAction = self.robot0.turn,["right"]
 
