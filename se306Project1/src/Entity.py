@@ -8,7 +8,7 @@ from sensor_msgs.msg import*
 from tf.transformations import *
 import math
 import ActionInterruptException
-import numpy.testing
+import time
 
 """
 @class
@@ -31,7 +31,8 @@ class Entity:
 
     Direction = enum(NORTH="north",EAST="east",SOUTH="south",WEST="west",LEFT="left",RIGHT="right")
     Angle = enum(DEGREES="degrees", RADIANS="radians")
-    State = enum(STOPPED="Stopped", TURNING="Turning", CORRECTING="Aligning to cardinal direction")
+    State = enum(STOPPED="Stopped", TURNING="Turning", CORRECTING="Aligning to cardinal direction",
+                 DETECTING="Detecting entity type")
     def __init__(self,r_id,x_off,y_off, theta_off):
 
 
@@ -68,6 +69,7 @@ class Entity:
             1: self.goto,
             2: self.turn,
             3: self.stop,
+            4: self.wait,
         }
 
         #Enums for direction and angles
@@ -315,7 +317,7 @@ class Entity:
         self.disableLaser = False
         if self._stopCurrentAction_ == True:
             self._stopCurrentAction_ = False
-            raise ActionInterruptException.ActionInterruptException("Wall hit")
+            #raise ActionInterruptException.ActionInterruptException("Wall hit")
             return 2
         else:
             #Stop robot by setting forward velocity to 0 and then publish change
@@ -377,7 +379,7 @@ class Entity:
 
         if self._stopCurrentAction_ == True:
             self._stopCurrentAction_ = False
-            raise ActionInterruptException.ActionInterruptException("Wall hit")
+            #raise ActionInterruptException.ActionInterruptException("Wall hit")
         else:
             #Stop robot by setting forward velocity to 0 and then publish change
             self.RobotNode_cmdvel.angular.z = 0
@@ -616,10 +618,24 @@ class Entity:
     """
     @function
 
-    Stop the robot
+    Stop the robot for 1 second, Using this funciton still allows the robots to read environment data
     """
-    def stop(self):
+    def stop(self, waitTime):
         self.RobotNode_cmdvel.linear.x = 0.0
+        time.sleep(waitTime)
+        return 0
+
+    """
+    @function
+
+    Stop the robot for the given time. No environment data will be read while waiting
+    """
+    def wait(self, waitTime):
+        self.RobotNode_cmdvel.linear.x = 0.0
+        self.state = self.State.DETECTING
+        time.sleep(waitTime)
+        self.disableLaser = False
+        return 0
 
 
 

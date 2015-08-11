@@ -13,7 +13,7 @@ def main(argv):
     file_name = []
     initial_x = -20
     #Types of robots that the script reads the config file for
-    robot_type = ["Picker", "Carrier", "Visitor"]
+    robot_type = ["Picker", "Carrier", "Visitor", "Animal"]
     #Loads the fields in the config file
     config = {}
     with open("config.properties", "r") as f:
@@ -34,32 +34,34 @@ def main(argv):
             initial_y = "-28"
         elif type == "Carrier":
             initial_y = "-32"
+    	elif type == "Visitor":
+        	initial_y = "-34"
         else:
-            initial_y = "-35"
-        #Loads the corresponding robot template
-        string = open('world/templates/' + type + '.template').read()
-        number = config.get(type + '.number')
-        robot = ""
-        for i in range(0, int(number)):
-            #Appends to the myworld file the robot model of each robot
-            robot = robot + type.lower() + "( pose [ " + str(initial_x+(i*10))  +  " " + initial_y + " 0.000 90 ] name \"r" + str(total_robots) + "\")" + "\n"
-            #The constructor of that robot type with the robot_id and the x y positions
-            constructor_name = "Robot" + type
-            if type == "Visitor":
-                constructor_name = constructor_name.replace("Robot", "")
-            constructor = "    robot = " + constructor_name + "(" + str(total_robots) + ", " + str(initial_x+(i*10)) + ", -28, math.pi/2)"
-            name = "r" + str(total_robots) + ".py" #Name of the robot files
-            file_name.append(name)
-            temp = open(os.path.join(directory, name),'w')
-            #Replaces "@@@" string in the template with the constructor
-            temp.write(string.replace("@@@", constructor))
-            temp.close()
-            #Gives the temporary robot file run permission
-            os.chmod(directory+name,stat.S_IRWXU)
-            total_robots += 1
-        robot = robot + "\n"
-        #Writes the robot models to the world file
-        myworld.write(robot)
+            initial_y = "-38"
+    #Loads the corresponding robot template
+    string = open('world/templates/' + type + '.template').read()
+    number = config.get(type + '.number')
+    robot = ""
+    for i in range(0, int(number)):
+        #Appends to the myworld file the robot model of each robot
+        robot = robot + type.lower() + "( pose [ " + str(initial_x+(i*10))  +  " " + initial_y + " 0.000 90 ] name \"r" + str(total_robots) + "\")" + "\n"
+        #The constructor of that robot type with the robot_id and the x y positions
+        constructor_name = "Robot" + type
+        if type == "Visitor" or type == "Animal":
+            constructor_name = constructor_name.replace("Robot", "")
+        constructor = "    robot = " + constructor_name + "(" + str(total_robots) + ", " + str(initial_x+(i*10)) + ", -28, math.pi/2)"
+        name = "r" + str(total_robots) + ".py" #Name of the robot files
+        file_name.append(name)
+        temp = open(os.path.join(directory, name),'w')
+        #Replaces "@@@" string in the template with the constructor
+        temp.write(string.replace("@@@", constructor))
+        temp.close()
+        #Gives the temporary robot file run permission
+        os.chmod(directory+name,stat.S_IRWXU)
+        total_robots += 1
+    robot = robot + "\n"
+    #Writes the robot models to the world file
+    myworld.write(robot)
     myworld.close()
 
     testing = False
