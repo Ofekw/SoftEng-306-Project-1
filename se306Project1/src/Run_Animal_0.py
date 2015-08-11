@@ -22,10 +22,10 @@ def main():
     #Construction of Robot objects take 3 params... Robot ID, Start X, Start Y. Start X and Start Y correlates to the myworld.world file
     #Can't create more than one robot per main() .... ie can't run more than one robot per terminal running
 
-    Animal_0 = Animal(6, -12, 0, 0)
+    robot = Animal(6, -12, 0, 0)
 
     while not rospy.is_shutdown():
-        Animal_0.animal_specific_function()
+        robot.animal_specific_function()
 
 
 if __name__ == '__main__':
