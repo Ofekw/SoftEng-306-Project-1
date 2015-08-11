@@ -39,7 +39,7 @@ for x in range(-WORLD_WIDTH/2 + width_between_rows/2,WORLD_WIDTH/2 - width_betwe
         tree_column.append(temp_right_tree)
     all_tree_string.append(''.join(tree_column))
 
-myworld = open('world/myworld.world','w')
+myworld = open('world/myworld.world','a')
 
-myworld.write(world_template)
-myworld.write(''.join(all_tree_string))
+myworld.write("".join(all_tree_string))
+myworld.close()

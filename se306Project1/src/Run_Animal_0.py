@@ -8,7 +8,7 @@ from sensor_msgs.msg import*
 from tf.transformations import *
 import math
 import numpy.testing
-from Visitor import Visitor
+from Animal import Animal
 import ActionInterruptException
 
 """
@@ -22,13 +22,10 @@ def main():
     #Construction of Robot objects take 3 params... Robot ID, Start X, Start Y. Start X and Start Y correlates to the myworld.world file
     #Can't create more than one robot per main() .... ie can't run more than one robot per terminal running
 
-    visitor_0 = Visitor(5, 0, -15, 0)
-
-    rospy.Rate(10)
-   # rospy.sleep(0.1)
+    Animal_0 = Animal(6, -12, 0, 0)
 
     while not rospy.is_shutdown():
-        visitor_0.visitor_specific_function()
+        Animal_0.animal_specific_function()
 
 
 if __name__ == '__main__':
@@ -36,3 +33,4 @@ if __name__ == '__main__':
         main()
     except rospy.ROSInterruptException:
         pass
+__author__ = 'carvrooom'

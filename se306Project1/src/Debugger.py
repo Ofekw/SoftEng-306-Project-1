@@ -1,6 +1,6 @@
+#!/usr/bin/env python
 __author__ = 'patrick'
 import threading
-import thread
 
 
 class Debugger:
@@ -14,7 +14,7 @@ class Debugger:
             self.user_input[0] = raw_input()
             if self.user_input[0] == "ps":
                 for action in self.robot._actionsStack_:
-                    print(action[0] +" " + action[1])
+                    print(str(action[0]) +" " + str(action[1]))
             elif self.user_input[0] == "stop":
                 print(self.robot._stopCurrentAction_)
 

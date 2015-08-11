@@ -8,7 +8,7 @@ from sensor_msgs.msg import*
 from tf.transformations import *
 import math
 import ActionInterruptException
-import numpy.testing
+import time
 
 """
 @class
@@ -30,8 +30,9 @@ class Entity:
         return type('Enum', (), enums)
 
     Direction = enum(NORTH="north",EAST="east",SOUTH="south",WEST="west",LEFT="left",RIGHT="right")
-    Angle = enum(DEGREES="degrees",RADIANS="radians")
-
+    Angle = enum(DEGREES="degrees", RADIANS="radians")
+    State = enum(STOPPED="Stopped", TURNING="Turning", CORRECTING="Aligning to cardinal direction",
+                 DETECTING="Detecting entity type")
     def __init__(self,r_id,x_off,y_off, theta_off):
 
 
@@ -56,6 +57,7 @@ class Entity:
         self.robot_node_identifier = ("robot_"+ str(r_id))
         self.goalx = self.px
         self.goaly = self.py
+        self.state = self.State.STOPPED
 
         #Used to determine how long we've waited for an element to pass by, if exceeds a threshold
         #we will know it is a static element and we need to do something different
@@ -64,9 +66,11 @@ class Entity:
         #array of methods of robot actions
         self._actions_ = {
             0: self.move_forward,
-            1: self.goto,
+            1: self.goto_yx,
             2: self.turn,
             3: self.stop,
+            4: self.wait,
+            5: self.goto_xy
         }
 
         #Enums for direction and angles
@@ -117,9 +121,9 @@ class Entity:
 
         #output_file.close("Capacity:")
 
-        # rospy.loginfo("Current x position: %f" , self.px)
-        # rospy.loginfo("Current y position: %f", self.py)
-        # rospy.loginfo("Current theta: %f", self.theta)
+        #rospy.loginfo("Current x position: %f" , self.px)
+        #rospy.loginfo("Current y position: %f", self.py)
+        #rospy.loginfo("Current theta: %f", self.theta)
 
     """
     @function
@@ -175,7 +179,7 @@ class Entity:
 
         #If current theta exceeds value of pi, means entity is facing southwards, so update value accordingly
         if (current_theta > math.pi):
-            current_theta - 2 * math.pi
+            current_theta = current_theta - 2 * math.pi
 
         #Update the current theta vlue
         self.theta = current_theta
@@ -212,7 +216,7 @@ class Entity:
         previousY = self.py
 
 
-        print "Moving Forward"
+        print ("Moving Forward")
         #While the distance that the Entity has gained has not exceeded the given distance, continue to move the Entity forward
         while (dist_gained < dist and not self._stopCurrentAction_):
 
@@ -250,10 +254,9 @@ class Entity:
                 #stop movement and throw exception
                 self.RobotNode_cmdvel.linear.x = 0
                 self.RobotNode_stage_pub.publish(self.RobotNode_cmdvel)
-                #self._stopCurrentAction_ = False
-                #raise ActionInterruptException.ActionInterruptException("Wall hit")
+                self._stopCurrentAction_ = False
+                raise ActionInterruptException.ActionInterruptException("Wall hit")
                 #print "Move Forward: Stopped due to potential collision"
-                print "Move Forward: Stopped due to potential collision"
                 return 2
         else:
             #Stop robot by setting forward velocity to 0 and then publish change
@@ -272,7 +275,7 @@ class Entity:
     Turn function which allows the Entity to turn 90 degrees ( a right angle) either left or right.
     """
     def turn(self, direction):
-        print "Turning "+ direction
+        print ("Turning "+ direction)
         pi = math.pi
 
         if (direction == Direction.LEFT):
@@ -280,14 +283,21 @@ class Entity:
             dir = 1
             if (thetaTarg > pi):
                 thetaTarg = - pi + (thetaTarg - pi)
+
+            if (thetaTarg < -pi):
+                thetaTarg = thetaTarg + 2 * pi
         elif (direction == Direction.RIGHT):
             thetaTarg = self.theta - pi/2
             dir = -1
             if (thetaTarg < -pi/2):
                 thetaTarg = pi + (thetaTarg + pi)
+
+            if (thetaTarg > pi):
+                thetaTarg = thetaTarg - 2 * pi
         #disable laser as don't want to be checking for collisions when turning as
         #robot will not cause collision while turning
         self.disableLaser = True
+        self.state=self.State.TURNING
         while (abs(self.theta - thetaTarg) > 0.01 and not (self._stopCurrentAction_)):
             thetaDiff = abs(self.theta - thetaTarg)
 
@@ -307,15 +317,17 @@ class Entity:
         #Turn complete, reenable laser
         self.disableLaser = False
         if self._stopCurrentAction_ == True:
+            self._stopCurrentAction_ = False
             #raise ActionInterruptException.ActionInterruptException("Wall hit")
             return 2
         else:
-                #Stop robot by setting forward velocity to 0 and then publish change
-                self.RobotNode_cmdvel.angular.z = 0
-                self.RobotNode_stage_pub.publish(self.RobotNode_cmdvel)
-                #self.correct_theta()
-                #return 0 for succesful finish
-                return 0
+            #Stop robot by setting forward velocity to 0 and then publish change
+            self.correct_theta()
+            self.RobotNode_cmdvel.angular.z = 0
+            self.RobotNode_stage_pub.publish(self.RobotNode_cmdvel)
+            self.correct_theta()
+            #return 0 for succesful finish
+            return 0
 
 
 
@@ -367,15 +379,15 @@ class Entity:
            # print("Rotating - current theta is " + str(self.theta) +", target theta is " + str(thetaTarg))
 
         if self._stopCurrentAction_ == True:
-                self._stopCurrentAction_ = False
-                raise ActionInterruptException.ActionInterruptException("Wall hit")
-                #return 2
+            self._stopCurrentAction_ = False
+            #raise ActionInterruptException.ActionInterruptException("Wall hit")
         else:
-                #Stop robot by setting forward velocity to 0 and then publish change
-                self.RobotNode_cmdvel.angular.z = 0
-                self.RobotNode_stage_pub.publish(self.RobotNode_cmdvel)
-                #return 0 for succesful finish
-                return 0
+            #Stop robot by setting forward velocity to 0 and then publish change
+            self.RobotNode_cmdvel.angular.z = 0
+            self.RobotNode_stage_pub.publish(self.RobotNode_cmdvel)
+            #return 0 for succesful finish
+            return 0
+
 
     """
      @function
@@ -444,18 +456,19 @@ class Entity:
     @parameter:double yCoord
 
 
-    Goto function that moves the Entity to a specified Cartesian Coordinate. Will move only at right angles towards target coordinate.
+    Goto function that moves the Entity to a specified Cartesian Coordinate. Will move only at right angles towards target coordinate. (Vertically first and then horizontally).
 
     ie: from A to B
 
-                           B
-                           |
-                           |
-                           |
-    A----------------------|
+    |----------------------B
+    |
+    |
+    |
+    |
+    A
     """
-    def goto(self, x_coord, y_coord):
-        print "Going To : ("+str(x_coord)+","+str(y_coord)+")"
+    def goto_yx(self, x_coord, y_coord):
+        print ("Going To : ("+str(x_coord)+","+str(y_coord)+")")
         #try run the goto command
         try:
             print("Current x pos = " + str(self.px))
@@ -535,7 +548,113 @@ class Entity:
 
             if self._stopCurrentAction_:
                 print("Halted at destination:", self.px, self.py)
-                print "Go To: Stopped due to potential collision"
+                print ("Go To: Stopped due to potential collision")
+                return 2
+            else:
+                print("Arrived at destination:", self.px, self.py)
+                return 0
+
+
+
+    """
+    @function
+
+    @parameter:double xCoord
+    @parameter:double yCoord
+
+
+    Goto function that moves the Entity to a specified Cartesian Coordinate. Will move only at right angles towards target coordinate. (Horizontally first and then vertically).
+
+    ie: from A to B
+                           B
+                           |
+                           |
+                           |
+    A----------------------|
+
+    """
+    def goto_xy(self, x_coord, y_coord):
+        print ("Going To : ("+str(x_coord)+","+str(y_coord)+")")
+        #try run the goto command
+        try:
+            print("Current x pos = " + str(self.px))
+            print("Current y pos = " + str(self.py))
+
+            if (abs(x_coord-self.px)<=0.3 and abs(y_coord-self.py)<=0.2 ):
+                print("Already at coordinate!")
+                return 0
+
+            x_difference = x_coord - self.px
+            y_difference = y_coord - self.py
+
+            print("Xdiff" + str(x_difference))
+            print("Ydiff" + str(y_difference))
+
+            #error tolerance
+            tol = 0.5
+
+            #If the robot needs to travel both directions
+            if (not((abs(x_difference)>tol and abs(y_difference)<tol) or(abs(y_difference)>tol and abs(x_difference)<tol))):
+
+                if (x_difference<=-tol and y_difference<=-tol):
+                    if (x_difference<-tol):
+                        self.face_direction(Direction.WEST)
+                        self.move_forward(abs(x_difference))
+                    if (y_difference<-tol):
+                        self.face_direction(Direction.SOUTH)
+                        self.move_forward(abs(y_difference))
+                    return 0
+                elif (x_difference>=tol and y_difference>=tol):
+                    if (x_difference>tol):
+                        self.face_direction(Direction.EAST)
+                        self.move_forward(abs(x_difference))
+                    if (y_difference>tol):
+                        self.face_direction(Direction.NORTH)
+                        self.move_forward(abs(y_difference))
+                    return 0
+                elif (x_difference>=tol and y_difference<=-tol):
+                    if (x_difference>tol):
+                        self.face_direction(Direction.EAST)
+                        self.move_forward(abs(x_difference))
+                    if (y_difference<-tol):
+                        self.face_direction(Direction.SOUTH)
+                        self.move_forward(abs(y_difference))
+                    return 0
+                elif (x_difference<=-tol and y_difference>=tol):
+                    if (x_difference<-tol):
+                        self.face_direction(Direction.WEST)
+                        self.move_forward(abs(x_difference))
+                    if (y_difference>tol):
+                        self.face_direction(Direction.NORTH)
+                        self.move_forward(abs(y_difference))
+                    return 0
+            #If the robot only needs to travel one direction to reach its destination
+            else:
+                if (x_difference>tol):
+                    self.face_direction(Direction.EAST)
+                    self.move_forward(abs(x_difference))
+                    return 0
+                elif (x_difference<-tol):
+                    self.face_direction(Direction.WEST)
+                    self.move_forward(abs(x_difference))
+                    return 0
+                if (y_difference>tol):
+                    self.face_direction(Direction.NORTH)
+                    self.move_forward(abs(y_difference))
+                    return 0
+                elif (y_difference<-tol):
+                    self.face_direction(Direction.SOUTH)
+                    self.move_forward(abs(y_difference))
+                    return 0
+
+        except ActionInterruptException.ActionInterruptException as e:
+            print(e.message)
+            return 1
+        finally:
+
+            if self._stopCurrentAction_:
+                print("Halted at destination:", self.px, self.py)
+                print ("Go To: Stopped due to potential collision")
                 return 2
             else:
                 print("Arrived at destination:", self.px, self.py)
@@ -590,6 +709,7 @@ class Entity:
 
     """
     def correct_theta(self):
+        self.state = self.State.CORRECTING
         current_direction="NoDirect"
         if (abs(self.theta-math.pi/2)<=0.4):
             self.rotate_relative(math.pi/2-self.theta,Angle.RADIANS)
@@ -613,10 +733,24 @@ class Entity:
     """
     @function
 
-    Stop the robot
+    Stop the robot for 1 second, Using this funciton still allows the robots to read environment data
     """
-    def stop(self):
+    def stop(self, waitTime):
         self.RobotNode_cmdvel.linear.x = 0.0
+        time.sleep(waitTime)
+        return 0
+
+    """
+    @function
+
+    Stop the robot for the given time. No environment data will be read while waiting
+    """
+    def wait(self, waitTime):
+        self.RobotNode_cmdvel.linear.x = 0.0
+        self.state = self.State.DETECTING
+        time.sleep(waitTime)
+        self.disableLaser = False
+        return 0
 
 
 

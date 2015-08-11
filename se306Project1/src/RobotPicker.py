@@ -7,10 +7,10 @@ from nav_msgs.msg import*
 from sensor_msgs.msg import*
 from tf.transformations import *
 import math
-import numpy.testing
 from Robot import Robot
 import os
 import Entity
+import time
 """
 @class
 
@@ -20,12 +20,19 @@ It inherits from the Robot class.
 """
 class RobotPicker(Robot):
 
+    def enum(**enums):
+        return type('Enum', (), enums)
+
+    PickerState = enum(PICKING="Picking Fruit",
+                              FINDING="Finding Orchard")
+
     def __init__(self,r_id,x_off,y_off,theta_off):
         global picker_pub
         picker_pub = rospy.Publisher("pickerPosition",String, queue_size=10)
 
-        self.max_load = 20;
-        self.current_load = 0;
+        self.max_load = 20
+        self.current_load = 0
+        self.firstLaserReading = []
         Robot.__init__(self,r_id,x_off,y_off,theta_off)
 
     def robot_specific_function(self):
@@ -55,11 +62,11 @@ class RobotPicker(Robot):
         picker_pub.publish(str(self.robot_id) + "," + xpos + "," + ypos+ "," + str(self.theta))
         #print("I have sent " + str(self.robot_id) + "," + xpos + "," + ypos+ "," + str(self.theta))
 
-        fn = os.path.join(os.path.dirname(__file__), "Picker"+str(self.robot_id)+".sta")
+        fn = os.path.join(os.path.dirname(__file__), str(self.robot_id)+"pic.sta")
         output_file = open(fn, "w")
         output_file.write(str(self.robot_node_identifier)+ "\n")
         output_file.write("Picker\n")
-        output_file.write("..........\n")
+        output_file.write(self.state+"\n")
         output_file.write(str(round(self.px,2)) + "\n")
         output_file.write(str(round(self.py,2)) + "\n")
         output_file.write(str(round(self.theta,2)) + "\n")
@@ -67,7 +74,7 @@ class RobotPicker(Robot):
 
         #rospy.loginfo("Current x position: %f" , self.px)
         #rospy.loginfo("Current y position: %f", self.py)
-        #rospy.loginfo("Current theta: %f", self.theta)
+        #rospy.loginfo("Current theta: %f", self.theta)s
 
     def StageLaser_callback(self, msg):
         barCount = 0
@@ -75,12 +82,42 @@ class RobotPicker(Robot):
         if not self.disableLaser:
             for i in range(70, 110):
                 if msg.ranges[i]< 4.0:
-                    action = self._actions_[2], [Entity.Direction.RIGHT]
-                    #check if action already exists in stack, otherwise laser will spam rotates
-                    if action != self._actionsStack_[-1]:
-                        #stop moving foward and add turn action
-                        self._stopCurrentAction_ = True
-                        self._actionsStack_.append(action)
+                    #check if dynamic entity
+                    self._stopCurrentAction_ = True
+                    if self.firstLaserReading == []:
+                        self.disableLaser = True
+                        #read 0-110 lasers into array
+                        self.read(msg.ranges, self.firstLaserReading)
+                        #add stop and wait actions to stack
+                        stop = self._actions_[3], [1]
+                        wait = self._actions_[4], [1]
+                        self._actionsStack_.append(stop)
+                        self._actionsStack_.append(wait)
+                        return
+                    #check for an initial laser reading
+                    if self.firstLaserReading != []:
+                        for i in range(len(self.firstLaserReading)):
+                            #check if laser reading's differ
+                            if self.firstLaserReading[i] != msg.ranges[i+70]:
+                                #if they do, entity is dynamic, so wait 5's for it to leave.
+                                wait = self._actions_[4], [5]
+                                self._actionsStack_.append(wait)
+                                #reset laserReading
+                                self.firstLaserReading = []
+                                return
+
+                        print("static")
+                        action = self._actions_[2], [Entity.Direction.RIGHT]
+                        #check if action already exists in stack, otherwise laser will spam rotates
+                        if action != self._actionsStack_[-1]:
+                            #stop moving foward and add turn action
+                            self._stopCurrentAction_ = True
+                            self._actionsStack_.append(action)
+                            self.firstLaserReading = []
+                            return
+                        return
+
+
             #check that all lasers in 0-20 range are not hitting object
 
             rangeCount = 0
@@ -88,7 +125,7 @@ class RobotPicker(Robot):
                 if msg.ranges[i]<5.0:
                     rangeCount += 1
             #check if no tree and are waiting for new tree
-            if self.noMoreTrees>15 and self.atOrchard:
+            if self.noMoreTrees>15 and self.state == self.PickerState.PICKING:
                 self.noMoreTrees = 0
                 #stop the robot moving forward
                 self._stopCurrentAction_ = True
@@ -99,7 +136,14 @@ class RobotPicker(Robot):
                 self.treeDetected = False
             #check if new tree dected
             elif 0 < rangeCount < 20 and not self.treeDetected:
-                self.atOrchard = True
+                self.state = self.PickerState.PICKING
                 self.treeDetected = True
                 self.noMoreTrees=0
-                print("Found Tree")
+                self.current_load += 1
+                #print("Found Tree")
+            elif rangeCount == 20:
+                self.state = self.PickerState.FINDING
+
+    def read(self, msg, container):
+        for i in range(70, 110):
+            container.append(msg[i])
