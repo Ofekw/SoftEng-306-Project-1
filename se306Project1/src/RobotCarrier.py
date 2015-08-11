@@ -45,7 +45,6 @@ class RobotCarrier(Robot):
 
         #these variables are used to help the laser callback, it will help in dealing with entities/debris on
         # it's path to the picker robot
-        self.StageLaser_sub = rospy.Subscriber(self.robot_node_identifier+"/base_scan",sensor_msgs.msg.LaserScan,self.StageLaser_callback)
         self.ReadLaser = False
         self.FiveCounter = 0
         self._divertingPath_ = False
@@ -128,58 +127,39 @@ class RobotCarrier(Robot):
     """
     def StageLaser_callback(self, msg):
 
-        #for some reason, ros is passing a value of 5 back every second call regardless if anything
-        #is in front of it, this bit of code is just to ignore that random value its passing through
 
-        #print "Header : " + str(msg.header)
-        # if not self.ReadLaser:
-        #     #print "Not Reading : " + str(msg.ranges[90])
-        #     self.ReadLaser = True
-        #     return
-        # else:
-        #     self.ReadLaser = False
-
-        #print "Reading : " + str(msg.ranges[90])
-        barCount = 0
-        found = False
-
-        #for i in range(0,180):
-        #print(msg.ranges[90])
         if msg.ranges[90] < 4.0:
-            #action = self._actions_[2], [self, "left"]
-            #check if action already exists in stack, otherwise laser will spam rotates
-            #if action != self._actionsStack_[-1]:
-            #self._stopCurrentAction_ = True
             self.halt_counter += 1
             self._stopCurrentAction_ = True
             self.FiveCounter = 0
-            #    self._actionsStack_.append(action)
-            #rospy.loginfo("Range at %f degree is: %f", i, msg.ranges[i])
         else:
+            #waits for 5 consecutive not found values, this is to tackle the weird laser scan issue
+            #that returns alternating incorrect values.
             self.FiveCounter += 1
             if self.FiveCounter == 5:
                 self.halt_counter = 0
                 self._stopCurrentAction_ = False
                 self.FiveCounter = 0
 
-        if self.halt_counter == 50:
-            if not self._divertingPath_:
-                print "ENCOUNTERED STATIC ELEMENT!!!!"
-                print "Diverting Path Now..."
-
-                move_action = self.move_forward, [10]
-                turn_action = self.turn, ["left"]
-                move_forward2 = self.move_forward, [5]
-                turn_action2 = self.turn, ["right"]
-
-                self._actionsStack_.append(move_action)
-                self._actionsStack_.append(turn_action)
-                self._actionsStack_.append(move_forward2)
-                self._actionsStack_.append(turn_action2)
-                self._stopCurrentAction_ = False
-            self._divertingPath_ = True
-        elif self.halt_counter == 30:
-            print "Checking if Entity in front is a static element..."
+        #Code for diverting path, which I don't think is needed atm, we can add it later if needed
+        # if self.halt_counter == 50:
+        #     if not self._divertingPath_:
+        #         print "ENCOUNTERED STATIC ELEMENT!!!!"
+        #         print "Diverting Path Now..."
+        #
+        #         move_action = self.move_forward, [10]
+        #         turn_action = self.turn, ["left"]
+        #         move_forward2 = self.move_forward, [5]
+        #         turn_action2 = self.turn, ["right"]
+        #
+        #         self._actionsStack_.append(move_action)
+        #         self._actionsStack_.append(turn_action)
+        #         self._actionsStack_.append(move_forward2)
+        #         self._actionsStack_.append(turn_action2)
+        #         self._stopCurrentAction_ = False
+        #     self._divertingPath_ = True
+        # elif self.halt_counter == 30:
+        #     print "Checking if Entity in front is a static element..."
 
     """
     @function
