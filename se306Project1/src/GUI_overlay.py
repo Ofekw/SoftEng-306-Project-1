@@ -161,7 +161,7 @@ class GUI_overlay(Tkinter.Tk):
         robot_tab.TLabel2.configure(relief=FLAT)
 
         robot_tab.TLabel3 = ttk.Label(TLabelframe1)
-        robot_tab.TLabel3.place(relx=0.31, rely=0.52, height=17, width=100)
+        robot_tab.TLabel3.place(relx=0.31, rely=0.52, height=17, width=200)
         robot_tab.TLabel3.configure(background=self._bgcolor)
         robot_tab.TLabel3.configure(foreground="#0066FF")
         robot_tab.TLabel3.configure(relief=FLAT)
@@ -243,7 +243,7 @@ class GUI_overlay(Tkinter.Tk):
         robot_tab.TLabel8.configure(relief=FLAT)
 
         robot_tab.TLabel9 = ttk.Label(TLabelframe2)
-        robot_tab.TLabel9.place(relx=0.31, rely=0.52, height=17, width=100)
+        robot_tab.TLabel9.place(relx=0.31, rely=0.52, height=17, width=200)
         robot_tab.TLabel9.configure(background=self._bgcolor)
         robot_tab.TLabel9.configure(foreground="#0066FF")
         robot_tab.TLabel9.configure(relief=FLAT)
@@ -324,7 +324,7 @@ class GUI_overlay(Tkinter.Tk):
         robot_tab.TLabel14.configure(relief=FLAT)
 
         robot_tab.TLabel15 = ttk.Label(TLabelframe3)
-        robot_tab.TLabel15.place(relx=0.31, rely=0.52, height=17, width=100)
+        robot_tab.TLabel15.place(relx=0.31, rely=0.52, height=17, width=200)
         robot_tab.TLabel15.configure(background=self._bgcolor)
         robot_tab.TLabel15.configure(foreground="#0066FF")
         robot_tab.TLabel15.configure(relief=FLAT)
@@ -407,7 +407,7 @@ class GUI_overlay(Tkinter.Tk):
         robot_tab.TLabel20.configure(relief=FLAT)
 
         robot_tab.TLabel21 = ttk.Label(TLabelframe4)
-        robot_tab.TLabel21.place(relx=0.31, rely=0.52, height=17, width=100)
+        robot_tab.TLabel21.place(relx=0.31, rely=0.52, height=17, width=200)
         robot_tab.TLabel21.configure(background=self._bgcolor)
         robot_tab.TLabel21.configure(foreground="#0066FF")
         robot_tab.TLabel21.configure(relief=FLAT)
@@ -489,7 +489,7 @@ class GUI_overlay(Tkinter.Tk):
         robot_tab.TLabel26.configure(relief=FLAT)
 
         robot_tab.TLabel27 = ttk.Label(TLabelframe5)
-        robot_tab.TLabel27.place(relx=0.31, rely=0.52, height=17, width=100)
+        robot_tab.TLabel27.place(relx=0.31, rely=0.52, height=17, width=200)
         robot_tab.TLabel27.configure(background=self._bgcolor)
         robot_tab.TLabel27.configure(foreground="#0066FF")
         robot_tab.TLabel27.configure(relief=FLAT)
@@ -594,7 +594,7 @@ class GUI_overlay(Tkinter.Tk):
         human_tab.TLabel2.configure(relief=FLAT)
 
         human_tab.TLabel3 = ttk.Label(TLabelframe1)
-        human_tab.TLabel3.place(relx=0.31, rely=0.52, height=17, width=100)
+        human_tab.TLabel3.place(relx=0.31, rely=0.52, height=17, width=200)
         human_tab.TLabel3.configure(background=self._bgcolor)
         human_tab.TLabel3.configure(foreground="#0066FF")
         human_tab.TLabel3.configure(relief=FLAT)
@@ -677,7 +677,7 @@ class GUI_overlay(Tkinter.Tk):
         human_tab.TLabel8.configure(relief=FLAT)
 
         human_tab.TLabel9 = ttk.Label(TLabelframe2)
-        human_tab.TLabel9.place(relx=0.31, rely=0.52, height=17, width=100)
+        human_tab.TLabel9.place(relx=0.31, rely=0.52, height=17, width=200)
         human_tab.TLabel9.configure(background=self._bgcolor)
         human_tab.TLabel9.configure(foreground="#0066FF")
         human_tab.TLabel9.configure(relief=FLAT)
@@ -768,7 +768,7 @@ class GUI_overlay(Tkinter.Tk):
         animal_tab.TLabel2.configure(relief=FLAT)
 
         animal_tab.TLabel3 = ttk.Label(TLabelframe1)
-        animal_tab.TLabel3.place(relx=0.31, rely=0.52, height=17, width=100)
+        animal_tab.TLabel3.place(relx=0.31, rely=0.52, height=17, width=200)
         animal_tab.TLabel3.configure(background=self._bgcolor)
         animal_tab.TLabel3.configure(foreground="#0066FF")
         animal_tab.TLabel3.configure(relief=FLAT)
