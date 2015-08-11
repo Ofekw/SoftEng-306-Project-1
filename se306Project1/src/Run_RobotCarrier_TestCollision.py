@@ -34,7 +34,7 @@ def main():
     #RobotNode_cmdvel = geometry_msgs.msg.Twist()
 
     # Add action here to go to position 1
-    moveAction = robot0.goto, [5,-28]
+    moveAction = robot0.goto_yx, [5,-28]
     robot0._actionsStack_.append(moveAction)
 
     while not rospy.is_shutdown():
