@@ -11,6 +11,8 @@ import time
 import numpy.testing
 from Robot import Robot
 import os
+import ActionInterruptException
+
 
 """
 @class
@@ -25,8 +27,8 @@ class RobotCarrier(Robot):
         self.carrier_pub = rospy.Publisher("carrierPosition",String, queue_size=10)
         self.carrier_sub = rospy.Subscriber("carrierPosition", String, self.carrierCallback)
         self.picker_sub = rospy.Subscriber("pickerPosition", String, self.pickerCallback)
-        self.kiwi_sub = rospy.Subscriber("kiwiTransfer", String, self.kiwi_callback)
-        self.kiwi_pub = rospy.Publisher("kiwiTransfer",String, queue_size=10)
+        self.kiwi_sub = rospy.Subscriber("picker_kiwiTransfer", String, self.kiwi_callback)
+        self.kiwi_pub = rospy.Publisher("carrier_kiwiTransfer",String, queue_size=10)
 
 
         self.closestRobotID = 0
@@ -121,15 +123,15 @@ class RobotCarrier(Robot):
     def pickerCallback(self, message):
         # print("Picker callback position " + message.data.split(',')[1] + "," + message.data.split(',')[2])
         self.picker_robots[int(message.data.split(',')[0])] = message.data.split(',')[1] + "," + message.data.split(',')[2] + "," + message.data.split(',')[4]  # Should add element 3 here which is theta
-        print("Picker array")
-        print(', '.join(self.picker_robots))
+        # print("Picker array")
+        # print(', '.join(self.picker_robots))
 
     def kiwi_callback(self, message):
+        print(message.data)
         if (message.data != str(self.robot_id)):
             self.current_load = 20
             print("going to dropoff zone")
             self.returnToOrigin()
-        pass
 
     def intiate_transfer(self):
         self.kiwi_pub.publish(str(self.robot_id))
@@ -144,58 +146,59 @@ class RobotCarrier(Robot):
     """
     def StageLaser_callback(self, msg):
 
-        #for some reason, ros is passing a value of 5 back every second call regardless if anything
-        #is in front of it, this bit of code is just to ignore that random value its passing through
-
-        #print "Header : " + str(msg.header)
-        # if not self.ReadLaser:
-        #     #print "Not Reading : " + str(msg.ranges[90])
-        #     self.ReadLaser = True
-        #     return
+        # #for some reason, ros is passing a value of 5 back every second call regardless if anything
+        # #is in front of it, this bit of code is just to ignore that random value its passing through
+        #
+        # #print "Header : " + str(msg.header)
+        # # if not self.ReadLaser:
+        # #     #print "Not Reading : " + str(msg.ranges[90])
+        # #     self.ReadLaser = True
+        # #     return
+        # # else:
+        # #     self.ReadLaser = False
+        #
+        # #print "Reading : " + str(msg.ranges[90])
+        # barCount = 0
+        # found = False
+        #
+        # #for i in range(0,180):
+        #     #print(msg.ranges[90])
+        # if msg.ranges[90] < 4.0:
+        #     #action = self._actions_[2], [self, "left"]
+        #     #check if action already exists in stack, otherwise laser will spam rotates
+        #     #if action != self._actionsStack_[-1]:
+        #     #self._stopCurrentAction_ = True
+        #     self.halt_counter += 1
+        #     self._stopCurrentAction_ = True
+        #     self.FiveCounter = 0
+        #     #    self._actionsStack_.append(action)
+        #     #rospy.loginfo("Range at %f degree is: %f", i, msg.ranges[i])
         # else:
-        #     self.ReadLaser = False
-
-        #print "Reading : " + str(msg.ranges[90])
-        barCount = 0
-        found = False
-
-        #for i in range(0,180):
-        #print(msg.ranges[90])
-        if msg.ranges[90] < 4.0:
-            #action = self._actions_[2], [self, "left"]
-            #check if action already exists in stack, otherwise laser will spam rotates
-            #if action != self._actionsStack_[-1]:
-            #self._stopCurrentAction_ = True
-            self.halt_counter += 1
-            self._stopCurrentAction_ = True
-            self.FiveCounter = 0
-            #    self._actionsStack_.append(action)
-            #rospy.loginfo("Range at %f degree is: %f", i, msg.ranges[i])
-        else:
-            self.FiveCounter += 1
-            if self.FiveCounter == 5:
-                self.halt_counter = 0
-                self._stopCurrentAction_ = False
-                self.FiveCounter = 0
-
-        if self.halt_counter == 50:
-            if not self._divertingPath_:
-                print("ENCOUNTERED STATIC ELEMENT!!!!")
-                print("Diverting Path Now...")
-
-                move_action = self.move_forward, [10]
-                turn_action = self.turn, ["left"]
-                move_forward2 = self.move_forward, [5]
-                turn_action2 = self.turn, ["right"]
-
-                self._actionsStack_.append(move_action)
-                self._actionsStack_.append(turn_action)
-                self._actionsStack_.append(move_forward2)
-                self._actionsStack_.append(turn_action2)
-                self._stopCurrentAction_ = False
-            self._divertingPath_ = True
-        elif self.halt_counter == 30:
-            print("Checking if Entity in front is a static element...")
+        #     self.FiveCounter += 1
+        #     if self.FiveCounter == 5:
+        #         self.halt_counter = 0
+        #         self._stopCurrentAction_ = False
+        #         self.FiveCounter = 0
+        #
+        # if self.halt_counter == 50:
+        #     if not self._divertingPath_:
+        #         print("ENCOUNTERED STATIC ELEMENT!!!!")
+        #         print("Diverting Path Now...")
+        #
+        #         move_action = self.move_forward, [10]
+        #         turn_action = self.turn, ["left"]
+        #         move_forward2 = self.move_forward, [5]
+        #         turn_action2 = self.turn, ["right"]
+        #
+        #         self._actionsStack_.append(move_action)
+        #         self._actionsStack_.append(turn_action)
+        #         self._actionsStack_.append(move_forward2)
+        #         self._actionsStack_.append(turn_action2)
+        #         self._stopCurrentAction_ = False
+        #     self._divertingPath_ = True
+        # elif self.halt_counter == 30:
+        #     print("Checking if Entity in front is a static element...")
+        pass
 
     """
     @function
@@ -219,17 +222,23 @@ class RobotCarrier(Robot):
     # This doesn't work right as it only calls the getClosest() once and then just continues to call goto()
     # Need a better understanding of how the actions stack works to get this to work correctly
     def waitForPicker(self):
-        self.getClosest()
-        if(int(self.picker_robots[self.closestRobotID].split(',')[2]) == 20):
-            self.goToClosest()
+        if self._stopCurrentAction_ == True:
+            self._stopCurrentAction_ = False
+            raise ActionInterruptException.ActionInterruptException("waitFor Stopped")
+        else:
+            self.getClosest()
+            if(int(self.picker_robots[self.closestRobotID].split(',')[2]) == 20):
+                self.goToClosest()
 
     def goToClosest(self):
-        self._stopCurrentAction_ = True
+        #self._stopCurrentAction_ = True
         action = self._actions_[1], [float(self.picker_robots[self.closestRobotID].split(',')[0]), float(self.picker_robots[self.closestRobotID].split(',')[1])-5.0]
             #goto(float(self.closestRobot.split(',')[0]), float(self.closestRobot.split(',')[1]))
         if action != self._actionsStack_[-1]:
             #stop moving foward and add turn action
-            #self._stopCurrentAction_ = True
+
+            # if len(self._actionsStack_) > 0:
+            # self._stopCurrentAction_ = True
             self._actionsStack_.append(action)
 
     def arrivedAtPoint(self):
@@ -243,4 +252,10 @@ class RobotCarrier(Robot):
                 self.intiate_transfer()
 
     def returnToOrigin(self):
-        self.goto(self.init_x, self.init_y)
+        print(str(self.init_x) + "  " + str(self.init_y))
+        action = self._actions_[1], [self.init_x, self.init_y]
+        print(str(self._stopCurrentAction_))
+        self._stopCurrentAction_ = False
+        self._actionsStack_.append(action)
+
+       # self.goto(self.init_x, self.init_y)

@@ -536,7 +536,7 @@ class Entity:
             if self._stopCurrentAction_:
                 print("Halted at destination:", self.px, self.py)
                 print("Go To: Stopped due to potential collision")
-                self.arrivedAtPoint()
+                self._stopCurrentAction_ = False
                 return 2
             else:
                 print("Arrived at destination:", self.px, self.py)

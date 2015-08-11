@@ -12,6 +12,8 @@ import numpy.testing
 from Robot import Robot
 import Entity
 import os
+import ActionInterruptException
+
 
 """
 @class
@@ -35,8 +37,8 @@ class RobotPicker(Robot):
         self.current_load = 0;
         self.timeLastAdded = time.clock()
 
-        self.kiwi_sub = rospy.Subscriber("kiwiTransfer", String, self.kiwi_callback)
-        self.kiwi_pub = rospy.Publisher("kiwiTransfer",String, queue_size=10)
+        self.kiwi_sub = rospy.Subscriber("carrier_kiwiTransfer", String, self.kiwi_callback)
+        self.kiwi_pub = rospy.Publisher("picker_kiwiTransfer",String, queue_size=10)
 
         # self._actions_ = {
         #     0: self.move_forward,
@@ -92,13 +94,12 @@ class RobotPicker(Robot):
         #rospy.loginfo("Current theta: %f", self.theta)s
 
     def kiwi_callback(self, message):
-        if (message.data != str(self.robot_id)):
+        if (message.data != str(self.robot_id) and self.current_load == 20):
             print("transfer load")
-            self.kiwi_pub.publish(str(self.robot_id))
-            self.disableLaser = False
             self.current_load = 0
-            # self._actionsStack_.pop()
-            # self._stopCurrentAction_ = False
+            self.kiwi_pub.publish(str(self.robot_id))
+
+
 
 
     def addKiwi(self, clockTime):
@@ -168,10 +169,10 @@ class RobotPicker(Robot):
         #until unloaded
         #while(self.current_load >= self.max_load):
             #do nothing
-        time.sleep(1)
-        print("waiting")
+        while (self.current_load != 0):
+            time.sleep(1)
 
-        if(self.current_load == 0):
-            time.sleep(10)
-            return 0
+        time.sleep(10)
+        self.disableLaser = False
 
+        return 0
