@@ -17,9 +17,7 @@ define animal position
   drive "diff"		 	# Differential steering model.
 
   obstacle_return 1           	# Can hit things.
-  laser_return 1                 # reflects laser beams
   ranger_return 1             	# reflects sonar beams
-  blobfinder_return 1         	# Seen by blobfinders  
   fiducial_return 1           	# Seen as "1" fiducial finders
 
   localization "gps"         	  

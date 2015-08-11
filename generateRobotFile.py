@@ -6,7 +6,7 @@ import atexit
 
 initial_x = -20
 #Types of robots that the script reads the config file for
-robot_type = ["Picker", "Carrier", "Visitor"]
+robot_type = ["Picker", "Carrier", "Visitor", "Animal"]
 #Loads the fields in the config file
 config = {}
 with open("config.properties", "r") as f:
@@ -31,19 +31,20 @@ for type in robot_type:
         initial_y = "-28"
     elif type == "Carrier":
         initial_y = "-32"
+    elif type == "Visitor":
+        initial_y = "-34"
     else:
-        initial_y = "-35"
+        initial_y = "-38"
     #Loads the corresponding robot template
     string = open('world/templates/' + type + '.template').read()
     number = config.get(type + '.number')
     robot = ""
     for i in range(0, int(number)):
-        #Have to change the picker name when there's a model for the other types
         #Appends to the myworld file the robot model of each robot
         robot = robot + type.lower() + "( pose [ " + str(initial_x+(i*10))  +  " " + initial_y + " 0.000 90 ] name \"r" + str(total_robots) + "\")" + "\n"
         #The constructor of that robot type with the robot_id and the x y positions
         constructor_name = "Robot" + type
-        if type == "Visitor":
+        if type == "Visitor" or type == "Animal":
             constructor_name = constructor_name.replace("Robot", "")
         constructor = "    robot = " + constructor_name + "(" + str(total_robots) + ", " + str(initial_x+(i*10)) + ", -28, math.pi/2)"
         name = "r" + str(total_robots) + ".py" #Name of the robot files
