@@ -3,6 +3,8 @@ import subprocess
 import os
 import stat
 import atexit
+import sys
+import getopt
 
 initial_x = -20
 #Types of robots that the script reads the config file for
@@ -60,11 +62,20 @@ for type in robot_type:
     myworld.write(robot)
 
 myworld.close()
-
-for name in file_name:
-    #Runs all the temporary robot files created
-    command = "bash -c 'sleep 3 && rosrun se306Project1 " + name + "'"
-    subprocess.Popen(command, shell=True)
+debugger = False
+try:
+    opts, args = getopt.getopt(sys.argv[1:],"d")
+except getopt.GetoptError:
+    print 'test.py -d for debugger mode '
+    sys.exit(2)
+for opt, arg in opts:
+    if opt == '-d':
+        debugger = True
+if debugger == False:
+    for name in file_name:
+        #Runs all the temporary robot files created
+        command = "bash -c 'sleep 3 && rosrun se306Project1 " + name + "'"
+        subprocess.Popen(command, shell=True)
 
 def delete_files():
     #This function is called when the process is killed. The function will delete all the temporary robot files and the myworld.world file
