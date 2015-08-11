@@ -399,7 +399,7 @@ class Entity:
 
     """
     def face_direction(self, direction_to_face):
-
+        print "Running Function face_direction"
         current_direction = self.get_current_direction()
 
         print("Currently facing:" + current_direction)
@@ -411,7 +411,8 @@ class Entity:
             if (direction_to_face==Direction.EAST):
                 self.turn(Direction.RIGHT)
             elif(direction_to_face==Direction.SOUTH):
-                self.rotate_relative(180, Angle.DEGREES)
+                self.turn(Direction.RIGHT)
+                self.turn(Direction.RIGHT)
             elif(direction_to_face==Direction.WEST):
                 self.turn(Direction.LEFT)
             self.correct_theta()
@@ -421,19 +422,22 @@ class Entity:
             elif(direction_to_face==Direction.SOUTH):
                 self.turn(Direction.RIGHT)
             elif(direction_to_face==Direction.WEST):
-                self.rotate_relative(180,Angle.DEGREES)
+                self.turn(Direction.RIGHT)
+                self.turn(Direction.RIGHT)
             self.correct_theta()
         elif (current_direction==Direction.SOUTH):
             if (direction_to_face==Direction.EAST):
                 self.turn(Direction.LEFT)
             elif(direction_to_face==Direction.NORTH):
-                self.rotate_relative(180,Angle.DEGREES)
+                self.turn(Direction.RIGHT)
+                self.turn(Direction.RIGHT)
             elif(direction_to_face==Direction.WEST):
                 self.turn(Direction.RIGHT)
             self.correct_theta()
         elif (current_direction==Direction.WEST):
             if (direction_to_face==Direction.EAST):
-                self.rotate_relative(180,Angle.DEGREES)
+                self.turn(Direction.RIGHT)
+                self.turn(Direction.RIGHT)
             elif(direction_to_face==Direction.SOUTH):
                 self.turn(Direction.LEFT)
             elif(direction_to_face==Direction.NORTH):
@@ -442,6 +446,8 @@ class Entity:
         else:
             print("Error: Face Direction")
             return
+
+        return 0
 
     """
     @function
@@ -663,6 +669,7 @@ class Entity:
 
     """
     def get_current_direction(self):
+
         if(abs(self.theta- math.pi/2)<=0.1):
             current_direction = Direction.NORTH
         elif (abs(self.theta-0)<=0.1):
@@ -714,7 +721,6 @@ class Entity:
             self.rotate_relative(-math.pi-self.theta,Angle.RADIANS)
             current_direction=Direction.WEST
         elif (abs(self.theta+math.pi/2)<=0.4):
-            print("Diff" + str(math.pi/2+self.theta))
             self.rotate_relative(-math.pi/2-self.theta,Angle.RADIANS)
             current_direction=Direction.SOUTH
         elif (abs(self.theta-0)<=0.4):
