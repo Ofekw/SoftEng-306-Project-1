@@ -5,11 +5,16 @@ import getopt
 import sys
 import atexit
 import generateEntity
+import os
 
 def main(argv):
     testing = False
     debugging = False
 
+    def cleanup():
+      os.system("ps aux | grep python | grep -v 'grep python' | awk '{print $2}' | xargs kill -9")
+
+    atexit.register(cleanup)
     try:
         opts, args = getopt.getopt(argv,"dt")
     except getopt.GetoptError:
