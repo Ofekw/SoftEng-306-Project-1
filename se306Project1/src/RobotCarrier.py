@@ -72,13 +72,8 @@ class RobotCarrier(Robot):
         #Update the theta value
         self.update_theta(yaw)
 
-        xpos = str(self.px)
-        ypos = str(self.py)
-        #com_pub.publish("\n" + rospy.get_caller_id() +  " is at position x: " + xpos + "\nposition y: " + ypos)
-
-
-        self.carrier_pub.publish(str(self.robot_id) + "," + xpos + "," + ypos+ "," + str(self.theta))
-        # print("I have sent " + str(self.robot_id) + "," + xpos + "," + ypos+ "," + str(self.theta))
+        #Sending it's location to the topic
+        self.carrier_pub.publish(str(self.robot_id) + "," + str(self.px) + "," + str(self.py) + "," + str(self.theta))
 
         fn = os.path.join(os.path.dirname(__file__), str(self.robot_id)+"car.sta")
         output_file = open(fn, "w")
@@ -90,32 +85,24 @@ class RobotCarrier(Robot):
         output_file.write(str(round(self.theta,2)) + "\n")
         output_file.write(str(self.current_load)+ "/" + str(self.max_load))
 
-
-        #rospy.loginfo("Current x position: %f"picker , self.px)
-        #rospy.loginfo("Current y position: %f", self.py)
-        #rospy.loginfo("Current theta: %f", self.theta)
-
     """
     @function
     @parameter: message
 
-    Displays info sent from another robot --- used for debugging
+    Sets the position of carrier robots received from messages on the topic
     """
     def carrierCallback(self, message):
-        # print("Carrier callback position " + message.data.split(',')[1] + "," + message.data.split(',')[2])
-        #self.carrier_robots[int(message.data.split(',')[0])] = message.data.split(',')[1] + "," + message.data.split(',')[2] #+ "," + message.data.split(',')[4]  # Should add element 4 here which is theta
+        self.carrier_robots[int(message.data.split(',')[0])] = message.data.split(',')[1] + "," + message.data.split(',')[2] #+ "," + message.data.split(',')[4]  # Should add element 4 here which is theta
         # print("Carrier array")
         # print ', '.join(self.carrier_robots)
-        pass
 
     """
     @function
     @parameter: message
 
-    Displays info sent from another robot --- used for debugging
+    Sets the position of picker robots received from messages on the topic
     """
     def pickerCallback(self, message):
-        # print("Picker callback position " + message.data.split(',')[1] + "," + message.data.split(',')[2])
         self.picker_robots[int(message.data.split(',')[0])] = message.data.split(',')[1] + "," + message.data.split(',')[2] + "," + message.data.split(',')[4]  # Should add element 3 here which is theta
         #print("Picker array")
         #print(', '.join(self.picker_robots))
@@ -190,7 +177,9 @@ class RobotCarrier(Robot):
     """
     @function
 
-    Gets the next robot to collect from
+    Gets the Closest robot to the carrier
+    Will need to change this method depending on how we want to implement multiple robots
+    Currently just goes to robot in array index 0
     """
     def getClosest(self):
         #print("Getting closest robot.....")
@@ -230,15 +219,8 @@ class RobotCarrier(Robot):
     Go to the full picker
     """
     def goToClosest(self):
-        #self._stopCurrentAction_ = True
-        #Move robot along x, and then up y
         action = self._actions_[5], [float(self.picker_robots[self.closestRobotID].split(',')[0]), float(self.picker_robots[self.closestRobotID].split(',')[1])-5.0]
-            #goto(float(self.closestRobot.split(',')[0]), float(self.closestRobot.split(',')[1]))
         if action != self._actionsStack_[-1]:
-            #stop moving foward and add turn action
-
-            # if len(self._actionsStack_) > 0:
-            # self._stopCurrentAction_ = True
             self._actionsStack_.append(action)
 
     """

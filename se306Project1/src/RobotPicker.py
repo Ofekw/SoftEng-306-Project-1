@@ -38,7 +38,6 @@ class RobotPicker(Robot):
         self.firstLaserReading = []
         self.timeLastAdded = time.clock()
 
-
         self.kiwi_sub = rospy.Subscriber("carrier_kiwiTransfer", String, self.kiwi_callback)
         self.kiwi_pub = rospy.Publisher("picker_kiwiTransfer",String, queue_size=10)
 
@@ -64,13 +63,8 @@ class RobotPicker(Robot):
         #Update the theta value
         self.update_theta(yaw)
 
-        xpos = str(self.px)
-        ypos = str(self.py)
-        #com_pub.publish("\n" + rospy.get_caller_id() +  " is at position x: " + xpos + "\nposition y: " + ypos)
-
-        #publish:- id xpos ypos kiwimunber
-        self.picker_pub.publish(str(self.robot_id) + "," + xpos + "," + ypos+ "," + str(self.theta) + "," + str(self.current_load))
-        print("I have sent " + str(self.robot_id) + "," + xpos + "," + ypos+ "," + str(self.theta) + "," + str(self.current_load))
+        #publish:- id, xpos, ypos, kiwinunber
+        self.picker_pub.publish(str(self.robot_id) + "," + str(self.px) + "," + str(self.py) + "," + str(self.theta) + "," + str(self.current_load))
 
         fn = os.path.join(os.path.dirname(__file__), str(self.robot_id)+"pic.sta")
         output_file = open(fn, "w")
@@ -81,10 +75,6 @@ class RobotPicker(Robot):
         output_file.write(str(round(self.py,2)) + "\n")
         output_file.write(str(round(self.theta,2)) + "\n")
         output_file.write(str(self.current_load)+ "/" + str(self.max_load))
-
-        #rospy.loginfo("Current x position: %f" , self.px)
-        #rospy.loginfo("Current y position: %f", self.py)
-        #rospy.loginfo("Current theta: %f", self.theta)s
 
     """
     @function
@@ -103,8 +93,6 @@ class RobotPicker(Robot):
     Add a kiwifruit
     """
     def addKiwi(self, clockTime):
-        print("looking to add " + str(self.max_load) + " " + str(self.current_load))
-        print(str(clockTime) + " " + str(self.timeLastAdded))
         if(self.current_load >= self.max_load):
             self.waitForCollection()
         elif(clockTime >= (self.timeLastAdded + 0.005)):
@@ -118,19 +106,13 @@ class RobotPicker(Robot):
     Wait for a carrier to pickup
     """
     def waitForCollection(self):
-        #while(self.current_load >= self.max_load):
+        self._stopCurrentAction_ = True
+        self.disableLaser = True
+        action = self._actions_[7],[]
+        if action != self._actionsStack_[-1]:
+            #stop moving foward and add turn action
             self._stopCurrentAction_ = True
-            self.disableLaser = True
-            action = self._actions_[7],[]
-            if action != self._actionsStack_[-1]:
-                #stop moving foward and add turn action
-                self._stopCurrentAction_ = True
-                self._actionsStack_.append(action)
-
-            #self.goto(self.px,self.py)
-        #    print("ohdera")
-            #make the robot stop moving until collected from
-        #pass
+            self._actionsStack_.append(action)
 
     def gotoClosestRobot(self):
         pass
