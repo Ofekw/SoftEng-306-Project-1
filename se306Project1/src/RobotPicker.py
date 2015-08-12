@@ -42,15 +42,6 @@ class RobotPicker(Robot):
         self.kiwi_sub = rospy.Subscriber("carrier_kiwiTransfer", String, self.kiwi_callback)
         self.kiwi_pub = rospy.Publisher("picker_kiwiTransfer",String, queue_size=10)
 
-        # self._actions_ = {
-        #     0: self.move_forward,
-        #     1: self.goto,
-        #     2: self.turn,
-        #     3: self.stop,
-        #     4: self.gotoClosestRobot,
-        #     5: self.wait,
-        # }
-
         Robot.__init__(self,r_id,x_off,y_off,theta_off)
 
     def robot_specific_function(self):
@@ -116,7 +107,7 @@ class RobotPicker(Robot):
         #while(self.current_load >= self.max_load):
             self._stopCurrentAction_ = True
             self.disableLaser = True
-            action = self._actions_[4],[]
+            action = self._actions_[7],[]
             if action != self._actionsStack_[-1]:
                 #stop moving foward and add turn action
                 self._stopCurrentAction_ = True
@@ -203,14 +194,10 @@ class RobotPicker(Robot):
         for i in range(70, 110):
             container.append(msg[i])
 
-	def wait(self):
-        #until unloaded
-        #while(self.current_load >= self.max_load):
-            #do nothing
-        while (self.current_load != 0):
+    def pickerWait(self):
+        while(self.current_load != 0):
             time.sleep(1)
 
         time.sleep(10)
         self.disableLaser = False
-
         return 0

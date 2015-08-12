@@ -70,8 +70,9 @@ class Entity:
             2: self.turn,
             3: self.stop,
             4: self.wait,
-            5: self.goto_xy
-            6: self.waitForPicker
+            5: self.goto_xy,
+            6: self.waitForPicker,
+            7: self.pickerWait
         }
 
         #Enums for direction and angles
@@ -400,7 +401,7 @@ class Entity:
 
     """
     def face_direction(self, direction_to_face):
-        print "Running Function face_direction"
+        print("Running Function face_direction")
         current_direction = self.get_current_direction()
 
         print("Currently facing:" + current_direction)
@@ -576,7 +577,7 @@ class Entity:
     """
     def goto_xy(self, x_coord, y_coord):
         print ("Going To : ("+str(x_coord)+","+str(y_coord)+")")
-        #try run the goto command
+        #try run the goto command]
         try:
             print("Current x pos = " + str(self.px))
             print("Current y pos = " + str(self.py))
@@ -765,15 +766,6 @@ class Entity:
 
     Function to be overridden in subclasses
     """
-    def wait(self):
-        pass
-
-
-    """
-    @function
-
-    Function to be overridden in subclasses
-    """
     def waitForPicker(self):
         pass
 
@@ -783,4 +775,7 @@ class Entity:
     Function to be overridden in subclasses
     """
     def arrivedAtPoint(self):
+        pass
+
+    def pickerWait(self):
         pass

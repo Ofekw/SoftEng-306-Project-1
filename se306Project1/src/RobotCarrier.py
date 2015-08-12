@@ -210,12 +210,13 @@ class RobotCarrier(Robot):
         else:
             if not(self.is_going_home):
                 self.getClosest()
-                if(int(self.picker_robots[self.closestRobotID].split(',')[2]) == 20):
+                if(int(self.picker_robots[self.closestRobotID].split(',')[2]) >= 20):
                     self.goToClosest()
 
     def goToClosest(self):
         #self._stopCurrentAction_ = True
-        action = self._actions_[1], [float(self.picker_robots[self.closestRobotID].split(',')[0]), float(self.picker_robots[self.closestRobotID].split(',')[1])-5.0]
+        #Move robot along x, and then up y
+        action = self._actions_[5], [float(self.picker_robots[self.closestRobotID].split(',')[0]), float(self.picker_robots[self.closestRobotID].split(',')[1])-5.0]
             #goto(float(self.closestRobot.split(',')[0]), float(self.closestRobot.split(',')[1]))
         if action != self._actionsStack_[-1]:
             #stop moving foward and add turn action
