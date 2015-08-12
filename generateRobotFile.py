@@ -68,7 +68,7 @@ def main(argv):
             constructor = "    robot = " + constructor_name + "(" + str(total_robots) + ", " + str(initial_x+(i*10)) + ", -28, math.pi/2)"
             if debugging == True:
                 constructor = constructor + "\n" + debug_text1 + "\n" + debug_text2
-            name = "r" + str(total_robots) + ".py" #Name of the robot files
+            name = type + str(i) + ".py" #Name of the robot files
             file_name.append(name)
             temp = open(os.path.join(directory, name),'w')
             #Replaces "@@@" string in the template with the constructor
