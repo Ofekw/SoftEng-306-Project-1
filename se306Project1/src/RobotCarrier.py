@@ -42,14 +42,6 @@ class RobotCarrier(Robot):
 
         Robot.__init__(self,r_id,x_off,y_off,theta_off)
 
-        # self._actions_ = {
-        #     0: self.move_forward,
-        #     1: self.goto,
-        #     2: self.turn,
-        #     3: self.stop,
-        #     4: self.gotoClosestRobot,
-        # }
-
 
         #these variables are used to help the laser callback, it will help in dealing with entities/debris on
         # it's path to the picker robot
@@ -92,7 +84,7 @@ class RobotCarrier(Robot):
         output_file = open(fn, "w")
         output_file.write(str(self.robot_node_identifier)+ "\n")
         output_file.write("Carrier\n")
-        output_file.write("..........\n")
+        output_file.write(self.state+"\n")
         output_file.write(str(round(self.px,2)) + "\n")
         output_file.write(str(round(self.py,2)) + "\n")
         output_file.write(str(round(self.theta,2)) + "\n")

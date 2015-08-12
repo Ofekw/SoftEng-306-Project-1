@@ -70,44 +70,6 @@ class GUI_overlay(Tkinter.Tk):
         self.animal_label_list = self.setup_animals(nb,animal_tab)
 
 
-
-        # self.label_list.append(self.TLabel1)
-        # self.label_list.append(self.TLabel2)
-        # self.label_list.append(self.TLabel3)
-        # self.label_list.append(self.TLabel4)
-        # self.label_list.append(self.TLabel5)
-        # self.label_list.append(self.TLabel6)
-        # self.label_list.append(self.Label36)
-        # self.label_list.append(self.TLabel7)
-        # self.label_list.append(self.TLabel8)
-        # self.label_list.append(self.TLabel9)
-        # self.label_list.append(self.TLabel10)
-        # self.label_list.append(self.TLabel11)
-        # self.label_list.append(self.TLabel12)
-        # self.label_list.append(self.Label37)
-        # self.label_list.append(self.TLabel13)
-        # self.label_list.append(self.TLabel14)
-        # self.label_list.append(self.TLabel15)
-        # self.label_list.append(self.TLabel16)
-        # self.label_list.append(self.TLabel17)
-        # self.label_list.append(self.TLabel18)
-        # self.label_list.append(self.Label38)
-        # self.label_list.append(self.TLabel19)
-        # self.label_list.append(self.TLabel20)
-        # self.label_list.append(self.TLabel21)
-        # self.label_list.append(self.TLabel22)
-        # self.label_list.append(self.TLabel23)
-        # self.label_list.append(self.TLabel24)
-        # self.label_list.append(self.Label39)
-        # self.label_list.append(self.TLabel25)
-        # self.label_list.append(self.TLabel26)
-        # self.label_list.append(self.TLabel27)
-        # self.label_list.append(self.TLabel28)
-        # self.label_list.append(self.TLabel29)
-        # self.label_list.append(self.TLabel30)
-        # self.label_list.append(self.Label40)
-
-
     def setup_robots(self,nb,robot_tab):
 
         #ROBOT 1 ___________________________________________________________
@@ -574,15 +536,11 @@ class GUI_overlay(Tkinter.Tk):
         human_tab.Label5.configure(text='''Type:''')
 
         human_tab.Label6 = Label(TLabelframe1)
-        human_tab.Label6.place(relx=0.03, rely=0.52, height=19, width=95)
+        human_tab.Label6.place(relx=0.03, rely=0.6, height=19, width=95)
         human_tab.Label6.configure(text='''Current action:''')
 
-        human_tab.Label7 = Label(TLabelframe1)
-        human_tab.Label7.place(relx=0.03, rely=0.74, height=19, width=109)
-        human_tab.Label7.configure(text='''Current capacity:''')
-
         human_tab.TLabel1 = ttk.Label(TLabelframe1)
-        human_tab.TLabel1.place(relx=0.26, rely=0.15, height=17, width=50)
+        human_tab.TLabel1.place(relx=0.26, rely=0.15, height=17, width=75)
         human_tab.TLabel1.configure(background=self._bgcolor)
         human_tab.TLabel1.configure(foreground="#0066FF")
         human_tab.TLabel1.configure(relief=FLAT)
@@ -594,7 +552,7 @@ class GUI_overlay(Tkinter.Tk):
         human_tab.TLabel2.configure(relief=FLAT)
 
         human_tab.TLabel3 = ttk.Label(TLabelframe1)
-        human_tab.TLabel3.place(relx=0.31, rely=0.52, height=17, width=200)
+        human_tab.TLabel3.place(relx=0.31, rely=0.6, height=17, width=200)
         human_tab.TLabel3.configure(background=self._bgcolor)
         human_tab.TLabel3.configure(foreground="#0066FF")
         human_tab.TLabel3.configure(relief=FLAT)
@@ -654,18 +612,12 @@ class GUI_overlay(Tkinter.Tk):
         human_tab.Label12.configure(text='''Type:''')
 
         human_tab.Label13 = Label(TLabelframe2)
-        human_tab.Label13.place(relx=0.03, rely=0.52, height=19, width=95)
+        human_tab.Label13.place(relx=0.03, rely=0.6, height=19, width=95)
         human_tab.Label13.configure(activebackground="#f9f9f9")
         human_tab.Label13.configure(text='''Current action:''')
 
-        human_tab.Label14 = Label(TLabelframe2)
-        human_tab.Label14.place(relx=0.03, rely=0.74, height=19, width=109)
-        human_tab.Label14.configure(activebackground="#f9f9f9")
-        human_tab.Label14.configure(text='''Current capacity:''')
-
-
         human_tab.TLabel7 = ttk.Label(TLabelframe2)
-        human_tab.TLabel7.place(relx=0.26, rely=0.15, height=17, width=50)
+        human_tab.TLabel7.place(relx=0.26, rely=0.15, height=17, width=75)
         human_tab.TLabel7.configure(background=self._bgcolor)
         human_tab.TLabel7.configure(foreground="#0066FF")
         human_tab.TLabel7.configure(relief=FLAT)
@@ -677,7 +629,7 @@ class GUI_overlay(Tkinter.Tk):
         human_tab.TLabel8.configure(relief=FLAT)
 
         human_tab.TLabel9 = ttk.Label(TLabelframe2)
-        human_tab.TLabel9.place(relx=0.31, rely=0.52, height=17, width=200)
+        human_tab.TLabel9.place(relx=0.31, rely=0.6, height=17, width=200)
         human_tab.TLabel9.configure(background=self._bgcolor)
         human_tab.TLabel9.configure(foreground="#0066FF")
         human_tab.TLabel9.configure(relief=FLAT)
@@ -700,18 +652,9 @@ class GUI_overlay(Tkinter.Tk):
         human_tab.TLabel12.configure(foreground="#006600")
         human_tab.TLabel12.configure(relief=FLAT)
 
-        human_tab.Label36 = Label(TLabelframe1)
-        human_tab.Label36.place(relx=0.33, rely=0.74, height=19, width=34)
-        human_tab.Label36.configure(cursor="fleur")
-        human_tab.Label36.configure(foreground="#FF0000")
-
-        human_tab.Label37 = Label(TLabelframe2)
-        human_tab.Label37.place(relx=0.31, rely=0.74, height=19, width=56)
-        human_tab.Label37.configure(width=56)
-        human_tab.Label37.configure(foreground="#FF0000")
 
 
-        human_label_list = [human_tab.TLabel1,human_tab.TLabel2,human_tab.TLabel3,human_tab.TLabel4,human_tab.TLabel5,human_tab.TLabel6,human_tab.Label36, human_tab.TLabel7,human_tab.TLabel8,human_tab.TLabel9,human_tab.TLabel10,human_tab.TLabel11,human_tab.TLabel12,human_tab.Label37]
+        human_label_list = [human_tab.TLabel1,human_tab.TLabel2,human_tab.TLabel3,human_tab.TLabel4,human_tab.TLabel5,human_tab.TLabel6,human_tab.TLabel8,human_tab.TLabel9,human_tab.TLabel10,human_tab.TLabel11]
 
         return human_label_list
 
@@ -748,15 +691,11 @@ class GUI_overlay(Tkinter.Tk):
         animal_tab.Label5.configure(text='''Type:''')
 
         animal_tab.Label6 = Label(TLabelframe1)
-        animal_tab.Label6.place(relx=0.03, rely=0.52, height=19, width=95)
+        animal_tab.Label6.place(relx=0.03, rely=0.6, height=19, width=95)
         animal_tab.Label6.configure(text='''Current action:''')
 
-        animal_tab.Label7 = Label(TLabelframe1)
-        animal_tab.Label7.place(relx=0.03, rely=0.74, height=19, width=109)
-        animal_tab.Label7.configure(text='''Current capacity:''')
-
         animal_tab.TLabel1 = ttk.Label(TLabelframe1)
-        animal_tab.TLabel1.place(relx=0.26, rely=0.15, height=17, width=50)
+        animal_tab.TLabel1.place(relx=0.26, rely=0.15, height=17, width=75)
         animal_tab.TLabel1.configure(background=self._bgcolor)
         animal_tab.TLabel1.configure(foreground="#0066FF")
         animal_tab.TLabel1.configure(relief=FLAT)
@@ -768,7 +707,7 @@ class GUI_overlay(Tkinter.Tk):
         animal_tab.TLabel2.configure(relief=FLAT)
 
         animal_tab.TLabel3 = ttk.Label(TLabelframe1)
-        animal_tab.TLabel3.place(relx=0.31, rely=0.52, height=17, width=200)
+        animal_tab.TLabel3.place(relx=0.31, rely=0.6, height=17, width=200)
         animal_tab.TLabel3.configure(background=self._bgcolor)
         animal_tab.TLabel3.configure(foreground="#0066FF")
         animal_tab.TLabel3.configure(relief=FLAT)
@@ -827,18 +766,12 @@ class GUI_overlay(Tkinter.Tk):
         animal_tab.Label12.configure(text='''Type:''')
 
         animal_tab.Label13 = Label(TLabelframe2)
-        animal_tab.Label13.place(relx=0.03, rely=0.52, height=19, width=95)
+        animal_tab.Label13.place(relx=0.03, rely=0.6, height=19, width=95)
         animal_tab.Label13.configure(activebackground="#f9f9f9")
         animal_tab.Label13.configure(text='''Current action:''')
 
-        animal_tab.Label14 = Label(TLabelframe2)
-        animal_tab.Label14.place(relx=0.03, rely=0.74, height=19, width=109)
-        animal_tab.Label14.configure(activebackground="#f9f9f9")
-        animal_tab.Label14.configure(text='''Current capacity:''')
-
-
         animal_tab.TLabel7 = ttk.Label(TLabelframe2)
-        animal_tab.TLabel7.place(relx=0.26, rely=0.15, height=17, width=50)
+        animal_tab.TLabel7.place(relx=0.26, rely=0.15, height=17, width=75)
         animal_tab.TLabel7.configure(background=self._bgcolor)
         animal_tab.TLabel7.configure(foreground="#0066FF")
         animal_tab.TLabel7.configure(relief=FLAT)
@@ -850,7 +783,7 @@ class GUI_overlay(Tkinter.Tk):
         animal_tab.TLabel8.configure(relief=FLAT)
 
         animal_tab.TLabel9 = ttk.Label(TLabelframe2)
-        animal_tab.TLabel9.place(relx=0.31, rely=0.52, height=17, width=50)
+        animal_tab.TLabel9.place(relx=0.31, rely=0.6, height=17, width=50)
         animal_tab.TLabel9.configure(background=self._bgcolor)
         animal_tab.TLabel9.configure(foreground="#0066FF")
         animal_tab.TLabel9.configure(relief=FLAT)
@@ -873,17 +806,8 @@ class GUI_overlay(Tkinter.Tk):
         animal_tab.TLabel12.configure(foreground="#006600")
         animal_tab.TLabel12.configure(relief=FLAT)
 
-        animal_tab.Label36 = Label(TLabelframe1)
-        animal_tab.Label36.place(relx=0.33, rely=0.74, height=19, width=34)
-        animal_tab.Label36.configure(cursor="fleur")
-        animal_tab.Label36.configure(foreground="#FF0000")
 
-        animal_tab.Label37 = Label(TLabelframe2)
-        animal_tab.Label37.place(relx=0.31, rely=0.74, height=19, width=56)
-        animal_tab.Label37.configure(width=56)
-        animal_tab.Label37.configure(foreground="#FF0000")
-
-        animal_label_list = [animal_tab.TLabel1,animal_tab.TLabel2,animal_tab.TLabel3,animal_tab.TLabel4,animal_tab.TLabel5,animal_tab.TLabel6,animal_tab.Label36, animal_tab.TLabel7,animal_tab.TLabel8,animal_tab.TLabel9,animal_tab.TLabel10,animal_tab.TLabel11,animal_tab.TLabel12,animal_tab.Label37]
+        animal_label_list = [animal_tab.TLabel1,animal_tab.TLabel2,animal_tab.TLabel3,animal_tab.TLabel4,animal_tab.TLabel5,animal_tab.TLabel6,animal_tab.TLabel8,animal_tab.TLabel9,animal_tab.TLabel10,animal_tab.TLabel11,animal_tab.TLabel12]
 
         return animal_label_list
 
@@ -896,10 +820,19 @@ class GUI_overlay(Tkinter.Tk):
                     for line in f:
                         self.robot_label_list[i].configure(text=str(line))
                         i+=1
-            elif file.endswith("vis.sta"):
+        i=0
+        for file in os.listdir(self.directory):
+            if file.endswith("vis.sta"):
                 with open(file) as f:
                     for line in f:
                         self.human_label_list[i].configure(text=str(line))
+                        i+=1
+        i=0
+        for file in os.listdir(self.directory):
+            if file.endswith("ani.sta"):
+                with open(file) as f:
+                    for line in f:
+                        self.animal_label_list[i].configure(text=str(line))
                         i+=1
         i=0
         self.after(50,self.update)
@@ -914,5 +847,5 @@ def delete_files():
         if file.endswith(".sta"):
             print(str(file) + " Deleted" )
             os.remove(file)
-
+            
 atexit.register(delete_files())

@@ -11,7 +11,7 @@ define mylaser ranger
   
 )
 
-define picker position 
+define carrier position 
 (
   color "gray50"
   drive "diff"		 	# Differential steering model.
@@ -37,7 +37,7 @@ define picker position
     point[2] [ 0.9 0.75 ] 
     point[3] [ 0.1 0.75 ] 
     z [ 0.2 0.6 ]
-	 color "yellow"
+	 color "red"
   )
 
   # body top

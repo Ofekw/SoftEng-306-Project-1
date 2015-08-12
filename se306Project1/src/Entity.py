@@ -53,8 +53,8 @@ class Entity:
         self.x_off = x_off
         self.y_off = y_off
         self.robot_id = r_id
-        self.robot_node_name = ("RobotNode" +str(r_id))
-        self.robot_node_identifier = ("robot_"+ str(r_id))
+        self.robot_node_name = ("RobotNode" +str(self.robot_id))
+        self.robot_node_identifier = ("robot_"+ str(self.robot_id))
         self.goalx = self.px
         self.goaly = self.py
         self.state = self.State.STOPPED
@@ -404,8 +404,8 @@ class Entity:
         print("Running Function face_direction")
         current_direction = self.get_current_direction()
 
-        print("Currently facing:" + current_direction)
-        print("Turning to face: "+ direction_to_face)
+        #print("Currently facing:" + current_direction)
+        #print("Turning to face: "+ direction_to_face)
 
         if (current_direction== direction_to_face):
             return
@@ -473,8 +473,6 @@ class Entity:
         print ("Going To : ("+str(x_coord)+","+str(y_coord)+")")
         #try run the goto command
         try:
-            print("Current x pos = " + str(self.px))
-            print("Current y pos = " + str(self.py))
 
             if (abs(x_coord-self.px)<=0.3 and abs(y_coord-self.py)<=0.2 ):
                 print("Already at coordinate!")
@@ -482,9 +480,6 @@ class Entity:
 
             x_difference = x_coord - self.px
             y_difference = y_coord - self.py
-
-            print("Xdiff" + str(x_difference))
-            print("Ydiff" + str(y_difference))
 
             #error tolerance
             tol = 0.5
@@ -579,8 +574,6 @@ class Entity:
         print ("Going To : ("+str(x_coord)+","+str(y_coord)+")")
         #try run the goto command]
         try:
-            print("Current x pos = " + str(self.px))
-            print("Current y pos = " + str(self.py))
 
             if (abs(x_coord-self.px)<=0.3 and abs(y_coord-self.py)<=0.2 ):
                 print("Already at coordinate!")
@@ -588,9 +581,6 @@ class Entity:
 
             x_difference = x_coord - self.px
             y_difference = y_coord - self.py
-
-            print("Xdiff" + str(x_difference))
-            print("Ydiff" + str(y_difference))
 
             #error tolerance
             tol = 0.5
