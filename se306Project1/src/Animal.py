@@ -12,6 +12,7 @@ import numpy.testing
 from Entity import Entity
 from Human import Human
 import ActionInterruptException
+import os
 
 """
 @class Animal
@@ -48,6 +49,25 @@ class Animal(Entity):
             5: self.go_to_visitor
         }
 
+    def StageOdom_callback(self, msg):
+        #Update the px and py values
+        self.update_position(msg.pose.pose.position.x, msg.pose.pose.position.y)
+
+        #Find the yaw from the quaternion values
+        (roll, pitch, yaw) = euler_from_quaternion((msg.pose.pose.orientation.x, msg.pose.pose.orientation.y, msg.pose.pose.orientation.z, msg.pose.pose.orientation.w))
+
+        #Update the theta value
+        self.update_theta(yaw)
+
+        fn = os.path.join(os.path.dirname(__file__), str(self.robot_id)+"ani.sta")
+        output_file = open(fn, "w")
+        output_file.write(str(self.robot_node_identifier)+ "\n")
+        output_file.write("Animal\n")
+        output_file.write(self.state+"\n")
+        output_file.write(str(round(self.px,2)) + "\n")
+        output_file.write(str(round(self.py,2)) + "\n")
+        output_file.write(str(round(self.theta,2)) + "\n")
+
     """
     @function
     @parameter: Sensor_Msg.LaserScan msg
@@ -57,8 +77,8 @@ class Animal(Entity):
     def StageLaser_callback(self, msg):
         #Define objects being in front of the Animal as being within a 30 degree radius
         for i in range(75, 105):
-            #If object within 2m and the laser is not disabled
-            if (msg.ranges[i] < 2 and self.disableLaser == False):
+            #If object within 3m and the laser is not disabled
+            if (msg.ranges[i] < 3 and self.disableLaser == False):
                 #Stop current action
                 self._stopCurrentAction_ = True
 

@@ -11,15 +11,13 @@ define mylaser ranger
   
 )
 
-define dog position 
+define animal position
 (
   color "gray50"
   drive "diff"		 	# Differential steering model.
 
   obstacle_return 1           	# Can hit things.
-  laser_return 1                 # reflects laser beams
   ranger_return 1             	# reflects sonar beams
-  blobfinder_return 1         	# Seen by blobfinders  
   fiducial_return 1           	# Seen as "1" fiducial finders
 
   localization "gps"         	  
@@ -27,7 +25,7 @@ define dog position
   size [1.5 0.5 0.75]
   #origin [-0.25 -0.25 0 0 ]
 
-  mylaser(pose [ 1 0.000 0 0.000 ])
+  mylaser(pose [ 0 0.000 0 0.000 ])
   velocity_bounds [-1000 1000 -1000 1000 -1000 1000 -90 90 ]
 
   # body
