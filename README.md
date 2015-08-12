@@ -22,7 +22,7 @@ git clone
 
 1. In terminal navigate to the home directory
 
-		cd se306-project-1
+		cd SoftEng-306-Project-1
 	
 2. Run the project
 

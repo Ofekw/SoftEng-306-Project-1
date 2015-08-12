@@ -42,7 +42,7 @@ class Animal(Entity):
 
         self._actions_ = {
             0: self.move_forward,
-            1: self.goto,
+            1: self.goto_yx,
             2: self.turn,
             3: self.stop,
             4: self.go_to_rand_location,

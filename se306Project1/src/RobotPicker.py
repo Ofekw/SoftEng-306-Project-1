@@ -62,7 +62,7 @@ class RobotPicker(Robot):
         picker_pub.publish(str(self.robot_id) + "," + xpos + "," + ypos+ "," + str(self.theta))
         #print("I have sent " + str(self.robot_id) + "," + xpos + "," + ypos+ "," + str(self.theta))
 
-        fn = os.path.join(os.path.dirname(__file__), "Picker"+str(self.robot_id)+".sta")
+        fn = os.path.join(os.path.dirname(__file__), str(self.robot_id)+"pic.sta")
         output_file = open(fn, "w")
         output_file.write(str(self.robot_node_identifier)+ "\n")
         output_file.write("Picker\n")

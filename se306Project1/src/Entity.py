@@ -66,10 +66,11 @@ class Entity:
         #array of methods of robot actions
         self._actions_ = {
             0: self.move_forward,
-            1: self.goto,
+            1: self.goto_yx,
             2: self.turn,
             3: self.stop,
             4: self.wait,
+            5: self.goto_xy
         }
 
         #Enums for direction and angles
@@ -398,7 +399,7 @@ class Entity:
 
     """
     def face_direction(self, direction_to_face):
-
+        print "Running Function face_direction"
         current_direction = self.get_current_direction()
 
         print("Currently facing:" + current_direction)
@@ -410,7 +411,8 @@ class Entity:
             if (direction_to_face==Direction.EAST):
                 self.turn(Direction.RIGHT)
             elif(direction_to_face==Direction.SOUTH):
-                self.rotate_relative(180, Angle.DEGREES)
+                self.turn(Direction.RIGHT)
+                self.turn(Direction.RIGHT)
             elif(direction_to_face==Direction.WEST):
                 self.turn(Direction.LEFT)
             self.correct_theta()
@@ -420,19 +422,22 @@ class Entity:
             elif(direction_to_face==Direction.SOUTH):
                 self.turn(Direction.RIGHT)
             elif(direction_to_face==Direction.WEST):
-                self.rotate_relative(180,Angle.DEGREES)
+                self.turn(Direction.RIGHT)
+                self.turn(Direction.RIGHT)
             self.correct_theta()
         elif (current_direction==Direction.SOUTH):
             if (direction_to_face==Direction.EAST):
                 self.turn(Direction.LEFT)
             elif(direction_to_face==Direction.NORTH):
-                self.rotate_relative(180,Angle.DEGREES)
+                self.turn(Direction.RIGHT)
+                self.turn(Direction.RIGHT)
             elif(direction_to_face==Direction.WEST):
                 self.turn(Direction.RIGHT)
             self.correct_theta()
         elif (current_direction==Direction.WEST):
             if (direction_to_face==Direction.EAST):
-                self.rotate_relative(180,Angle.DEGREES)
+                self.turn(Direction.RIGHT)
+                self.turn(Direction.RIGHT)
             elif(direction_to_face==Direction.SOUTH):
                 self.turn(Direction.LEFT)
             elif(direction_to_face==Direction.NORTH):
@@ -442,6 +447,8 @@ class Entity:
             print("Error: Face Direction")
             return
 
+        return 0
+
     """
     @function
 
@@ -449,17 +456,18 @@ class Entity:
     @parameter:double yCoord
 
 
-    Goto function that moves the Entity to a specified Cartesian Coordinate. Will move only at right angles towards target coordinate.
+    Goto function that moves the Entity to a specified Cartesian Coordinate. Will move only at right angles towards target coordinate. (Vertically first and then horizontally).
 
     ie: from A to B
 
-                           B
-                           |
-                           |
-                           |
-    A----------------------|
+    |----------------------B
+    |
+    |
+    |
+    |
+    A
     """
-    def goto(self, x_coord, y_coord):
+    def goto_yx(self, x_coord, y_coord):
         print ("Going To : ("+str(x_coord)+","+str(y_coord)+")")
         #try run the goto command
         try:
@@ -546,6 +554,112 @@ class Entity:
                 print("Arrived at destination:", self.px, self.py)
                 return 0
 
+
+
+    """
+    @function
+
+    @parameter:double xCoord
+    @parameter:double yCoord
+
+
+    Goto function that moves the Entity to a specified Cartesian Coordinate. Will move only at right angles towards target coordinate. (Horizontally first and then vertically).
+
+    ie: from A to B
+                           B
+                           |
+                           |
+                           |
+    A----------------------|
+
+    """
+    def goto_xy(self, x_coord, y_coord):
+        print ("Going To : ("+str(x_coord)+","+str(y_coord)+")")
+        #try run the goto command
+        try:
+            print("Current x pos = " + str(self.px))
+            print("Current y pos = " + str(self.py))
+
+            if (abs(x_coord-self.px)<=0.3 and abs(y_coord-self.py)<=0.2 ):
+                print("Already at coordinate!")
+                return 0
+
+            x_difference = x_coord - self.px
+            y_difference = y_coord - self.py
+
+            print("Xdiff" + str(x_difference))
+            print("Ydiff" + str(y_difference))
+
+            #error tolerance
+            tol = 0.5
+
+            #If the robot needs to travel both directions
+            if (not((abs(x_difference)>tol and abs(y_difference)<tol) or(abs(y_difference)>tol and abs(x_difference)<tol))):
+
+                if (x_difference<=-tol and y_difference<=-tol):
+                    if (x_difference<-tol):
+                        self.face_direction(Direction.WEST)
+                        self.move_forward(abs(x_difference))
+                    if (y_difference<-tol):
+                        self.face_direction(Direction.SOUTH)
+                        self.move_forward(abs(y_difference))
+                    return 0
+                elif (x_difference>=tol and y_difference>=tol):
+                    if (x_difference>tol):
+                        self.face_direction(Direction.EAST)
+                        self.move_forward(abs(x_difference))
+                    if (y_difference>tol):
+                        self.face_direction(Direction.NORTH)
+                        self.move_forward(abs(y_difference))
+                    return 0
+                elif (x_difference>=tol and y_difference<=-tol):
+                    if (x_difference>tol):
+                        self.face_direction(Direction.EAST)
+                        self.move_forward(abs(x_difference))
+                    if (y_difference<-tol):
+                        self.face_direction(Direction.SOUTH)
+                        self.move_forward(abs(y_difference))
+                    return 0
+                elif (x_difference<=-tol and y_difference>=tol):
+                    if (x_difference<-tol):
+                        self.face_direction(Direction.WEST)
+                        self.move_forward(abs(x_difference))
+                    if (y_difference>tol):
+                        self.face_direction(Direction.NORTH)
+                        self.move_forward(abs(y_difference))
+                    return 0
+            #If the robot only needs to travel one direction to reach its destination
+            else:
+                if (x_difference>tol):
+                    self.face_direction(Direction.EAST)
+                    self.move_forward(abs(x_difference))
+                    return 0
+                elif (x_difference<-tol):
+                    self.face_direction(Direction.WEST)
+                    self.move_forward(abs(x_difference))
+                    return 0
+                if (y_difference>tol):
+                    self.face_direction(Direction.NORTH)
+                    self.move_forward(abs(y_difference))
+                    return 0
+                elif (y_difference<-tol):
+                    self.face_direction(Direction.SOUTH)
+                    self.move_forward(abs(y_difference))
+                    return 0
+
+        except ActionInterruptException.ActionInterruptException as e:
+            print(e.message)
+            return 1
+        finally:
+
+            if self._stopCurrentAction_:
+                print("Halted at destination:", self.px, self.py)
+                print ("Go To: Stopped due to potential collision")
+                return 2
+            else:
+                print("Arrived at destination:", self.px, self.py)
+                return 0
+
     """
     @function
 
@@ -555,6 +669,7 @@ class Entity:
 
     """
     def get_current_direction(self):
+
         if(abs(self.theta- math.pi/2)<=0.1):
             current_direction = Direction.NORTH
         elif (abs(self.theta-0)<=0.1):
@@ -606,7 +721,6 @@ class Entity:
             self.rotate_relative(-math.pi-self.theta,Angle.RADIANS)
             current_direction=Direction.WEST
         elif (abs(self.theta+math.pi/2)<=0.4):
-            print("Diff" + str(math.pi/2+self.theta))
             self.rotate_relative(-math.pi/2-self.theta,Angle.RADIANS)
             current_direction=Direction.SOUTH
         elif (abs(self.theta-0)<=0.4):
