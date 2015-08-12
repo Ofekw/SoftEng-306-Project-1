@@ -76,9 +76,9 @@ class Animal(Entity):
     """
     def StageLaser_callback(self, msg):
         #Define objects being in front of the Animal as being within a 30 degree radius
-        for i in range(75, 105):
+        for i in range(70, 110):
             #If object within 3m and the laser is not disabled
-            if (msg.ranges[i] < 3 and self.disableLaser == False):
+            if (msg.ranges[i] < 4 and self.disableLaser == False):
                 #Stop current action
                 self._stopCurrentAction_ = True
 
