@@ -82,7 +82,7 @@ class RobotCarrier(Robot):
         output_file = open(fn, "w")
         output_file.write(str(self.robot_node_identifier)+ "\n")
         output_file.write("Carrier\n")
-        output_file.write("..........\n")
+        output_file.write(self.state+"\n")
         output_file.write(str(round(self.px,2)) + "\n")
         output_file.write(str(round(self.py,2)) + "\n")
         output_file.write(str(round(self.theta,2)) + "\n")
