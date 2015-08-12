@@ -62,8 +62,6 @@ class Visitor(Human):
 
         self.pub_to_dog.publish(str(self.robot_id) + ":" + str(self.px) + ":" + str(self.py))
 
-        print(self.state)
-
         fn = os.path.join(os.path.dirname(__file__), "Visitor"+str(self.robot_id)+".sta")
         output_file = open(fn, "w")
         output_file.write(str(self.robot_node_identifier)+ "\n")
