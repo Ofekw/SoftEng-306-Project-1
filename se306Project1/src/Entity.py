@@ -572,7 +572,7 @@ class Entity:
     """
     def goto_xy(self, x_coord, y_coord):
         print ("Going To : ("+str(x_coord)+","+str(y_coord)+")")
-        #try run the goto command]
+        #try run the goto command
         try:
 
             if (abs(x_coord-self.px)<=0.3 and abs(y_coord-self.py)<=0.2 ):
