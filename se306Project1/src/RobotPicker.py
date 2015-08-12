@@ -93,14 +93,14 @@ class RobotPicker(Robot):
             self.kiwi_pub.publish(str(self.robot_id))
 
 
-
-
     def addKiwi(self, clockTime):
         print("looking to add " + str(self.max_load) + " " + str(self.current_load))
+        print(str(clockTime) + " " + str(self.timeLastAdded))
         if(self.current_load >= self.max_load):
             self.waitForCollection()
-        elif(clockTime <= (self.timeLastAdded + 1)):
+        elif(clockTime >= (self.timeLastAdded + 0.005)):
             self.current_load = self.current_load + 1
+            self.timeLastAdded = clockTime
             print("kiwi added")
 
     def waitForCollection(self):
@@ -184,7 +184,6 @@ class RobotPicker(Robot):
                 self.state = self.PickerState.PICKING
                 self.treeDetected = True
                 self.noMoreTrees=0
-                self.current_load += 1
                 #print("Found Tree")
                 self.addKiwi(time.clock())
             elif rangeCount == 20:

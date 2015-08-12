@@ -147,20 +147,20 @@ class RobotCarrier(Robot):
     Determines what to do when encountering static and dynamic elements.
     """
     def StageLaser_callback(self, msg):
+        pass
 
-
-        if msg.ranges[90] < 4.0:
-            self.halt_counter += 1
-            self._stopCurrentAction_ = True
-            self.FiveCounter = 0
-        else:
-            #waits for 5 consecutive not found values, this is to tackle the weird laser scan issue
-            #that returns alternating incorrect values.
-            self.FiveCounter += 1
-            if self.FiveCounter == 5:
-                self.halt_counter = 0
-                self._stopCurrentAction_ = False
-                self.FiveCounter = 0
+        # if msg.ranges[90] < 4.0:
+        #     self.halt_counter += 1
+        #     self._stopCurrentAction_ = True
+        #     self.FiveCounter = 0
+        # else:
+        #     #waits for 5 consecutive not found values, this is to tackle the weird laser scan issue
+        #     #that returns alternating incorrect values.
+        #     self.FiveCounter += 1
+        #     if self.FiveCounter == 5:
+        #         self.halt_counter = 0
+        #         self._stopCurrentAction_ = False
+        #         self.FiveCounter = 0
 
         #Code for diverting path, which I don't think is needed atm, we can add it later if needed
         # if self.halt_counter == 50:
