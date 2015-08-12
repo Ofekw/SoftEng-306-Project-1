@@ -36,7 +36,7 @@ class RobotCarrier(Robot):
 
         self._actions_ = {
             0: self.move_forward,
-            1: self.goto,
+            1: self.goto_yx,
             2: self.turn,
             3: self.stop,
             4: self.gotoRobotDemo,
@@ -176,4 +176,4 @@ class RobotCarrier(Robot):
                     self.currentClosest = position
 
     def gotoRobotDemo(self):
-        self.goto(float(self.picker_robots[0].split(',')[0]), float(self.picker_robots[0].split(',')[1]))
+        self.goto_yx(float(self.picker_robots[0].split(',')[0]), float(self.picker_robots[0].split(',')[1]))
