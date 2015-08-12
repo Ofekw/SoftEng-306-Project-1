@@ -9,6 +9,7 @@ from tf.transformations import *
 import math
 import numpy.testing
 from RobotCarrier import RobotCarrier
+from Debugger import Debugger
 
 """
 @MAIN
@@ -21,7 +22,9 @@ def main():
     #Construction of Robot objects take 3 params... Robot ID, Start X, Start Y. Start X and Start Y correlates to the myworld.world file
     #Can't create more than one robot per main() .... ie can't run more than one robot per terminal running
 
-    robot0 = RobotCarrier(1,-10,-28, math.pi/2)
+    robot0 = RobotCarrier(3,-20,-32, math.pi/2)
+    debugger = Debugger(robot0)
+    debugger.start()
 
     rospy.Rate(100)
     rospy.sleep(0.1)
@@ -34,7 +37,7 @@ def main():
     #RobotNode_cmdvel = geometry_msgs.msg.Twist()
 
     # Add action here to go to position 1
-    moveAction = robot0._actions_[4], []
+    moveAction = robot0._actions_[6], []
     robot0._actionsStack_.append(moveAction)
 
     while not rospy.is_shutdown():
@@ -50,6 +53,7 @@ def main():
             #if action completes succesfully pop it
             if result == 0 or result == 1:
                 robot0._actionsStack_.pop()
+                robot0.arrivedAtPoint()
 
 
 if __name__ == '__main__':

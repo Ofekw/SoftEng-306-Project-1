@@ -25,3 +25,6 @@ class Human(Entity):
 
     def human_specific_function(self):
         pass
+
+    def __str__(self):
+        return "human_"

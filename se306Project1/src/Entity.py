@@ -53,8 +53,8 @@ class Entity:
         self.x_off = x_off
         self.y_off = y_off
         self.robot_id = r_id
-        self.robot_node_name = ("RobotNode" +str(r_id))
-        self.robot_node_identifier = ("robot_"+ str(r_id))
+        self.robot_node_name = ("RobotNode" +str(self.robot_id))
+        self.robot_node_identifier = ("robot_"+ str(self.robot_id))
         self.goalx = self.px
         self.goaly = self.py
         self.state = self.State.STOPPED
@@ -70,7 +70,9 @@ class Entity:
             2: self.turn,
             3: self.stop,
             4: self.wait,
-            5: self.goto_xy
+            5: self.goto_xy,
+            6: self.waitForPicker,
+            7: self.pickerWait
         }
 
         #Enums for direction and angles
@@ -216,7 +218,7 @@ class Entity:
         previousY = self.py
 
 
-        print ("Moving Forward")
+        print("Moving Forward")
         #While the distance that the Entity has gained has not exceeded the given distance, continue to move the Entity forward
         while (dist_gained < dist and not self._stopCurrentAction_):
 
@@ -275,7 +277,7 @@ class Entity:
     Turn function which allows the Entity to turn 90 degrees ( a right angle) either left or right.
     """
     def turn(self, direction):
-        print ("Turning "+ direction)
+        print("Turning "+ direction)
         pi = math.pi
 
         if (direction == Direction.LEFT):
@@ -399,11 +401,11 @@ class Entity:
 
     """
     def face_direction(self, direction_to_face):
-        print "Running Function face_direction"
+        print("Running Function face_direction")
         current_direction = self.get_current_direction()
 
-        print("Currently facing:" + current_direction)
-        print("Turning to face: "+ direction_to_face)
+        #print("Currently facing:" + current_direction)
+        #print("Turning to face: "+ direction_to_face)
 
         if (current_direction== direction_to_face):
             return
@@ -471,8 +473,6 @@ class Entity:
         print ("Going To : ("+str(x_coord)+","+str(y_coord)+")")
         #try run the goto command
         try:
-            print("Current x pos = " + str(self.px))
-            print("Current y pos = " + str(self.py))
 
             if (abs(x_coord-self.px)<=0.3 and abs(y_coord-self.py)<=0.2 ):
                 print("Already at coordinate!")
@@ -480,9 +480,6 @@ class Entity:
 
             x_difference = x_coord - self.px
             y_difference = y_coord - self.py
-
-            print("Xdiff" + str(x_difference))
-            print("Ydiff" + str(y_difference))
 
             #error tolerance
             tol = 0.5
@@ -548,7 +545,7 @@ class Entity:
 
             if self._stopCurrentAction_:
                 print("Halted at destination:", self.px, self.py)
-                print ("Go To: Stopped due to potential collision")
+                print("Go To: Stopped due to potential collision")
                 return 2
             else:
                 print("Arrived at destination:", self.px, self.py)
@@ -577,8 +574,6 @@ class Entity:
         print ("Going To : ("+str(x_coord)+","+str(y_coord)+")")
         #try run the goto command
         try:
-            print("Current x pos = " + str(self.px))
-            print("Current y pos = " + str(self.py))
 
             if (abs(x_coord-self.px)<=0.3 and abs(y_coord-self.py)<=0.2 ):
                 print("Already at coordinate!")
@@ -586,9 +581,6 @@ class Entity:
 
             x_difference = x_coord - self.px
             y_difference = y_coord - self.py
-
-            print("Xdiff" + str(x_difference))
-            print("Ydiff" + str(y_difference))
 
             #error tolerance
             tol = 0.5
@@ -751,5 +743,34 @@ class Entity:
         self.disableLaser = False
         return 0
 
+    """
+    @function
 
+    Function to be overridden in subclasses
+    """
+    def addKiwi(self):
+        pass
 
+    """
+    @function
+
+    Function to be overridden in subclasses
+    """
+    def waitForPicker(self):
+        pass
+
+    """
+    @function
+
+    Function to be overridden in subclasses
+    """
+    def arrivedAtPoint(self):
+        pass
+
+        """
+    @function
+
+    Function to be overridden in subclasses
+    """
+    def pickerWait(self):
+        pass
