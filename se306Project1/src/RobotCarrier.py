@@ -246,10 +246,13 @@ class RobotCarrier(Robot):
             print("gotoclosest " + str(self._actionsStack_))
 
     def arrivedAtPoint(self):
-        if (self.px == self.init_x and self.py == self.init_y):
+        xabsolute = abs(self.goalx - self.px)
+        yabsolute = abs(self.goaly - self.py)
+        if (xabsolute < 0.5 and yabsolute < 0.5):
             self.is_going_home = False
         else:
             self.is_going_home = True
+
         if (self.is_going_home):
             xgoal = float(self.picker_robots[self.closestRobotID].split(',')[0])
             ygoal = float(self.picker_robots[self.closestRobotID].split(',')[1])
