@@ -51,12 +51,12 @@ def main(argv):
         elif type == "Carrier":
             initial_y = "-32"
     	elif type == "Visitor":
-        	initial_y = "-34"
+        	initial_y = "-38"
         else:
-            initial_y = "-38"
+            initial_y = "-42"
         #Loads the corresponding robot template
         string = open('world/templates/' + type + '.template').read()
-        number = config.get(type + '.number')
+        number = config.get(type.lower() + '.number')
         robot = ""
         for i in range(0, int(number)):
             #Appends to the myworld file the robot model of each robot

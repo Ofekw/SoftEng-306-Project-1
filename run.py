@@ -9,6 +9,7 @@ import generateRobotFile
 def main(argv):
     testing = False
     debugging = False
+    
 
     try:
         opts, args = getopt.getopt(argv,"dt")
