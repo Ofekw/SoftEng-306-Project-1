@@ -53,6 +53,7 @@ def main():
             #if action completes succesfully pop it
             if result == 0 or result == 1:
                 robot0._actionsStack_.pop()
+                robot0.arrivedAtPoint()
 
 
 if __name__ == '__main__':

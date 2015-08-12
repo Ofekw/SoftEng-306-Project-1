@@ -35,8 +35,10 @@ class RobotCarrier(Robot):
         self.carrier_robots = ["0,0,0","0,0,0"]
         self.picker_robots = ["0,0,0","0,0,0"]
 
-        self.max_load = 100;
-        self.current_load = 0;
+        self.max_load = 100
+        self.current_load = 0
+
+        self.is_going_home = False
 
         Robot.__init__(self,r_id,x_off,y_off,theta_off)
 
@@ -226,9 +228,10 @@ class RobotCarrier(Robot):
             self._stopCurrentAction_ = False
             raise ActionInterruptException.ActionInterruptException("waitFor Stopped")
         else:
-            self.getClosest()
-            if(int(self.picker_robots[self.closestRobotID].split(',')[2]) == 20):
-                self.goToClosest()
+            if not(self.is_going_home):
+                self.getClosest()
+                if(int(self.picker_robots[self.closestRobotID].split(',')[2]) == 20):
+                    self.goToClosest()
 
     def goToClosest(self):
         #self._stopCurrentAction_ = True
@@ -240,22 +243,35 @@ class RobotCarrier(Robot):
             # if len(self._actionsStack_) > 0:
             # self._stopCurrentAction_ = True
             self._actionsStack_.append(action)
+            print("gotoclosest " + str(self._actionsStack_))
 
     def arrivedAtPoint(self):
-        xgoal = float(self.picker_robots[self.closestRobotID].split(',')[0])
-        ygoal = float(self.picker_robots[self.closestRobotID].split(',')[1])
-        xabsolute = abs(xgoal - self.px)
-        yabsolute = abs(ygoal - self.py)
-        if (xabsolute < 0.5 and yabsolute < 5):
-            print (str(xabsolute) + "  " + str(yabsolute))
-            if (int(self.picker_robots[self.closestRobotID].split(',')[2]) == 20):
-                self.intiate_transfer()
+        if (self.px == self.init_x and self.py == self.init_y):
+            self.is_going_home = False
+        else:
+            self.is_going_home = True
+        if (self.is_going_home):
+            xgoal = float(self.picker_robots[self.closestRobotID].split(',')[0])
+            ygoal = float(self.picker_robots[self.closestRobotID].split(',')[1])
+            xabsolute = abs(xgoal - self.px)
+            yabsolute = abs(ygoal - self.py)
+            if (xabsolute < 0.5 and yabsolute < 5):
+                print (str(xabsolute) + "  " + str(yabsolute))
+                if (int(self.picker_robots[self.closestRobotID].split(',')[2]) == 20):
+                    print("arrivedAtPoint " + str(self._actionsStack_))
+                    self.intiate_transfer()
 
     def returnToOrigin(self):
         print(str(self.init_x) + "  " + str(self.init_y))
         action = self._actions_[1], [self.init_x, self.init_y]
         print(str(self._stopCurrentAction_))
+        print(self._actionsStack_)
+
+        self.is_going_home = True;
+
         self._stopCurrentAction_ = False
         self._actionsStack_.append(action)
+        print(self._actionsStack_)
+
 
        # self.goto(self.init_x, self.init_y)

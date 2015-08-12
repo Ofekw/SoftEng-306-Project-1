@@ -455,6 +455,7 @@ class Entity:
     A----------------------|
     """
     def goto(self, x_coord, y_coord):
+        print(str(self._stopCurrentAction_))
         print("Going To : ("+str(x_coord)+","+str(y_coord)+")")
         #try run the goto command
         try:
@@ -540,7 +541,7 @@ class Entity:
                 return 2
             else:
                 print("Arrived at destination:", self.px, self.py)
-                self.arrivedAtPoint()
+                # self.arrivedAtPoint()
 
                 return 0
 
