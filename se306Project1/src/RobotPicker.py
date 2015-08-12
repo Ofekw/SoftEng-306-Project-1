@@ -33,9 +33,11 @@ class RobotPicker(Robot):
     def __init__(self,r_id,x_off,y_off,theta_off):
         self.picker_pub = rospy.Publisher("pickerPosition",String, queue_size=10)
 
-        self.max_load = 20;
-        self.current_load = 0;
+        self.max_load = 20
+        self.current_load = 0
+        self.firstLaserReading = []
         self.timeLastAdded = time.clock()
+
 
         self.kiwi_sub = rospy.Subscriber("carrier_kiwiTransfer", String, self.kiwi_callback)
         self.kiwi_pub = rospy.Publisher("picker_kiwiTransfer",String, queue_size=10)
@@ -79,7 +81,7 @@ class RobotPicker(Robot):
         self.picker_pub.publish(str(self.robot_id) + "," + xpos + "," + ypos+ "," + str(self.theta) + "," + str(self.current_load))
         print("I have sent " + str(self.robot_id) + "," + xpos + "," + ypos+ "," + str(self.theta) + "," + str(self.current_load))
 
-        fn = os.path.join(os.path.dirname(__file__), "Picker"+str(self.robot_id)+".sta")
+        fn = os.path.join(os.path.dirname(__file__), str(self.robot_id)+"pic.sta")
         output_file = open(fn, "w")
         output_file.write(str(self.robot_node_identifier)+ "\n")
         output_file.write("Picker\n")
@@ -134,13 +136,42 @@ class RobotPicker(Robot):
         if not self.disableLaser:
             for i in range(70, 110):
                 if msg.ranges[i]< 4.0:
-                    action = self._actions_[2], [Entity.Direction.RIGHT]
-                    #check if action already exists in stack, otherwise laser will spam rotates
+                    #check if dynamic entity
+                    self._stopCurrentAction_ = True
+                    if self.firstLaserReading == []:
+                        self.disableLaser = True
+                        #read 0-110 lasers into array
+                        self.read(msg.ranges, self.firstLaserReading)
+                        #add stop and wait actions to stack
+                        stop = self._actions_[3], [1]
+                        wait = self._actions_[4], [1]
+                        self._actionsStack_.append(stop)
+                        self._actionsStack_.append(wait)
+                        return
+                    #check for an initial laser reading
+                    if self.firstLaserReading != []:
+                        for i in range(len(self.firstLaserReading)):
+                            #check if laser reading's differ
+                            if self.firstLaserReading[i] != msg.ranges[i+70]:
+                                #if they do, entity is dynamic, so wait 5's for it to leave.
+                                wait = self._actions_[4], [5]
+                                self._actionsStack_.append(wait)
+                                #reset laserReading
+                                self.firstLaserReading = []
+                                return
 
-                    if action != self._actionsStack_[-1] :
-                        #stop moving foward and add turn action
-                        self._stopCurrentAction_ = True
-                        self._actionsStack_.append(action)
+                        print("static")
+                        action = self._actions_[2], [Entity.Direction.RIGHT]
+                        #check if action already exists in stack, otherwise laser will spam rotates
+                        if action != self._actionsStack_[-1]:
+                            #stop moving foward and add turn action
+                            self._stopCurrentAction_ = True
+                            self._actionsStack_.append(action)
+                            self.firstLaserReading = []
+                            return
+                        return
+
+
             #check that all lasers in 0-20 range are not hitting object
 
             rangeCount = 0
@@ -162,10 +193,17 @@ class RobotPicker(Robot):
                 self.state = self.PickerState.PICKING
                 self.treeDetected = True
                 self.noMoreTrees=0
-                print("Found Tree")
+                self.current_load += 1
+                #print("Found Tree")
                 self.addKiwi(time.clock())
+            elif rangeCount == 20:
+                self.state = self.PickerState.FINDING
 
-    def wait(self):
+    def read(self, msg, container):
+        for i in range(70, 110):
+            container.append(msg[i])
+
+	def wait(self):
         #until unloaded
         #while(self.current_load >= self.max_load):
             #do nothing
