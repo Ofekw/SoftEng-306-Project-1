@@ -27,7 +27,7 @@ def main(argv):
 
     #List of the temporary robot files created
     file_name = []
-    initial_x = -20
+    x_value = -30
     #Types of robots that the script reads the config file for
     robot_type = ["Picker", "Carrier", "Visitor", "Animal"]
     #Loads the fields in the config file
@@ -46,26 +46,18 @@ def main(argv):
     total_robots = 0;
     #Each robot type will start at a different y-position
     for type in robot_type:
-        if type == "Picker":
-            initial_y = "-28"
-        elif type == "Carrier":
-            initial_y = "-32"
-    	elif type == "Visitor":
-        	initial_y = "-38"
-        else:
-            initial_y = "-42"
         #Loads the corresponding robot template
         string = open('world/templates/' + type + '.template').read()
         number = config.get(type.lower() + '.number')
         robot = ""
         for i in range(0, int(number)):
             #Appends to the myworld file the robot model of each robot
-            robot = robot + type.lower() + "( pose [ " + str(initial_x+(i*10))  +  " " + initial_y + " 0.000 90 ] name \"r" + str(total_robots) + "\")" + "\n"
+            robot = robot + type.lower() + "( pose [ " + str(x_value)  +  " -28 0.000 90 ] name \"r" + str(total_robots) + "\")" + "\n"
             #The constructor of that robot type with the robot_id and the x y positions
             constructor_name = "Robot" + type
             if type == "Visitor" or type == "Animal":
                 constructor_name = constructor_name.replace("Robot", "")
-            constructor = "    robot = " + constructor_name + "(" + str(total_robots) + ", " + str(initial_x+(i*10)) + ", -28, math.pi/2)"
+            constructor = "    robot = " + constructor_name + "(" + str(total_robots) + ", " + str(x_value) + ", -28, math.pi/2)"
             if debugging == True:
                 constructor = constructor + "\n" + debug_text1 + "\n" + debug_text2
             name = type + str(i) + ".py" #Name of the robot files
@@ -77,6 +69,7 @@ def main(argv):
             #Gives the temporary robot file run permission
             os.chmod(directory+name,stat.S_IRWXU)
             total_robots += 1
+            x_value += 10
         robot = robot + "\n"
         #Writes the robot models to the world file
         myworld.write(robot)

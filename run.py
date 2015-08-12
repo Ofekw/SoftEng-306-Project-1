@@ -9,7 +9,6 @@ import generateRobotFile
 def main(argv):
     testing = False
     debugging = False
-    
 
     try:
         opts, args = getopt.getopt(argv,"dt")
@@ -42,6 +41,7 @@ def main(argv):
         gui = subprocess.call("./run_gui.sh")
         while True:
             pass
+
 
 if __name__ == "__main__":
     main(sys.argv[1:])
