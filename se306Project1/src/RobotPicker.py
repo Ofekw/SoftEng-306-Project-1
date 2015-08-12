@@ -86,13 +86,22 @@ class RobotPicker(Robot):
         #rospy.loginfo("Current y position: %f", self.py)
         #rospy.loginfo("Current theta: %f", self.theta)s
 
+    """
+    @function
+
+    Transfer kiwifruit
+    """
     def kiwi_callback(self, message):
         if (message.data != str(self.robot_id) and self.current_load == 20):
             print("transfer load")
             self.current_load = 0
             self.kiwi_pub.publish(str(self.robot_id))
 
+    """
+    @function
 
+    Add a kiwifruit
+    """
     def addKiwi(self, clockTime):
         print("looking to add " + str(self.max_load) + " " + str(self.current_load))
         print(str(clockTime) + " " + str(self.timeLastAdded))
@@ -103,6 +112,11 @@ class RobotPicker(Robot):
             self.timeLastAdded = clockTime
             print("kiwi added")
 
+        """
+    @function
+
+    Wait for a carrier to pickup
+    """
     def waitForCollection(self):
         #while(self.current_load >= self.max_load):
             self._stopCurrentAction_ = True
@@ -193,6 +207,11 @@ class RobotPicker(Robot):
         for i in range(70, 110):
             container.append(msg[i])
 
+    """
+    @function
+
+    Wait function
+    """
     def pickerWait(self):
         while(self.current_load != 0):
             time.sleep(1)

@@ -119,12 +119,24 @@ class RobotCarrier(Robot):
         # print("Picker array")
         # print(', '.join(self.picker_robots))
 
+    """
+    @function
+    @parameter: message
+
+    Displays info sent from a picker robot when trnsferring kiwis
+    """
     def kiwi_callback(self, message):
         if (message.data != str(self.robot_id)):
             self.current_load = 20
             print("going to dropoff zone")
             self.returnToOrigin()
 
+    """
+    @function
+    @parameter: message
+
+    Tells the picker robot to transfer kiwifruit
+    """
     def intiate_transfer(self):
         self.kiwi_pub.publish(str(self.robot_id))
         print("intitate transfer")
@@ -175,7 +187,7 @@ class RobotCarrier(Robot):
     """
     @function
 
-    Gets the closest robot out of the array of robots
+    Gets the next robot to collect from
     """
     def getClosest(self):
         #print("Getting closest robot.....")
@@ -190,6 +202,13 @@ class RobotCarrier(Robot):
         #return robot ID 0
         return 0
 
+    """
+    @function
+    @parameter: message
+
+    Default action for picker
+    Used to wait until a picker is ready for collection
+    """
     def waitForPicker(self):
         if self._stopCurrentAction_ == True:
             self._stopCurrentAction_ = False
@@ -200,6 +219,12 @@ class RobotCarrier(Robot):
                 if(int(self.picker_robots[self.closestRobotID].split(',')[2]) >= 20):
                     self.goToClosest()
 
+    """
+    @function
+    @parameter: message
+
+    Go to the full picker
+    """
     def goToClosest(self):
         #self._stopCurrentAction_ = True
         #Move robot along x, and then up y
@@ -212,6 +237,12 @@ class RobotCarrier(Robot):
             # self._stopCurrentAction_ = True
             self._actionsStack_.append(action)
 
+    """
+    @function
+    @parameter: message
+
+    Robot has arrived at point, then decides whether to wait or go to drop off
+    """
     def arrivedAtPoint(self):
         xabsolute = abs(self.goalx - self.px)
         yabsolute = abs(self.goaly - self.py)
@@ -230,11 +261,14 @@ class RobotCarrier(Robot):
                 if (int(self.picker_robots[self.closestRobotID].split(',')[2]) == 20):
                     self.intiate_transfer()
 
+    """
+    @function
+    @parameter: message
+
+    Return to drop off point
+    """
     def returnToOrigin(self):
         action = self._actions_[1], [self.init_x, self.init_y]
         self.is_going_home = True;
         self._stopCurrentAction_ = False
         self._actionsStack_.append(action)
-
-
-       # self.goto(self.init_x, self.init_y)

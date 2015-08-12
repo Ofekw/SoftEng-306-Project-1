@@ -767,5 +767,10 @@ class Entity:
     def arrivedAtPoint(self):
         pass
 
+        """
+    @function
+
+    Function to be overridden in subclasses
+    """
     def pickerWait(self):
         pass
