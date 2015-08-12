@@ -26,9 +26,11 @@ def main(argv):
         process = subprocess.Popen("bash -c 'python generateWorldFile.py'", shell=True)
         process.wait()
         return list
-    #elif debugging == True:
     else:
-        list = generateRobotFile.main([""])
+        if debugging == True:
+            list = generateRobotFile.main(["-d"])
+        else:
+            list = generateRobotFile.main([""])
         atexit.register(generateRobotFile.delete_files, list)
         subprocess.Popen("bash -c 'python generateWorldFile.py'", shell=True)
         subprocess.check_output("rosmake se306Project1", shell=True)

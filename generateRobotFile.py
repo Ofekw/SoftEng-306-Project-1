@@ -7,8 +7,24 @@ import getopt
 
 #Directory of where the temporary robot .py files will be written
 directory = "./se306Project1/src/"
+debug_text1 = "    debug = Debugger(robot)"
+debug_text2 = "    debug.start()"
 
 def main(argv):
+    testing = False
+    debugging = False
+    try:
+        opts, args = getopt.getopt(argv,"td")
+    except getopt.GetoptError:
+        print 'test.py -d for debugger mode '
+        print 'test.py -t for debugger mode '
+        sys.exit(2)
+    for opt, arg in opts:
+        if opt == '-t':
+            testing = True
+        elif opt == '-d':
+            debugging = True
+
     #List of the temporary robot files created
     file_name = []
     initial_x = -20
@@ -50,6 +66,8 @@ def main(argv):
             if type == "Visitor" or type == "Animal":
                 constructor_name = constructor_name.replace("Robot", "")
             constructor = "    robot = " + constructor_name + "(" + str(total_robots) + ", " + str(initial_x+(i*10)) + ", -28, math.pi/2)"
+            if debugging == True:
+                constructor = constructor + "\n" + debug_text1 + "\n" + debug_text2
             name = "r" + str(total_robots) + ".py" #Name of the robot files
             file_name.append(name)
             temp = open(os.path.join(directory, name),'w')
@@ -64,16 +82,6 @@ def main(argv):
         myworld.write(robot)
     myworld.close()
 
-    testing = False
-    try:
-        opts, args = getopt.getopt(argv,"td")
-    except getopt.GetoptError:
-        print 'test.py -d for debugger mode '
-        print 'test.py -t for debugger mode '
-        sys.exit(2)
-    for opt, arg in opts:
-        if opt == '-t':
-            testing = True
     if testing == False:
         for name in file_name:
             #Runs all the temporary robot files created
