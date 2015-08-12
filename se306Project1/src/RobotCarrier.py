@@ -32,8 +32,8 @@ class RobotCarrier(Robot):
 
 
         self.closestRobotID = 0
-        self.carrier_robots = ["0,0,0","0,0,0"]
-        self.picker_robots = ["0,0,0","0,0,0"]
+        self.carrier_robots = ["0,0,0","0,0,0","0,0,0","0,0,0","0,0,0","0,0,0"]
+        self.picker_robots = ["0,0,0","0,0,0","0,0,0","0,0,0","0,0,0","0,0,0"]
 
         self.max_load = 100
         self.current_load = 0
@@ -78,7 +78,6 @@ class RobotCarrier(Robot):
 
         self.carrier_pub.publish(str(self.robot_id) + "," + xpos + "," + ypos+ "," + str(self.theta))
         # print("I have sent " + str(self.robot_id) + "," + xpos + "," + ypos+ "," + str(self.theta))
-        #print("I am at " + xpos + "," + ypos)
 
         fn = os.path.join(os.path.dirname(__file__), str(self.robot_id)+"car.sta")
         output_file = open(fn, "w")
@@ -121,7 +120,6 @@ class RobotCarrier(Robot):
         # print(', '.join(self.picker_robots))
 
     def kiwi_callback(self, message):
-        print(message.data)
         if (message.data != str(self.robot_id)):
             self.current_load = 20
             print("going to dropoff zone")
@@ -192,9 +190,6 @@ class RobotCarrier(Robot):
         #return robot ID 0
         return 0
 
-    # It is supposed to get the closest robot and then go to that location
-    # This doesn't work right as it only calls the getClosest() once and then just continues to call goto()
-    # Need a better understanding of how the actions stack works to get this to work correctly
     def waitForPicker(self):
         if self._stopCurrentAction_ == True:
             self._stopCurrentAction_ = False
@@ -216,13 +211,13 @@ class RobotCarrier(Robot):
             # if len(self._actionsStack_) > 0:
             # self._stopCurrentAction_ = True
             self._actionsStack_.append(action)
-            print("gotoclosest " + str(self._actionsStack_))
 
     def arrivedAtPoint(self):
         xabsolute = abs(self.goalx - self.px)
         yabsolute = abs(self.goaly - self.py)
         if (xabsolute < 0.5 and yabsolute < 0.5):
             self.is_going_home = False
+            self.current_load = 0
         else:
             self.is_going_home = True
 
@@ -232,22 +227,14 @@ class RobotCarrier(Robot):
             xabsolute = abs(xgoal - self.px)
             yabsolute = abs(ygoal - self.py)
             if (xabsolute < 0.5 and yabsolute < 5):
-                print (str(xabsolute) + "  " + str(yabsolute))
                 if (int(self.picker_robots[self.closestRobotID].split(',')[2]) == 20):
-                    print("arrivedAtPoint " + str(self._actionsStack_))
                     self.intiate_transfer()
 
     def returnToOrigin(self):
-        print(str(self.init_x) + "  " + str(self.init_y))
         action = self._actions_[1], [self.init_x, self.init_y]
-        print(str(self._stopCurrentAction_))
-        print(self._actionsStack_)
-
         self.is_going_home = True;
-
         self._stopCurrentAction_ = False
         self._actionsStack_.append(action)
-        print(self._actionsStack_)
 
 
        # self.goto(self.init_x, self.init_y)
