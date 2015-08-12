@@ -7,10 +7,14 @@ from nav_msgs.msg import*
 from sensor_msgs.msg import*
 from tf.transformations import *
 import math
-from Robot import Robot
-import os
-import Entity
 import time
+import numpy.testing
+from Robot import Robot
+import Entity
+import os
+import ActionInterruptException
+
+
 """
 @class
 
@@ -27,12 +31,16 @@ class RobotPicker(Robot):
                               FINDING="Finding Orchard")
 
     def __init__(self,r_id,x_off,y_off,theta_off):
-        global picker_pub
-        picker_pub = rospy.Publisher("pickerPosition",String, queue_size=10)
+        self.picker_pub = rospy.Publisher("pickerPosition",String, queue_size=10)
 
         self.max_load = 20
         self.current_load = 0
         self.firstLaserReading = []
+        self.timeLastAdded = time.clock()
+
+        self.kiwi_sub = rospy.Subscriber("carrier_kiwiTransfer", String, self.kiwi_callback)
+        self.kiwi_pub = rospy.Publisher("picker_kiwiTransfer",String, queue_size=10)
+
         Robot.__init__(self,r_id,x_off,y_off,theta_off)
 
     def robot_specific_function(self):
@@ -55,14 +63,10 @@ class RobotPicker(Robot):
         #Update the theta value
         self.update_theta(yaw)
 
-        xpos = str(self.px)
-        ypos = str(self.py)
-        #com_pub.publish("\n" + rospy.get_caller_id() +  " is at position x: " + xpos + "\nposition y: " + ypos)
+        #publish:- id, xpos, ypos, kiwinunber
+        self.picker_pub.publish(str(self.robot_id) + "," + str(self.px) + "," + str(self.py) + "," + str(self.theta) + "," + str(self.current_load))
 
-        picker_pub.publish(str(self.robot_id) + "," + xpos + "," + ypos+ "," + str(self.theta))
-        #print("I have sent " + str(self.robot_id) + "," + xpos + "," + ypos+ "," + str(self.theta))
-
-        fn = os.path.join(os.path.dirname(__file__), "Picker"+str(self.robot_id)+".sta")
+        fn = os.path.join(os.path.dirname(__file__), str(self.robot_id)+"pic.sta")
         output_file = open(fn, "w")
         output_file.write(str(self.robot_node_identifier)+ "\n")
         output_file.write("Picker\n")
@@ -72,9 +76,46 @@ class RobotPicker(Robot):
         output_file.write(str(round(self.theta,2)) + "\n")
         output_file.write(str(self.current_load)+ "/" + str(self.max_load))
 
-        #rospy.loginfo("Current x position: %f" , self.px)
-        #rospy.loginfo("Current y position: %f", self.py)
-        #rospy.loginfo("Current theta: %f", self.theta)s
+    """
+    @function
+
+    Transfer kiwifruit
+    """
+    def kiwi_callback(self, message):
+        if (message.data != str(self.robot_id) and self.current_load == 20):
+            print("transfer load")
+            self.current_load = 0
+            self.kiwi_pub.publish(str(self.robot_id))
+
+    """
+    @function
+
+    Add a kiwifruit
+    """
+    def addKiwi(self, clockTime):
+        if(self.current_load >= self.max_load):
+            self.waitForCollection()
+        elif(clockTime >= (self.timeLastAdded + 0.005)):
+            self.current_load = self.current_load + 1
+            self.timeLastAdded = clockTime
+            print("kiwi added")
+
+        """
+    @function
+
+    Wait for a carrier to pickup
+    """
+    def waitForCollection(self):
+        self._stopCurrentAction_ = True
+        self.disableLaser = True
+        action = self._actions_[7],[]
+        if action != self._actionsStack_[-1]:
+            #stop moving foward and add turn action
+            self._stopCurrentAction_ = True
+            self._actionsStack_.append(action)
+
+    def gotoClosestRobot(self):
+        pass
 
     def StageLaser_callback(self, msg):
         barCount = 0
@@ -139,11 +180,24 @@ class RobotPicker(Robot):
                 self.state = self.PickerState.PICKING
                 self.treeDetected = True
                 self.noMoreTrees=0
-                self.current_load += 1
                 #print("Found Tree")
+                self.addKiwi(time.clock())
             elif rangeCount == 20:
                 self.state = self.PickerState.FINDING
 
     def read(self, msg, container):
         for i in range(70, 110):
             container.append(msg[i])
+
+    """
+    @function
+
+    Wait function
+    """
+    def pickerWait(self):
+        while(self.current_load != 0):
+            time.sleep(1)
+
+        time.sleep(10)
+        self.disableLaser = False
+        return 0
