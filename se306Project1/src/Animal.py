@@ -59,7 +59,7 @@ class Animal(Entity):
         #Update the theta value
         self.update_theta(yaw)
 
-        fn = os.path.join(os.path.dirname(__file__), "Animal"+str(self.robot_id)+".sta")
+        fn = os.path.join(os.path.dirname(__file__), str(self.robot_id)+"ani.sta")
         output_file = open(fn, "w")
         output_file.write(str(self.robot_node_identifier)+ "\n")
         output_file.write("Animal\n")
