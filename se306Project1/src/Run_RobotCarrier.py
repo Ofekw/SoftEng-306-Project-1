@@ -9,6 +9,7 @@ from tf.transformations import *
 import math
 import numpy.testing
 from RobotCarrier import RobotCarrier
+from Debugger import Debugger
 
 """
 @MAIN
@@ -22,6 +23,8 @@ def main():
     #Can't create more than one robot per main() .... ie can't run more than one robot per terminal running
 
     robot0 = RobotCarrier(1,-10,-28, math.pi/2)
+    debug = Debugger(robot0)
+    debug.start()
 
     rospy.Rate(100)
     rospy.sleep(0.1)

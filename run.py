@@ -8,21 +8,25 @@ import generateRobotFile
 
 def main(argv):
     testing = False
+    debugging = False
 
     try:
         opts, args = getopt.getopt(argv,"dt")
     except getopt.GetoptError:
-        print 'test.py -d for debugger mode (Note working yet)'
+        print 'test.py -d for debugger mode '
         print 'test.py -t for debugger mode '
         sys.exit(2)
     for opt, arg in opts:
         if opt == "-t":
             testing = True
+        elif opt == "-d":
+            debugging = True
     if testing == True:
         list = generateRobotFile.main(['-t'])
         process = subprocess.Popen("bash -c 'python generateWorldFile.py'", shell=True)
         process.wait()
         return list
+    #elif debugging == True:
     else:
         list = generateRobotFile.main([""])
         atexit.register(generateRobotFile.delete_files, list)

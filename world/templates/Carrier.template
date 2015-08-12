@@ -9,6 +9,7 @@ from tf.transformations import *
 import math
 import numpy.testing
 from RobotCarrier import RobotCarrier
+from Debugger import Debugger
 
 """
 @MAIN
