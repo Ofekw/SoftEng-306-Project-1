@@ -70,44 +70,6 @@ class GUI_overlay(Tkinter.Tk):
         self.animal_label_list = self.setup_animals(nb,animal_tab)
 
 
-
-        # self.label_list.append(self.TLabel1)
-        # self.label_list.append(self.TLabel2)
-        # self.label_list.append(self.TLabel3)
-        # self.label_list.append(self.TLabel4)
-        # self.label_list.append(self.TLabel5)
-        # self.label_list.append(self.TLabel6)
-        # self.label_list.append(self.Label36)
-        # self.label_list.append(self.TLabel7)
-        # self.label_list.append(self.TLabel8)
-        # self.label_list.append(self.TLabel9)
-        # self.label_list.append(self.TLabel10)
-        # self.label_list.append(self.TLabel11)
-        # self.label_list.append(self.TLabel12)
-        # self.label_list.append(self.Label37)
-        # self.label_list.append(self.TLabel13)
-        # self.label_list.append(self.TLabel14)
-        # self.label_list.append(self.TLabel15)
-        # self.label_list.append(self.TLabel16)
-        # self.label_list.append(self.TLabel17)
-        # self.label_list.append(self.TLabel18)
-        # self.label_list.append(self.Label38)
-        # self.label_list.append(self.TLabel19)
-        # self.label_list.append(self.TLabel20)
-        # self.label_list.append(self.TLabel21)
-        # self.label_list.append(self.TLabel22)
-        # self.label_list.append(self.TLabel23)
-        # self.label_list.append(self.TLabel24)
-        # self.label_list.append(self.Label39)
-        # self.label_list.append(self.TLabel25)
-        # self.label_list.append(self.TLabel26)
-        # self.label_list.append(self.TLabel27)
-        # self.label_list.append(self.TLabel28)
-        # self.label_list.append(self.TLabel29)
-        # self.label_list.append(self.TLabel30)
-        # self.label_list.append(self.Label40)
-
-
     def setup_robots(self,nb,robot_tab):
 
         #ROBOT 1 ___________________________________________________________
