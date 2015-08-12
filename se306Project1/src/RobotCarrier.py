@@ -32,6 +32,7 @@ class RobotCarrier(Robot):
 
 
         self.closestRobotID = 0
+        self.nextRobotID = 0
         self.carrier_robots = ["0,0,0","0,0,0","0,0,0","0,0,0","0,0,0","0,0,0"]
         self.picker_robots = ["0,0,0","0,0,0","0,0,0","0,0,0","0,0,0","0,0,0"]
 
@@ -116,19 +117,21 @@ class RobotCarrier(Robot):
     def pickerCallback(self, message):
         # print("Picker callback position " + message.data.split(',')[1] + "," + message.data.split(',')[2])
         self.picker_robots[int(message.data.split(',')[0])] = message.data.split(',')[1] + "," + message.data.split(',')[2] + "," + message.data.split(',')[4]  # Should add element 3 here which is theta
-        # print("Picker array")
-        # print(', '.join(self.picker_robots))
+        #print("Picker array")
+        #print(', '.join(self.picker_robots))
 
     """
     @function
     @parameter: message
 
-    Displays info sent from a picker robot when trnsferring kiwis
+    Displays info sent from a picker robot when transferring kiwis
     """
     def kiwi_callback(self, message):
         if (message.data != str(self.robot_id)):
             self.current_load = 20
             print("going to dropoff zone")
+            # self.nextRobotID = (self.nextRobotID + 1) % 3
+            # print("next robot is " + str(self.nextRobotID))
             self.returnToOrigin()
 
     """
@@ -201,6 +204,7 @@ class RobotCarrier(Robot):
 
         #return robot ID 0
         return 0
+        # return self.nextRobotID
 
     """
     @function
