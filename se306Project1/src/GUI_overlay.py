@@ -578,7 +578,7 @@ class GUI_overlay(Tkinter.Tk):
         human_tab.Label6.configure(text='''Current action:''')
 
         human_tab.TLabel1 = ttk.Label(TLabelframe1)
-        human_tab.TLabel1.place(relx=0.26, rely=0.15, height=17, width=50)
+        human_tab.TLabel1.place(relx=0.26, rely=0.15, height=17, width=75)
         human_tab.TLabel1.configure(background=self._bgcolor)
         human_tab.TLabel1.configure(foreground="#0066FF")
         human_tab.TLabel1.configure(relief=FLAT)
@@ -655,7 +655,7 @@ class GUI_overlay(Tkinter.Tk):
         human_tab.Label13.configure(text='''Current action:''')
 
         human_tab.TLabel7 = ttk.Label(TLabelframe2)
-        human_tab.TLabel7.place(relx=0.26, rely=0.15, height=17, width=50)
+        human_tab.TLabel7.place(relx=0.26, rely=0.15, height=17, width=75)
         human_tab.TLabel7.configure(background=self._bgcolor)
         human_tab.TLabel7.configure(foreground="#0066FF")
         human_tab.TLabel7.configure(relief=FLAT)
@@ -733,7 +733,7 @@ class GUI_overlay(Tkinter.Tk):
         animal_tab.Label6.configure(text='''Current action:''')
 
         animal_tab.TLabel1 = ttk.Label(TLabelframe1)
-        animal_tab.TLabel1.place(relx=0.26, rely=0.15, height=17, width=50)
+        animal_tab.TLabel1.place(relx=0.26, rely=0.15, height=17, width=75)
         animal_tab.TLabel1.configure(background=self._bgcolor)
         animal_tab.TLabel1.configure(foreground="#0066FF")
         animal_tab.TLabel1.configure(relief=FLAT)
@@ -809,7 +809,7 @@ class GUI_overlay(Tkinter.Tk):
         animal_tab.Label13.configure(text='''Current action:''')
 
         animal_tab.TLabel7 = ttk.Label(TLabelframe2)
-        animal_tab.TLabel7.place(relx=0.26, rely=0.15, height=17, width=50)
+        animal_tab.TLabel7.place(relx=0.26, rely=0.15, height=17, width=75)
         animal_tab.TLabel7.configure(background=self._bgcolor)
         animal_tab.TLabel7.configure(foreground="#0066FF")
         animal_tab.TLabel7.configure(relief=FLAT)

@@ -53,8 +53,8 @@ class Entity:
         self.x_off = x_off
         self.y_off = y_off
         self.robot_id = r_id
-        self.robot_node_name = ("RobotNode" +str(r_id))
-        self.robot_node_identifier = ("robot_"+ str(r_id))
+        self.robot_node_name = ("RobotNode" +str(self.robot_id))
+        self.robot_node_identifier = ("robot_"+ str(self.robot_id))
         self.goalx = self.px
         self.goaly = self.py
         self.state = self.State.STOPPED

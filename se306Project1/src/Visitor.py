@@ -64,7 +64,7 @@ class Visitor(Human):
 
         fn = os.path.join(os.path.dirname(__file__), str(self.robot_id)+"vis.sta")
         output_file = open(fn, "w")
-        output_file.write(str(self.robot_node_identifier)+ "\n")
+        output_file.write(str(self)+str(self.robot_id)+ "\n")
         output_file.write("Visitor\n")
         output_file.write(self.state+"\n")
         output_file.write(str(round(self.px,2)) + "\n")
@@ -168,3 +168,4 @@ class Visitor(Human):
                 self._actionRunning_ = False
             except ActionInterruptException.ActionInterruptException as e:
                 ()
+

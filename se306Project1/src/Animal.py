@@ -61,7 +61,7 @@ class Animal(Entity):
 
         fn = os.path.join(os.path.dirname(__file__), str(self.robot_id)+"ani.sta")
         output_file = open(fn, "w")
-        output_file.write(str(self.robot_node_identifier)+ "\n")
+        output_file.write(str(self)+str(self.robot_id)+ "\n")
         output_file.write("Animal\n")
         output_file.write(self.state+"\n")
         output_file.write(str(round(self.px,2)) + "\n")
@@ -176,3 +176,6 @@ class Animal(Entity):
                 self._actionRunning_ = False
             except ActionInterruptException.ActionInterruptException as e:
                 ()
+
+    def __str__(self):
+        return "animal_"
