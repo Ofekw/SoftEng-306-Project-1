@@ -23,6 +23,12 @@ It inherits from the Entity class.
 """
 class RobotCarrier(Robot):
 
+    def enum(**enums):
+        return type('Enum', (), enums)
+
+    CarrierState = enum(WAITINGFORPICKER="Waiting for picker",
+                              GOINGTOPICKER="Going to picker", GOTODROPOFF="Going to dropoff")
+
     def __init__(self,r_id,x_off,y_off,theta_off):
         self.carrier_pub = rospy.Publisher("carrierPosition",String, queue_size=10)
         self.carrier_sub = rospy.Subscriber("carrierPosition", String, self.carrierCallback)
@@ -115,7 +121,7 @@ class RobotCarrier(Robot):
     """
     def kiwi_callback(self, message):
         if (message.data != str(self.robot_id)):
-            self.current_load = 20
+            self.current_load = self.current_load + 100
             print("going to dropoff zone")
             # self.nextRobotID = (self.nextRobotID + 1) % 3
             # print("next robot is " + str(self.nextRobotID))
@@ -128,7 +134,7 @@ class RobotCarrier(Robot):
     Tells the picker robot to transfer kiwifruit
     """
     def intiate_transfer(self):
-        self.kiwi_pub.publish(str(self.robot_id))
+        self.kiwi_pub.publish(str(self.robot_id) + "," + str(self.nextRobotID))
         print("intitate transfer")
 
     """
@@ -192,8 +198,7 @@ class RobotCarrier(Robot):
         #             self.closestRobot = position
 
         #return robot ID 0
-        return 0
-        # return self.nextRobotID
+        return self.nextRobotID
 
     """
     @function
@@ -203,13 +208,14 @@ class RobotCarrier(Robot):
     Used to wait until a picker is ready for collection
     """
     def waitForPicker(self):
+        self.state = self.CarrierState.GOINGTOPICKER
         if self._stopCurrentAction_ == True:
             self._stopCurrentAction_ = False
             raise ActionInterruptException.ActionInterruptException("waitFor Stopped")
         else:
             if not(self.is_going_home):
                 self.getClosest()
-                if(int(self.picker_robots[self.closestRobotID].split(',')[2]) >= 20):
+                if(int(self.picker_robots[self.closestRobotID].split(',')[2]) >= 100):
                     self.goToClosest()
 
     """
@@ -219,6 +225,7 @@ class RobotCarrier(Robot):
     Go to the full picker
     """
     def goToClosest(self):
+        self.state = self.CarrierState.WAITINGFORPICKER
         action = self._actions_[5], [float(self.picker_robots[self.closestRobotID].split(',')[0]), float(self.picker_robots[self.closestRobotID].split(',')[1])-5.0]
         if action != self._actionsStack_[-1]:
             self._actionsStack_.append(action)
@@ -244,7 +251,7 @@ class RobotCarrier(Robot):
             xabsolute = abs(xgoal - self.px)
             yabsolute = abs(ygoal - self.py)
             if (xabsolute < 0.5 and yabsolute < 5):
-                if (int(self.picker_robots[self.closestRobotID].split(',')[2]) == 20):
+                if (int(self.picker_robots[self.closestRobotID].split(',')[2]) == 100):
                     self.intiate_transfer()
 
     """
@@ -254,6 +261,7 @@ class RobotCarrier(Robot):
     Return to drop off point
     """
     def returnToOrigin(self):
+        self.state = self.CarrierState.GOTODROPOFF
         action = self._actions_[1], [self.init_x, self.init_y]
         self.is_going_home = True;
         self._stopCurrentAction_ = False
