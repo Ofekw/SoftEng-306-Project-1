@@ -10,6 +10,7 @@ import math
 import numpy.testing
 from Visitor import Visitor
 import ActionInterruptException
+from Debugger import Debugger
 
 """
 @MAIN

@@ -22,7 +22,7 @@ define animal position
 
   localization "gps"         	  
 
-  size [1.5 0.5 0.75]
+  size [1.5 0.5 1.0]
   #origin [-0.25 -0.25 0 0 ]
 
   mylaser(pose [ 0 0.000 0 0.000 ])

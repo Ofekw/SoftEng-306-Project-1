@@ -28,12 +28,12 @@ class RobotPicker(Robot):
         return type('Enum', (), enums)
 
     PickerState = enum(PICKING="Picking Fruit",
-                              FINDING="Finding Orchard")
+                              FINDING="Finding Orchard", WAITINGFORCOLLECTION="Waiting for collection")
 
     def __init__(self,r_id,x_off,y_off,theta_off):
         self.picker_pub = rospy.Publisher("pickerPosition",String, queue_size=10)
 
-        self.max_load = 20
+        self.max_load = 100
         self.current_load = 0
         self.firstLaserReading = []
         self.timeLastAdded = time.clock()
@@ -82,7 +82,7 @@ class RobotPicker(Robot):
     Transfer kiwifruit
     """
     def kiwi_callback(self, message):
-        if (message.data != str(self.robot_id) and self.current_load == 20):
+        if (message.data.split(",")[0] != str(self.robot_id) and self.current_load >= self.max_load and message.data.split(",")[1] == str(self.robot_id)):
             print("transfer load")
             self.current_load = 0
             self.kiwi_pub.publish(str(self.robot_id))
@@ -98,7 +98,6 @@ class RobotPicker(Robot):
         elif(clockTime >= (self.timeLastAdded + 0.005)):
             self.current_load = self.current_load + 1
             self.timeLastAdded = clockTime
-            print("kiwi added")
 
         """
     @function
@@ -106,6 +105,7 @@ class RobotPicker(Robot):
     Wait for a carrier to pickup
     """
     def waitForCollection(self):
+        self.state = self.PickerState.WAITINGFORCOLLECTION
         self._stopCurrentAction_ = True
         self.disableLaser = True
         action = self._actions_[7],[]
@@ -176,13 +176,13 @@ class RobotPicker(Robot):
                 self.noMoreTrees +=1
                 self.treeDetected = False
             #check if new tree dected
-            elif 0 < rangeCount < 20 and not self.treeDetected:
+            elif 0 < rangeCount < self.max_load and not self.treeDetected:
                 self.state = self.PickerState.PICKING
                 self.treeDetected = True
                 self.noMoreTrees=0
                 #print("Found Tree")
                 self.addKiwi(time.clock())
-            elif rangeCount == 20:
+            elif rangeCount == self.max_load:
                 self.state = self.PickerState.FINDING
 
     def read(self, msg, container):
