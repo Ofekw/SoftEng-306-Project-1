@@ -23,6 +23,12 @@ It inherits from the Entity class.
 """
 class RobotCarrier(Robot):
 
+    def enum(**enums):
+        return type('Enum', (), enums)
+
+    CarrierState = enum(WAITINGFORPICKER="Waiting for picker",
+                              GOINGTOPICKER="Going to picker", GOTODROPOFF="Going to dropoff")
+
     def __init__(self,r_id,x_off,y_off,theta_off):
         self.carrier_pub = rospy.Publisher("carrierPosition",String, queue_size=10)
         self.carrier_sub = rospy.Subscriber("carrierPosition", String, self.carrierCallback)
@@ -202,6 +208,7 @@ class RobotCarrier(Robot):
     Used to wait until a picker is ready for collection
     """
     def waitForPicker(self):
+        self.state = self.CarrierState.GOINGTOPICKER
         if self._stopCurrentAction_ == True:
             self._stopCurrentAction_ = False
             raise ActionInterruptException.ActionInterruptException("waitFor Stopped")
@@ -218,6 +225,7 @@ class RobotCarrier(Robot):
     Go to the full picker
     """
     def goToClosest(self):
+        self.state = self.CarrierState.WAITINGFORPICKER
         action = self._actions_[5], [float(self.picker_robots[self.closestRobotID].split(',')[0]), float(self.picker_robots[self.closestRobotID].split(',')[1])-5.0]
         if action != self._actionsStack_[-1]:
             self._actionsStack_.append(action)
@@ -253,6 +261,7 @@ class RobotCarrier(Robot):
     Return to drop off point
     """
     def returnToOrigin(self):
+        self.state = self.CarrierState.GOTODROPOFF
         action = self._actions_[1], [self.init_x, self.init_y]
         self.is_going_home = True;
         self._stopCurrentAction_ = False

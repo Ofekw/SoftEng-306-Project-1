@@ -28,7 +28,7 @@ class RobotPicker(Robot):
         return type('Enum', (), enums)
 
     PickerState = enum(PICKING="Picking Fruit",
-                              FINDING="Finding Orchard")
+                              FINDING="Finding Orchard", WAITINGFORCOLLECTION="Waiting for collection")
 
     def __init__(self,r_id,x_off,y_off,theta_off):
         self.picker_pub = rospy.Publisher("pickerPosition",String, queue_size=10)
@@ -105,6 +105,7 @@ class RobotPicker(Robot):
     Wait for a carrier to pickup
     """
     def waitForCollection(self):
+        self.state = self.PickerState.WAITINGFORCOLLECTION
         self._stopCurrentAction_ = True
         self.disableLaser = True
         action = self._actions_[7],[]
