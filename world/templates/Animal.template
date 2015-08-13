@@ -10,6 +10,7 @@ import math
 import numpy.testing
 from Animal import Animal
 import ActionInterruptException
+from Debugger import Debugger
 
 """
 @MAIN

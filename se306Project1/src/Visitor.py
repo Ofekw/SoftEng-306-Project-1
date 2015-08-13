@@ -72,8 +72,8 @@ class Visitor(Human):
         output_file.write(str(round(self.theta,2)) + "\n")
 
     def StageLaser_callback(self, msg):
-        for i in range(75, 105):
-            if (msg.ranges[i] < 2 and self.disableLaser == False):
+        for i in range(70, 110):
+            if (msg.ranges[i] < 4 and self.disableLaser == False):
                 self._stopCurrentAction_ = True
                 move1 = self._actions_[0], [3]
                 turn2 = self._actions_[2], ["right"]
