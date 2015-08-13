@@ -115,7 +115,7 @@ class RobotCarrier(Robot):
     """
     def kiwi_callback(self, message):
         if (message.data != str(self.robot_id)):
-            self.current_load = 20
+            self.current_load = self.current_load + 100
             print("going to dropoff zone")
             # self.nextRobotID = (self.nextRobotID + 1) % 3
             # print("next robot is " + str(self.nextRobotID))
@@ -128,7 +128,7 @@ class RobotCarrier(Robot):
     Tells the picker robot to transfer kiwifruit
     """
     def intiate_transfer(self):
-        self.kiwi_pub.publish(str(self.robot_id))
+        self.kiwi_pub.publish(str(self.robot_id) + "," + str(self.nextRobotID))
         print("intitate transfer")
 
     """
@@ -192,8 +192,7 @@ class RobotCarrier(Robot):
         #             self.closestRobot = position
 
         #return robot ID 0
-        return 0
-        # return self.nextRobotID
+        return self.nextRobotID
 
     """
     @function
@@ -209,7 +208,7 @@ class RobotCarrier(Robot):
         else:
             if not(self.is_going_home):
                 self.getClosest()
-                if(int(self.picker_robots[self.closestRobotID].split(',')[2]) >= 20):
+                if(int(self.picker_robots[self.closestRobotID].split(',')[2]) >= 100):
                     self.goToClosest()
 
     """
@@ -244,7 +243,7 @@ class RobotCarrier(Robot):
             xabsolute = abs(xgoal - self.px)
             yabsolute = abs(ygoal - self.py)
             if (xabsolute < 0.5 and yabsolute < 5):
-                if (int(self.picker_robots[self.closestRobotID].split(',')[2]) == 20):
+                if (int(self.picker_robots[self.closestRobotID].split(',')[2]) == 100):
                     self.intiate_transfer()
 
     """
