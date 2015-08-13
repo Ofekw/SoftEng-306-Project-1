@@ -6,6 +6,7 @@ from std_msgs.msg import *
 import sensor_msgs.msg
 import time
 from se306Project1.src.RobotPicker import RobotPicker
+from se306Project1.src.RobotCarrier import RobotCarrier
 import math
 import logging
 from TestModule import TestModule
@@ -15,10 +16,11 @@ class Test_Robot_Setup(unittest.TestCase,TestModule):
 
     robot0 = RobotPicker(0,-20,-28, math.pi/2)
 
-    def test_setup_variables(self):
+    def test_robot_picker_setup(self):
 
         self.print_function_name(inspect.stack()[0][3])
 
+        #Entity Variables
         self.assertEqual(self.robot0.linearX, 2, "Setting linearX")
         self.assertEqual(self.robot0.angularZ, 0, "Setting angularZ")
         self.assertEqual(self.robot0.init_theta, math.pi/2, "Setting init_theta")
@@ -39,10 +41,10 @@ class Test_Robot_Setup(unittest.TestCase,TestModule):
         self.assertEqual(self.robot0.noMoreTrees, 0, "Setting noMoreTrees")
         self.assertEqual(self.robot0.treeDetected, False, "Setting treeDetected")
         self.assertEqual(self.robot0.atOrchard, False, "Setting atOrchard")
+        #Robot Picker Variables
         self.assertEqual(self.robot0.max_load, 20, "Setting max_load")
         self.assertEqual(self.robot0.current_load, 0, "Setting current_load")
         self.assertEqual(self.robot0.firstLaserReading, [], "Setting firstLaserReading")
-
 
 if __name__ == '__main__':
     unittest.main()
