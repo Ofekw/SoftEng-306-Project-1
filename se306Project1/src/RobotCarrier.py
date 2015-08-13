@@ -30,6 +30,9 @@ class RobotCarrier(Robot):
                               GOINGTOPICKER="Going to picker", GOTODROPOFF="Going to dropoff")
 
     def __init__(self,r_id,x_off,y_off,theta_off):
+
+        Robot.__init__(self,r_id,x_off,y_off,theta_off)
+
         self.carrier_pub = rospy.Publisher("carrierPosition",String, queue_size=10)
         self.carrier_sub = rospy.Subscriber("carrierPosition", String, self.carrierCallback)
         self.picker_sub = rospy.Subscriber("pickerPosition", String, self.pickerCallback)
@@ -47,7 +50,7 @@ class RobotCarrier(Robot):
 
         self.is_going_home = False
 
-        Robot.__init__(self,r_id,x_off,y_off,theta_off)
+
 
 
         #these variables are used to help the laser callback, it will help in dealing with entities/debris on
