@@ -835,7 +835,7 @@ class GUI_overlay(Tkinter.Tk):
                         self.animal_label_list[i].configure(text=str(line))
                         i+=1
         i=0
-        self.after(50,self.update)
+        self.after(500,self.update)
 
 if __name__ == '__main__':
     gui = GUI_overlay()
