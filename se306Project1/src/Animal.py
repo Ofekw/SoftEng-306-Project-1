@@ -26,7 +26,7 @@ class Animal(Entity):
     def enum(**enums):
         return type('Enum', (), enums)
 
-    AnimalState = enum(NAVIGATING_RANDOM = "Navigating to random location \n",
+    AnimalState = enum(NAVIGATING_RANDOM = "Nav to rand location \n",
                         GOING_TO_VISITOR = "Going to visitor")
 
 
@@ -65,7 +65,7 @@ class Animal(Entity):
         output_file = open(fn, "w")
         output_file.write(str(self)+str(self.robot_id)+ "\n")
         output_file.write("Animal\n")
-        output_file.write(self.animal_state+", " + self.state + "\n")
+        output_file.write(self.animal_state + "\n")
         output_file.write(str(round(self.px,2)) + "\n")
         output_file.write(str(round(self.py,2)) + "\n")
         output_file.write(str(round(self.theta,2)) + "\n")
@@ -144,7 +144,7 @@ class Animal(Entity):
         #visitor_y = self.dict_of_visitors.values()[0][1]
 
         if (self.dict_of_visitors.__len__() > 0):
-            self.state = self.AnimalState.GOING_TO_VISITOR
+            self.animal_state = self.AnimalState.GOING_TO_VISITOR
 
             visitor_coord = self.dict_of_visitors["5"]
             visitor_x = visitor_coord[0]

@@ -29,8 +29,8 @@ class Visitor(Human):
 
     random_nav = {}
 
-    VisitorState = enum(NAVIGATING_RANDOM="Navigating to random location \n",
-                        MOVING_RANDOM = "Moving towards random direction")
+    VisitorState = enum(NAVIGATING_RANDOM="Nav to rand location\n",
+                        MOVING_RANDOM = "Move to rand direction")
 
 
     def __init__(self, r_id, x_off, y_off, theta_offset):
@@ -68,7 +68,7 @@ class Visitor(Human):
         output_file = open(fn, "w")
         output_file.write(str(self)+str(self.robot_id)+ "\n")
         output_file.write("Visitor\n")
-        output_file.write(self.visitor_state + ", " + self.state + "\n")
+        output_file.write(self.visitor_state + "\n")
         output_file.write(str(round(self.px,2)) + "\n")
         output_file.write(str(round(self.py,2)) + "\n")
         output_file.write(str(round(self.theta,2)) + "\n")
