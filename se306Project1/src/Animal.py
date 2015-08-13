@@ -67,6 +67,8 @@ class Animal(Entity):
         output_file.write(str(round(self.px,2)) + "\n")
         output_file.write(str(round(self.py,2)) + "\n")
         output_file.write(str(round(self.theta,2)) + "\n")
+        output_file.close()
+
 
     """
     @function

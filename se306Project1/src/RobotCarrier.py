@@ -93,6 +93,8 @@ class RobotCarrier(Robot):
         output_file.write(str(round(self.py,2)) + "\n")
         output_file.write(str(round(self.theta,2)) + "\n")
         output_file.write(str(self.current_load)+ "/" + str(self.max_load))
+        output_file.close()
+        
 
     """
     @function
