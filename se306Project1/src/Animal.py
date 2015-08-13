@@ -26,7 +26,7 @@ class Animal(Entity):
     def enum(**enums):
         return type('Enum', (), enums)
 
-    AnimalState = enum(NAVIGATING_RANDOM = "Navigating to random location ",
+    AnimalState = enum(NAVIGATING_RANDOM = "Navigating to random location \n",
                         GOING_TO_VISITOR = "Going to visitor")
 
 
@@ -39,6 +39,8 @@ class Animal(Entity):
         self.sub_to_visitor = rospy.Subscriber("visitor_dog_topic", String, self.Visitor_Subscription)
 
         self.linearX = 3
+
+        self.animal_state = ""
 
         self._actions_ = {
             0: self.move_forward,
@@ -63,7 +65,7 @@ class Animal(Entity):
         output_file = open(fn, "w")
         output_file.write(str(self)+str(self.robot_id)+ "\n")
         output_file.write("Animal\n")
-        output_file.write(self.state+"\n")
+        output_file.write(self.animal_state+", " + self.state + "\n")
         output_file.write(str(round(self.px,2)) + "\n")
         output_file.write(str(round(self.py,2)) + "\n")
         output_file.write(str(round(self.theta,2)) + "\n")
@@ -133,7 +135,7 @@ class Animal(Entity):
         random_x = random.randint(-40, 40)
         random_y = random.randint(-40, 40)
 
-        self.state = self.AnimalState.NAVIGATING_RANDOM
+        self.animal_state = self.AnimalState.NAVIGATING_RANDOM
 
         self.go_to_location(random_x, random_y)
 

@@ -29,14 +29,16 @@ class Visitor(Human):
 
     random_nav = {}
 
-    VisitorState = enum(NAVIGATING_RANDOM="Navigating to random location ",
-                        MOVING_RANDOM = "Moving towards random direction ")
+    VisitorState = enum(NAVIGATING_RANDOM="Navigating to random location \n",
+                        MOVING_RANDOM = "Moving towards random direction")
 
 
     def __init__(self, r_id, x_off, y_off, theta_offset):
         Human.__init__(self, r_id, x_off, y_off, theta_offset)
 
         self.pub_to_dog = rospy.Publisher("visitor_dog_topic", String, queue_size=10)
+
+        self.visitor_state = ""
 
 
         self._actions_ = {
@@ -66,7 +68,7 @@ class Visitor(Human):
         output_file = open(fn, "w")
         output_file.write(str(self)+str(self.robot_id)+ "\n")
         output_file.write("Visitor\n")
-        output_file.write(self.state+"\n")
+        output_file.write(self.visitor_state + ", " + self.state + "\n")
         output_file.write(str(round(self.px,2)) + "\n")
         output_file.write(str(round(self.py,2)) + "\n")
         output_file.write(str(round(self.theta,2)) + "\n")
@@ -103,7 +105,7 @@ class Visitor(Human):
 
         #random_nav[0] = rand_direction
         #random_nav[1] = str(rand_dist)
-        self.state = self.VisitorState.MOVING_RANDOM
+        self.visitor_state = self.VisitorState.MOVING_RANDOM
 
         self.face_direction(rand_direction)
         self.move_forward(rand_dist)
@@ -123,7 +125,7 @@ class Visitor(Human):
         random_y = random.randint(-40, 40)
 
         random_location = {random_x, random_y}
-        self.state = self.VisitorState.NAVIGATING_RANDOM
+        self.visitor_state = self.VisitorState.NAVIGATING_RANDOM
 
         print("Attempting to go to " + str(random_x) + ", " + str(random_y))
 
