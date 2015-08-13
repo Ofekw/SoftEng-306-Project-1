@@ -29,7 +29,7 @@ class Visitor(Human):
 
     random_nav = {}
 
-    VisitorState = enum(NAVIGATING_RANDOM="Nav to rand location\n",
+    VisitorState = enum(NAVIGATING_RANDOM="Nav to rand location",
                         MOVING_RANDOM = "Move to rand direction")
 
 
