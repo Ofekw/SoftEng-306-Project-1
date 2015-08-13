@@ -4,7 +4,7 @@ import time
 import getopt
 import sys
 import atexit
-import generateRobotFile
+import generateEntity
 import os
 
 def main(argv):
@@ -27,16 +27,16 @@ def main(argv):
         elif opt == "-d":
             debugging = True
     if testing == True:
-        list = generateRobotFile.main(['-t'])
+        list = generateEntity.main(['-t'])
         process = subprocess.Popen("bash -c 'python generateWorldFile.py'", shell=True)
         process.wait()
         return list
     else:
         if debugging == True:
-            list = generateRobotFile.main(["-d"])
+            list = generateEntity.main(["-d"])
         else:
-            list = generateRobotFile.main([""])
-        atexit.register(generateRobotFile.delete_files, list)
+            list = generateEntity.main([""])
+        atexit.register(generateEntity.delete_files, list)
         subprocess.Popen("bash -c 'python generateWorldFile.py'", shell=True)
         subprocess.check_output("rosmake se306Project1", shell=True)
         subprocess.Popen("bash -c 'roscore'", shell=True)
