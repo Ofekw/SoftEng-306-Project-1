@@ -76,7 +76,7 @@ class Visitor(Human):
 
 
     def StageLaser_callback(self, msg):
-        for i in range(70, 110):
+        for i in range(60, 120):
             if (msg.ranges[i] < 4 and self.disableLaser == False):
                 self._stopCurrentAction_ = True
                 move1 = self._actions_[0], [3]

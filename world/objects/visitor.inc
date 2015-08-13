@@ -30,25 +30,49 @@ define visitor position
   mylaser(pose [ 0.000 0.000 -2.5 0.000 ])
   velocity_bounds [-1000 1000 -1000 1000 -1000 1000 -90 90 ]
 
-  # feet
+  # left foot
   block
   (
 	points 4
-	point[0] [0 0]
+	point[0] [0 0.6]
 	point[1] [0 1]
-	point[2] [1 1]
-	point[3] [1 0]
+	point[2] [0.7 1]
+	point[3] [0.7 0.6]
 	z [0 0.05]
 	color "brown"
   )
 
-  # legs
+  # right foot
   block
   (
 	points 4
 	point[0] [0 0]
+	point[1] [0 0.4]
+	point[2] [0.7 0.4]
+	point[3] [0.7 0]
+	z [0 0.05]
+	color "brown"
+  )
+
+  # left leg
+  block
+  (
+	points 4
+	point[0] [0 0.6]
 	point[1] [0 1]
 	point[2] [0.6 1]
+	point[3] [0.6 0.6]
+	z [0.05 0.4]
+	color "blue"
+  )
+
+  # left leg
+  block
+  (
+	points 4
+	point[0] [0 0]
+	point[1] [0 0.4]
+	point[2] [0.6 0.4]
 	point[3] [0.6 0]
 	z [0.05 0.4]
 	color "blue"
