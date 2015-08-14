@@ -21,10 +21,6 @@ def main():
     #You can use RobotNode_cmdvel to simulate movements, place them in the while loop to try it out
     #RobotNode_cmdvel = geometry_msgs.msg.Twist()
 
-    moveAction = robot._actions_[0], [1000]
-    robot._actionsStack_.append(moveAction)
-    robot.state = robot.PickerState.FINDING
-
     while not rospy.is_shutdown():
     #check if there is an action on the stack or an action already running
         if(robot._actionsStack_.__len__() > 0 and not robot._actionRunning_):
