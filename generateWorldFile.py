@@ -30,7 +30,7 @@ width_between_rows = WORLD_WIDTH/(rows)
 
 for x in range(-WORLD_WIDTH/2 + width_between_rows/2,WORLD_WIDTH/2 - width_between_rows/2 + 1, width_between_rows): #x co-cordinates step size
     tree_column = []
-    for y in range(-10, 50, 2):  #safe zone is at -12, so orchard will go from 46 to -12
+    for y in range(-10, 40, 2):  #safe zone is at -12, so orchard will go from 46 to -12
         temp_left_tree = left_tree.replace('x',str(x-3))
         temp_left_tree = temp_left_tree.replace('y',str(y-2))
         temp_right_tree = right_tree.replace('x',str(x+3))
