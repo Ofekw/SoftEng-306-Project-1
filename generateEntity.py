@@ -27,7 +27,7 @@ def main(argv):
 
     #List of the temporary robot files created
     file_name = []
-    x_value = -30
+    x_value = -40
     #Types of robots that the script reads the config file for
     robot_type = ["Picker", "Carrier", "Visitor", "Animal"]
     #Loads the fields in the config file

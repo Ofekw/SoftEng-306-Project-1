@@ -93,6 +93,8 @@ class RobotCarrier(Robot):
         output_file.write(str(round(self.py,2)) + "\n")
         output_file.write(str(round(self.theta,2)) + "\n")
         output_file.write(str(self.current_load)+ "/" + str(self.max_load))
+        output_file.close()
+        
 
     """
     @function
@@ -212,6 +214,7 @@ class RobotCarrier(Robot):
     """
     def waitForPicker(self):
         self.state = self.CarrierState.GOINGTOPICKER
+        self.carrier_pub.publish(str(self.robot_id) + "," + str(self.px) + "," + str(self.py) + "," + str(self.theta))
         if self._stopCurrentAction_ == True:
             self._stopCurrentAction_ = False
             raise ActionInterruptException.ActionInterruptException("waitFor Stopped")
@@ -253,7 +256,7 @@ class RobotCarrier(Robot):
             ygoal = float(self.picker_robots[self.closestRobotID].split(',')[1])
             xabsolute = abs(xgoal - self.px)
             yabsolute = abs(ygoal - self.py)
-            if (xabsolute < 0.5 and yabsolute < 5):
+            if (xabsolute < 0.5 and yabsolute < 6):
                 if (int(self.picker_robots[self.closestRobotID].split(',')[2]) == 100):
                     self.intiate_transfer()
 
