@@ -29,14 +29,16 @@ class Visitor(Human):
 
     random_nav = {}
 
-    VisitorState = enum(NAVIGATING_RANDOM="Navigating to random location ",
-                        MOVING_RANDOM = "Moving towards random direction ")
+    VisitorState = enum(NAVIGATING_RANDOM="Nav to rand location",
+                        MOVING_RANDOM = "Move to rand direction")
 
 
     def __init__(self, r_id, x_off, y_off, theta_offset):
         Human.__init__(self, r_id, x_off, y_off, theta_offset)
 
         self.pub_to_dog = rospy.Publisher("visitor_dog_topic", String, queue_size=10)
+
+        self.visitor_state = ""
 
 
         self._actions_ = {
@@ -66,13 +68,15 @@ class Visitor(Human):
         output_file = open(fn, "w")
         output_file.write(str(self)+str(self.robot_id)+ "\n")
         output_file.write("Visitor\n")
-        output_file.write(self.state+"\n")
+        output_file.write(self.visitor_state + "\n")
         output_file.write(str(round(self.px,2)) + "\n")
         output_file.write(str(round(self.py,2)) + "\n")
         output_file.write(str(round(self.theta,2)) + "\n")
+        output_file.close()
+
 
     def StageLaser_callback(self, msg):
-        for i in range(70, 110):
+        for i in range(60, 120):
             if (msg.ranges[i] < 4 and self.disableLaser == False):
                 self._stopCurrentAction_ = True
                 move1 = self._actions_[0], [3]
@@ -101,7 +105,7 @@ class Visitor(Human):
 
         #random_nav[0] = rand_direction
         #random_nav[1] = str(rand_dist)
-        self.state = self.VisitorState.MOVING_RANDOM
+        self.visitor_state = self.VisitorState.MOVING_RANDOM
 
         self.face_direction(rand_direction)
         self.move_forward(rand_dist)
@@ -121,7 +125,7 @@ class Visitor(Human):
         random_y = random.randint(-40, 40)
 
         random_location = {random_x, random_y}
-        self.state = self.VisitorState.NAVIGATING_RANDOM
+        self.visitor_state = self.VisitorState.NAVIGATING_RANDOM
 
         print("Attempting to go to " + str(random_x) + ", " + str(random_y))
 

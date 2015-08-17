@@ -38,7 +38,6 @@ class Entity:
 
 
         #declaring the instance variables
-        self.robot_id = 0
         self.linearX = 2
         self.angularZ = 0
 

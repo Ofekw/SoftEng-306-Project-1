@@ -30,6 +30,9 @@ class RobotCarrier(Robot):
                               GOINGTOPICKER="Going to picker", GOTODROPOFF="Going to dropoff")
 
     def __init__(self,r_id,x_off,y_off,theta_off):
+
+        Robot.__init__(self,r_id,x_off,y_off,theta_off)
+
         self.carrier_pub = rospy.Publisher("carrierPosition",String, queue_size=10)
         self.carrier_sub = rospy.Subscriber("carrierPosition", String, self.carrierCallback)
         self.picker_sub = rospy.Subscriber("pickerPosition", String, self.pickerCallback)
@@ -47,7 +50,7 @@ class RobotCarrier(Robot):
 
         self.is_going_home = False
 
-        Robot.__init__(self,r_id,x_off,y_off,theta_off)
+
 
 
         #these variables are used to help the laser callback, it will help in dealing with entities/debris on
@@ -90,6 +93,8 @@ class RobotCarrier(Robot):
         output_file.write(str(round(self.py,2)) + "\n")
         output_file.write(str(round(self.theta,2)) + "\n")
         output_file.write(str(self.current_load)+ "/" + str(self.max_load))
+        output_file.close()
+        
 
     """
     @function
@@ -209,6 +214,7 @@ class RobotCarrier(Robot):
     """
     def waitForPicker(self):
         self.state = self.CarrierState.GOINGTOPICKER
+        self.carrier_pub.publish(str(self.robot_id) + "," + str(self.px) + "," + str(self.py) + "," + str(self.theta))
         if self._stopCurrentAction_ == True:
             self._stopCurrentAction_ = False
             raise ActionInterruptException.ActionInterruptException("waitFor Stopped")
@@ -250,7 +256,7 @@ class RobotCarrier(Robot):
             ygoal = float(self.picker_robots[self.closestRobotID].split(',')[1])
             xabsolute = abs(xgoal - self.px)
             yabsolute = abs(ygoal - self.py)
-            if (xabsolute < 0.5 and yabsolute < 5):
+            if (xabsolute < 0.5 and yabsolute < 6):
                 if (int(self.picker_robots[self.closestRobotID].split(',')[2]) == 100):
                     self.intiate_transfer()
 
