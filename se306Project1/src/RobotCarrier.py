@@ -256,7 +256,7 @@ class RobotCarrier(Robot):
             ygoal = float(self.picker_robots[self.closestRobotID].split(',')[1])
             xabsolute = abs(xgoal - self.px)
             yabsolute = abs(ygoal - self.py)
-            if (xabsolute < 2 and yabsolute < 6):
+            if (xabsolute < 0.5 and yabsolute < 6):
                 if (int(self.picker_robots[self.closestRobotID].split(',')[2]) == 100):
                     self.intiate_transfer()
 
