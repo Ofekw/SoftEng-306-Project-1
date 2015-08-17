@@ -214,7 +214,6 @@ class RobotCarrier(Robot):
     """
     def waitForPicker(self):
         self.state = self.CarrierState.GOINGTOPICKER
-        self.carrier_pub.publish(str(self.robot_id) + "," + str(self.px) + "," + str(self.py) + "," + str(self.theta))
         if self._stopCurrentAction_ == True:
             self._stopCurrentAction_ = False
             raise ActionInterruptException.ActionInterruptException("waitFor Stopped")
