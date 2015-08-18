@@ -8,7 +8,6 @@ from sensor_msgs.msg import*
 from tf.transformations import *
 import math
 import time
-import numpy.testing
 from Robot import Robot
 import Entity
 import os
@@ -38,6 +37,8 @@ class RobotPicker(Robot):
         # self.current_load = 0
         self.firstLaserReading = []
         self.timeLastAdded = time.clock()
+
+        self.disableSideLaser = False
 
         self.kiwi_sub = rospy.Subscriber("carrier_kiwiTransfer", String, self.kiwi_callback)
         self.kiwi_pub = rospy.Publisher("picker_kiwiTransfer",String, queue_size=10)
@@ -151,11 +152,16 @@ class RobotPicker(Robot):
                                 return
 
                         print("static")
-                        action = self._actions_[2], [Entity.Direction.RIGHT]
+                        # action = self._actions_[2], [Entity.Direction.RIGHT]
+                        action = self._actions_[1], [self.init_x, self.init_y]
+                        goToAction = self._actions_[5], [self.init_x, -13.5]
+                        turnAction = self._actions_[2], [Entity.Direction.RIGHT]
                         #check if action already exists in stack, otherwise laser will spam rotates
                         if action != self._actionsStack_[-1]:
                             #stop moving foward and add turn action
                             self._stopCurrentAction_ = True
+                            self._actionsStack_.append(turnAction)
+                            self._actionsStack_.append(goToAction)
                             self._actionsStack_.append(action)
                             self.firstLaserReading = []
                             return
@@ -163,30 +169,40 @@ class RobotPicker(Robot):
 
 
             #check that all lasers in 0-20 range are not hitting object
-
-            rangeCount = 0
-            for i in range(160,180):
-                if msg.ranges[i]<5.0:
-                    rangeCount += 1
-            #check if no tree and are waiting for new tree
-            if self.noMoreTrees>15 and self.state == self.PickerState.PICKING:
-                self.noMoreTrees = 0
-                #stop the robot moving forward
-                self._stopCurrentAction_ = True
-                turnAction = self._actions_[2], [Entity.Direction.LEFT]
-                self._actionsStack_.append(turnAction)
-            elif rangeCount == 0:
-                self.noMoreTrees +=1
-                self.treeDetected = False
-            #check if new tree dected
-            elif 0 < rangeCount < self.max_load and not self.treeDetected:
-                self.state = self.PickerState.PICKING
-                self.treeDetected = True
-                self.noMoreTrees=0
-                #print("Found Tree")
-                self.addKiwi(time.clock())
-            elif rangeCount == self.max_load:
-                self.state = self.PickerState.FINDING
+            if not self.disableSideLaser:
+                rangeCount = 0
+                for i in range(160,180):
+                    if msg.ranges[i]<5.0:
+                        rangeCount += 1
+                #move to next row
+                if self.noMoreTrees>15 and self.state == self.PickerState.PICKING and \
+                        self.py < -10 and self.get_current_direction() == Entity.Direction.SOUTH:
+                    #stop the robot moving forward
+                    self.noMoreTrees = 0
+                    self.state = self.PickerState.FINDING
+                    self._stopCurrentAction_ = True
+                    self.disableSideLaser = True
+                    goToAction = self._actions_[5], [self.px+15, self.py]
+                    self._actionsStack_.append(goToAction)
+                #check if no more trees at top
+                elif self.noMoreTrees>15 and self.state == self.PickerState.PICKING:
+                    self.noMoreTrees = 0
+                    #stop the robot moving forward
+                    self._stopCurrentAction_ = True
+                    turnAction = self._actions_[2], [Entity.Direction.LEFT]
+                    self._actionsStack_.append(turnAction)
+                elif rangeCount == 0:
+                    self.noMoreTrees +=1
+                    self.treeDetected = False
+                #check if new tree dected
+                elif 0 < rangeCount < 20 and not self.treeDetected:
+                    self.state = self.PickerState.PICKING
+                    self.treeDetected = True
+                    self.noMoreTrees=0
+                    #print("Found Tree")
+                    self.addKiwi(time.clock())
+                elif rangeCount == 20:
+                    pass
 
     def read(self, msg, container):
         for i in range(70, 110):

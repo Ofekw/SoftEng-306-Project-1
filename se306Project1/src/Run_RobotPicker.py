@@ -7,10 +7,10 @@ from nav_msgs.msg import*
 from sensor_msgs.msg import*
 from tf.transformations import *
 import math
-import numpy.testing
 from RobotPicker import RobotPicker
 import ActionInterruptException
 from Debugger import Debugger
+import Entity
 
 def main():
     #Construction of Robot objects take 3 params... Robot ID, Start X, Start Y. Start X and Start Y correlates to the myworld.world file
@@ -31,11 +31,13 @@ def main():
     #RobotNode_cmdvel = geometry_msgs.msg.Twist()
 
     moveAction = robot._actions_[0], [1000]
-    robot._actionsStack_.append(moveAction)
-    robot.state = robot.PickerState.FINDING
-    # turnAction = robot.actions[2], ["left"]
-    # robot.actionsStack.append(turnAction)
+    goToAction = robot._actions_[5], [robot.px, -13.5]
+    turnAction = robot._actions_[2], [Entity.Direction.RIGHT]
 
+    robot._actionsStack_.append(moveAction)
+    robot._actionsStack_.append(turnAction)
+    robot._actionsStack_.append(goToAction)
+    robot.state = robot.PickerState.FINDING
 
     while not rospy.is_shutdown():
     #check if there is an action on the stack or an action already running
@@ -49,6 +51,7 @@ def main():
                 #if action completes succesfully pop it
                 if result == 0:
                     robot._actionsStack_.pop()
+                    robot.disableSideLaser = False
             except ActionInterruptException.ActionInterruptException as e:
                 print(e)
 
