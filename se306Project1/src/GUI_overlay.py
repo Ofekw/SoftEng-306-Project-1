@@ -847,5 +847,5 @@ def delete_files():
         if file.endswith(".sta"):
             print(str(file) + " Deleted" )
             os.remove(file)
-            
+
 atexit.register(delete_files())

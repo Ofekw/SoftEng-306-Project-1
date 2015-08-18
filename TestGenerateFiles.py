@@ -48,7 +48,7 @@ class TestGenerateFiles(unittest.TestCase):
         for i in os.listdir(path):
             if os.path.isfile(os.path.join(path, i)) and re.match('Picker\d.py',i):
                 number += 1
-        self.assertEqual(str(number), self.config.get('Picker.number').rstrip())
+        self.assertEqual(str(number), self.config.get('picker.number').rstrip())
 
     def test_CarrierRobotGenerated(self):
         number = 0
@@ -57,7 +57,7 @@ class TestGenerateFiles(unittest.TestCase):
         for i in os.listdir(path):
             if os.path.isfile(os.path.join(path, i)) and re.match('Carrier\d.py',i):
                 number += 1
-        self.assertEqual(str(number), self.config.get('Carrier.number').rstrip())
+        self.assertEqual(str(number), self.config.get('carrier.number').rstrip())
 
     def test_AnimalGenerated(self):
         number = 0
@@ -66,7 +66,7 @@ class TestGenerateFiles(unittest.TestCase):
         for i in os.listdir(path):
             if os.path.isfile(os.path.join(path, i)) and re.match('Animal\d.py',i):
                 number += 1
-        self.assertEqual(str(number), self.config.get('Animal.number').rstrip())
+        self.assertEqual(str(number), self.config.get('animal.number').rstrip())
 
     def test_VisitorGenerated(self):
         number = 0
@@ -75,7 +75,7 @@ class TestGenerateFiles(unittest.TestCase):
         for i in os.listdir(path):
             if os.path.isfile(os.path.join(path, i)) and re.match('Visitor\d.py',i):
                 number += 1
-        self.assertEqual(str(number), self.config.get('Visitor.number').rstrip())
+        self.assertEqual(str(number), self.config.get('visitor.number').rstrip())
 
     def tearDown(self):
         generateRobotFile.delete_files(self.list)

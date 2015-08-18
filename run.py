@@ -6,6 +6,7 @@ import sys
 import atexit
 import generateEntity
 import os
+from se306Project1.src import GUI_overlay
 
 def main(argv):
     testing = False
@@ -41,12 +42,11 @@ def main(argv):
         subprocess.check_output("rosmake se306Project1", shell=True)
         subprocess.Popen("bash -c 'roscore'", shell=True)
         subprocess.Popen("bash -c 'sleep 2 && rosrun stage_ros stageros world/myworld.world'", shell=True)
-        time.sleep(3)
+        time.sleep(5)
         #execute GUI script
-        gui = subprocess.call("./run_gui.sh")
+        process = subprocess.call("./run_gui.sh")
         while True:
             pass
-
 
 if __name__ == "__main__":
     main(sys.argv[1:])

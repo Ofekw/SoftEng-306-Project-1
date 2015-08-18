@@ -1,4 +1,5 @@
 #!/usr/bin/python
+import generateObstacles
 
 #read config file and save properties into hashmap
 config = {}
@@ -25,10 +26,11 @@ if rows > 10:
 elif rows < 1:
     rows = 1
 width_between_rows = WORLD_WIDTH/(rows)
-
+row_values = []
 #Always start from middle (0,0) and branch out if odd number else start from
 
 for x in range(-WORLD_WIDTH/2 + width_between_rows/2,WORLD_WIDTH/2 - width_between_rows/2 + 1, width_between_rows): #x co-cordinates step size
+    row_values.append(x)
     tree_column = []
     for y in range(-10, 50, 2):  #safe zone is at -12, so orchard will go from 46 to -12
         temp_left_tree = left_tree.replace('x',str(x-3))
@@ -43,3 +45,4 @@ myworld = open('world/myworld.world','a')
 
 myworld.write("".join(all_tree_string))
 myworld.close()
+generateObstacles.main(row_values)

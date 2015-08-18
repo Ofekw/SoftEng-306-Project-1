@@ -25,7 +25,7 @@ define animal position
   size [1.5 0.5 1.0]
   #origin [-0.25 -0.25 0 0 ]
 
-  mylaser(pose [ 0 0.000 0 0.000 ])
+  mylaser(pose [ 0 0.000 -0.750 0.000 ])
   velocity_bounds [-1000 1000 -1000 1000 -1000 1000 -90 90 ]
 
   # body
