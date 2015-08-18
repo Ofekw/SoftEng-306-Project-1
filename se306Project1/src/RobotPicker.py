@@ -43,10 +43,17 @@ class RobotPicker(Robot):
         self.kiwi_sub = rospy.Subscriber("carrier_kiwiTransfer", String, self.kiwi_callback)
         self.kiwi_pub = rospy.Publisher("picker_kiwiTransfer",String, queue_size=10)
 
+        self.picker_sub = rospy.Subscriber("pickerPosition", String, self.pickerCallback)
+        self.picker_robots = ["0,0,0","0,0,0","0,0,0","0,0,0","0,0,0","0,0,0"]
+
 
 
     def robot_specific_function(self):
         pass
+
+    def pickerCallback(self, message):
+        picker_index = int(message.data.split(',')[0])
+        self.picker_robots[picker_index] = message.data.split(',')[1] + "," + message.data.split(',')[2] + "," + message.data.split(',')[4]  # Should add element 3 here which is theta
 
     """
     @function
@@ -189,6 +196,20 @@ class RobotPicker(Robot):
                     self.noMoreTrees = 0
                     #stop the robot moving forward
                     self._stopCurrentAction_ = True
+                    #check other pickers to see if in row.
+                    for i in range(len(self.picker_robots)):
+                        data = self.picker_robots[i].split(",")
+                        #check if
+                        if self.px-0.5 <= float(data[0]) +i*10 <= self.px+0.5 and self.py-1 <= float(data[1] <= self.py+1):
+                            continue
+                        elif self.px-10 < float(data[0]) +i*10 < self.px+2 and self.py < float(data[1]) and float(data[0]) != 0:
+                            self.noMoreTrees = 0
+                            self.state = self.PickerState.FINDING
+                            self.disableSideLaser = True
+                            goToAction = self._actions_[5], [self.px+10, self.py]
+                            self._actionsStack_.append(goToAction)
+                            return
+
                     turnAction = self._actions_[2], [Entity.Direction.LEFT]
                     self._actionsStack_.append(turnAction)
                 elif rangeCount == 0:
