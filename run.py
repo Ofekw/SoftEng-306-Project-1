@@ -42,7 +42,6 @@ def main(argv):
         atexit.register(generateEntity.exit_process, list)
         process = subprocess.Popen(["python", "generateWorldFile.py"], shell=False)
         process.wait()
-        #subprocess.check_output("rosmake se306Project1", shell=True)
         processes.append(subprocess.Popen(["roscore"], shell=False))
         processes.append(subprocess.Popen(["rosrun", "stage_ros", "stageros", "world/myworld.world"], shell=False))
         time.sleep(5)
