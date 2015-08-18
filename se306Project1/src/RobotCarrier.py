@@ -15,7 +15,6 @@ import ActionInterruptException
 import globals
 from collections import deque
 
-
 """
 @class
 
@@ -117,11 +116,14 @@ class RobotCarrier(Robot):
         self.picker_robots[picker_index] = message.data.split(',')[1] + "," + message.data.split(',')[2] + "," + message.data.split(',')[4]  # Should add element 3 here which is theta
 
         if int(self.picker_robots[picker_index].split(',')[2]) == self.max_load:
-            if picker_index not in globals.picker_queue:
-                print("Added picker " + str(picker_index) + " to queue")
-                globals.picker_queue.append(picker_index)
-                print(globals.picker_queue)
-
+            globals.globals_lock.acquire()
+            try:
+                if picker_index not in globals.picker_queue:
+                    print("Added picker " + str(picker_index) + " to queue by " + str(self.robot_id))
+                    globals.picker_queue.append(picker_index)
+                    print(globals.picker_queue)
+            finally:
+                globals.globals_lock.release()
 
 
     """
@@ -135,11 +137,15 @@ class RobotCarrier(Robot):
             #message.data != str(self.robot_id) and
             self.current_load = self.max_load # possible add max load here
             # globals.targeted_pickers.remove(int(message.data))
-            globals.targeted_pickers.remove(globals.picker_queue.popleft())
-            if len(globals.picker_queue) > 0:
-                self.get_next_in_queue()
-            print("going to dropoff zone")
-            self.returnToOrigin()
+            globals.globals_lock.acquire()
+            try:
+                globals.targeted_pickers.remove(globals.picker_queue.popleft())
+                if len(globals.picker_queue) > 0:
+                    self.get_next_in_queue()
+                print("going to dropoff zone")
+                self.returnToOrigin()
+            finally:
+                globals.globals_lock.release()
 
     """
     @function
@@ -200,10 +206,15 @@ class RobotCarrier(Robot):
     Sets the next robot in the picker queue
     """
     def get_next_in_queue(self):
-        for pickerid in globals.picker_queue:
-            if(pickerid not in globals.targeted_pickers):
-                self.next_robot_id = pickerid
-                globals.targeted_pickers.append(pickerid)
+        globals.globals_lock.acquire()
+        try:
+            print(str(self) + " next")
+            for pickerid in globals.picker_queue:
+                if(pickerid not in globals.targeted_pickers):
+                    self.next_robot_id = pickerid
+                    globals.targeted_pickers.append(pickerid)
+        finally:
+            globals.globals_lock.release()
 
     """
     @function
@@ -220,9 +231,13 @@ class RobotCarrier(Robot):
             raise ActionInterruptException.ActionInterruptException("waitFor Stopped")
         else:
             if not(self.is_going_home):
-                if len(globals.picker_queue) > 0:
-                    self.get_next_in_queue()
-                    self.go_to_next_picker()
+                globals.globals_lock.acquire()
+                try:
+                    if len(globals.picker_queue) > 0:
+                        self.get_next_in_queue()
+                        self.go_to_next_picker()
+                finally:
+                    globals.globals_lock.release()
 
     """
     @function
