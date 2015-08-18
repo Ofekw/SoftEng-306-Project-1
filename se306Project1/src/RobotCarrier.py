@@ -131,10 +131,11 @@ class RobotCarrier(Robot):
     Displays info sent from a picker robot when transferring kiwis
     """
     def kiwi_callback(self, message):
-        if (message.data != str(self.robot_id)):
+        if (int(message.data) == self.next_robot_id):
+            #message.data != str(self.robot_id) and
             self.current_load = self.max_load # possible add max load here
             # globals.targeted_pickers.remove(int(message.data))
-            globals.picker_queue.popleft()
+            globals.targeted_pickers.remove(globals.picker_queue.popleft())
             if len(globals.picker_queue) > 0:
                 self.get_next_in_queue()
             print("going to dropoff zone")
@@ -199,7 +200,10 @@ class RobotCarrier(Robot):
     Sets the next robot in the picker queue
     """
     def get_next_in_queue(self):
-        self.next_robot_id = globals.picker_queue[0]
+        for pickerid in globals.picker_queue:
+            if(pickerid not in globals.targeted_pickers):
+                self.next_robot_id = pickerid
+                globals.targeted_pickers.append(pickerid)
 
     """
     @function
