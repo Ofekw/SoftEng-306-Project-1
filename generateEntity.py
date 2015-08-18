@@ -11,7 +11,7 @@ debug_text1 = "    debug = Debugger(robot)"
 debug_text2 = "    debug.start()"
 processes = []
 
-def main(argv):
+def main(argv, config):
     testing = False
     debugging = False
     try:
@@ -32,11 +32,6 @@ def main(argv):
     #Types of robots that the script reads the config file for
     robot_type = ["Picker", "Carrier", "Visitor", "Animal"]
     #Loads the fields in the config file
-    config = {}
-    with open("config.properties", "r") as f:
-        for line in f:
-            property = line.split('=')
-            config[property[0]] = property[1]
 
     #Creates or overwrites the myworld.world file
     myworld = open('world/myworld.world','w')

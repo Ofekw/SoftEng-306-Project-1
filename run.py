@@ -5,8 +5,7 @@ import getopt
 import sys
 import atexit
 import generateEntity
-import os
-from se306Project1.src import GUI_overlay
+import generateWorldFile
 
 processes = []
 
@@ -14,10 +13,11 @@ def main(argv):
     testing = False
     debugging = False
 
-    def cleanup():
-      os.system("ps aux | grep python | grep -v 'grep python' | awk '{print $2}' | xargs kill -9")
-
-    #atexit.register(cleanup)
+    config = {}
+    with open("config.properties", "r") as f:
+        for line in f:
+            property = line.split('=')
+            config[property[0]] = property[1]
     try:
         opts, args = getopt.getopt(argv,"dt")
     except getopt.GetoptError:
@@ -30,18 +30,16 @@ def main(argv):
         elif opt == "-d":
             debugging = True
     if testing == True:
-        list = generateEntity.main(['-t'])
-        process = subprocess.Popen(["python", "generateWorldFile.py"], shell=False)
-        process.wait()
+        list = generateEntity.main(['-t'], config)
+        generateWorldFile.main(config)
         return list
     else:
         if debugging == True:
             list = generateEntity.main(["-d"])
         else:
-            list = generateEntity.main([""])
+            list = generateEntity.main([""], config)
         atexit.register(generateEntity.exit_process, list)
-        process = subprocess.Popen(["python", "generateWorldFile.py"], shell=False)
-        process.wait()
+        generateWorldFile.main(config)
         processes.append(subprocess.Popen(["roscore"], shell=False))
         processes.append(subprocess.Popen(["rosrun", "stage_ros", "stageros", "world/myworld.world"], shell=False))
         time.sleep(5)

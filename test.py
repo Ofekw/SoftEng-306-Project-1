@@ -4,8 +4,14 @@ import time
 from os import listdir
 from os.path import isfile, join, devnull
 import time
+import generateWorldFile
 
+config = {}
 def main(argv):
+    with open("config.properties", "r") as f:
+        for line in f:
+            property = line.split('=')
+            config[property[0]] = property[1]
     global log
     processes = []
     mypath = 'se306Project1/test'
@@ -37,7 +43,7 @@ def test_build():
         print("SUCCESS build tests all passed")
 
 def start_services(processes):
-    processes.append(subprocess.Popen(['python', 'generateWorldFile.py'], shell=False))
+    generateWorldFile.main(config)
     processes.append(subprocess.Popen(['roscore'], shell=False))
 
 def setup(processes):

@@ -1,11 +1,12 @@
 #!/usr/bin/python
 import random
 
-def main(row_values):
+def main(row_values, config):
+    number = int(config.get('obstacle.number'))
     obstacle = open('world/templates/obstacle.template','r').read()
     myworld = open('world/myworld.world','a+')
     string = ""
-    for i in range(0, 10):
+    for i in range(0, number):
         rand = random.randint(0, 1)
         if rand == 1:
             temp = obstacle.replace("obstacle", "rock")
