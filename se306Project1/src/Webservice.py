@@ -35,6 +35,36 @@ def create_JSON_strings():
 
     JSON_string = JSON_string[:-1]
     JSON_string+="]}"
+
+    JSON_string+="{ Visitors [ {"
+    for file in os.listdir(directory):
+        if file.endswith("vis.sta"):
+            f=open(file)
+            lines=f.readlines()
+            JSON_string+="\"Name(ID):" +"\""+ lines[0] +"\","
+            JSON_string+="\"Type:" +"\""+ lines[1] +"\","
+            JSON_string+="\"Current_action:" +"\""+ lines[2] +"\","
+            JSON_string+="\"X_Position:" +"\""+ lines[3] +"\","
+            JSON_string+="\"Y_Position:" +"\""+ lines[4] +"\","
+            JSON_string+="\"Theta(Rads):" +"\""+ lines[5] +"\","
+
+    JSON_string = JSON_string[:-1]
+    JSON_string+="]}"
+
+    JSON_string+="{ Animals [ {"
+    for file in os.listdir(directory):
+        if file.endswith("ani.sta"):
+            f=open(file)
+            lines=f.readlines()
+            JSON_string+="\"Name(ID):" +"\""+ lines[0] +"\","
+            JSON_string+="\"Type:" +"\""+ lines[1] +"\","
+            JSON_string+="\"Current_action:" +"\""+ lines[2] +"\","
+            JSON_string+="\"X_Position:" +"\""+ lines[3] +"\","
+            JSON_string+="\"Y_Position:" +"\""+ lines[4] +"\","
+            JSON_string+="\"Theta(Rads):" +"\""+ lines[5] +"\","
+
+    JSON_string = JSON_string[:-1]
+    JSON_string+="]}"
     print(JSON_string)
 
 
