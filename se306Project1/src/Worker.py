@@ -41,12 +41,47 @@ class Worker(Human):
 
         self.robot_locations = {}
 
-        self.orchard_row_gaps = {}
+        self.orchard_row_gaps = []
 
         self.config = {}
 
+        #self.define_orchard_row_gaps()
+
         self.sub_to_picker_positions = rospy.Subscriber("pickerPosition", String, self.Robot_Locations_Callback)
         self.sub_to_carrier_positions = rospy.Subscriber("carrierPosition", String, self.Robot_Locations_Callback)
+
+    def StageOdom_callback(self, msg):
+        #Update the px and py values
+        self.update_position(msg.pose.pose.position.x, msg.pose.pose.position.y)
+
+        #Find the yaw from the quaternion values
+        (roll, pitch, yaw) = euler_from_quaternion((msg.pose.pose.orientation.x, msg.pose.pose.orientation.y, msg.pose.pose.orientation.z, msg.pose.pose.orientation.w))
+
+        #Update the theta value
+        self.update_theta(yaw)
+
+        fn = os.path.join(os.path.dirname(__file__), str(self.robot_id)+"wor.sta")
+        output_file = open(fn, "w")
+        output_file.write(str(self)+str(self.robot_id)+ "\n")
+        output_file.write("Worker\n")
+        output_file.write(self.worker_state + "\n")
+        output_file.write(str(round(self.px,2)) + "\n")
+        output_file.write(str(round(self.py,2)) + "\n")
+        output_file.write(str(round(self.theta,2)) + "\n")
+        output_file.close()
+
+        print(str(self.worker_state))
+
+    def StageLaser_callback(self, msg):
+        for i in range(60, 120):
+            if (msg.ranges[i] < 4 and self.disableLaser == False):
+                self._stopCurrentAction_ = True
+                move1 = self._actions_[0], [3]
+                turn2 = self._actions_[2], ["right"]
+                self._actionsStack_.append(move1)
+                self._actionsStack_.append(turn2)
+
+                return
 
 
     def Robot_Locations_Callback(self, message):
@@ -54,29 +89,39 @@ class Worker(Human):
         msg_values = msg.split(",")
 
         r_id = msg_values[0]
-        r_px = msg_values[1]
-        r_py = msg_values[2]
+        r_px = float(msg_values[1])
+        r_py = float(msg_values[2])
 
-        self.robot_locations[r_id] = [r_px, r_py]
+        r_coord = [r_px, r_py]
+
+        self.robot_locations[r_id] = r_coord
+
+        self.check_robot_locations()
+
+        #print(self.worker_state)
+
 
     def go_to_empty_orchard_row(self):
-        empty_orchard_row_x = None
+        self.worker_state = self.WorkerState.GOING_TO_EMPTY_ORCHARD
+        empty_orchard_row_x = self.px
 
         found_row = False
 
         for g in self.orchard_row_gaps:
             unpopulated = True
-            for r_coord in self.robot_locations:
+            for r_coord in self.robot_locations.itervalues():
                 if (g[0] - 6) <= r_coord[0] <= (g[1] + 6):
                     unpopulated = False
 
             if (unpopulated):
+                print "Unpopulated"
                 empty_orchard_row_x = g[0]
                 found_row = True
                 break
 
         if found_row == False:
-            self.go_to_empty_orchard_row()
+            ()
+            #return self.go_to_empty_orchard_row()
 
         goto_x_action = self.goto_xy(empty_orchard_row_x, self.py)
         goto_y_action = self.goto_yx(empty_orchard_row_x, -10)
@@ -86,7 +131,12 @@ class Worker(Human):
         self._actionsStack_.append(goto_y_action)
         self._actionsStack_.append(goto_x_action)
 
+
+        return 0
+
     def patrol_orchard(self):
+        self.worker_state = self.WorkerState.PATROLLING_ORCHARD
+
         while self._stopCurrentAction_ == False or self.worker_state != Worker.WorkerState.AVOIDING_ROBOT:
             self.goto_yx(self.px, 40)
             self.goto_yx(self.px, -10)
@@ -112,27 +162,54 @@ class Worker(Human):
 
         for x in range(-WORLD_WIDTH/2 + width_between_rows/2,WORLD_WIDTH/2 - width_between_rows/2 + 1, width_between_rows):
             x_left = x + 6
-            x_right = x + width_between_rows - 6
+            x_right = x + width_between_rows
 
-            self.orchard_row_gaps.append({x_left, x_right})
+            self.orchard_row_gaps.append([x_left, x_right])
 
     def avoid_robot(self, robot_py):
         if robot_py > self.py:
+            self._actionsStack_ = []
             self.goto_yx(self.px, -15)
         else:
+            self._actionsStack_ = []
             self.goto_yx(self.px, 52)
 
+        self._actionsStack_.append(self.go_to_empty_orchard_row())
+
     def check_robot_locations(self):
-        for r_coord in self.robot_locations:
+        for r_coord in self.robot_locations.itervalues():
             r_px = r_coord[0]
             r_py = r_coord[1]
 
-            if self.px - 3 <= r_px <= self.px + 5:
+            if self.px - 3 <= r_px <= self.px + 5 and self.worker_state == self.WorkerState.PATROLLING_ORCHARD:
                 if -10 <= r_py <= 48:
                     self.worker_state = Worker.WorkerState.AVOIDING_ROBOT
 
                     avoid_robot_action = self.avoid_robot(r_py)
 
                     self._actionsStack_.append(avoid_robot_action)
+
+                    return
+
+    def worker_specific_function(self):
+        if len(self._actionsStack_) == 0:
+            self._actionsStack_.append(self.go_to_empty_orchard_row())
+
+        #While there are actions on the stack and no action is currently running
+        while (len(self._actionsStack_) > 0 and not self._actionRunning_):
+
+            #get top action on stack
+            action = self._actionsStack_[-1]
+
+            try:
+                self._actionRunning_ = True
+
+                #run aciton with paremeter
+                result = action[0](*action[1])
+
+                self._actionsStack_.pop()
+                self._actionRunning_ = False
+            except ActionInterruptException.ActionInterruptException as e:
+                pass
 
 
