@@ -30,10 +30,11 @@ class RobotPicker(Robot):
                               FINDING="Finding Orchard", WAITINGFORCOLLECTION="Waiting for collection")
 
     def __init__(self,r_id,x_off,y_off,theta_off):
+        Robot.__init__(self,r_id,x_off,y_off,theta_off)
         self.picker_pub = rospy.Publisher("pickerPosition",String, queue_size=10)
 
-        self.max_load = 100
-        self.current_load = 0
+        # self.max_load = 100
+        # self.current_load = 0
         self.firstLaserReading = []
         self.timeLastAdded = time.clock()
 
@@ -42,7 +43,7 @@ class RobotPicker(Robot):
         self.kiwi_sub = rospy.Subscriber("carrier_kiwiTransfer", String, self.kiwi_callback)
         self.kiwi_pub = rospy.Publisher("picker_kiwiTransfer",String, queue_size=10)
 
-        Robot.__init__(self,r_id,x_off,y_off,theta_off)
+
 
     def robot_specific_function(self):
         pass

@@ -17,6 +17,8 @@ class Debugger:
                     print(str(action[0]) +" " + str(action[1]))
             elif self.user_input[0] == "stop":
                 print(self.robot._stopCurrentAction_)
+            elif self.user_input[0] == "unload":
+                self.robot.current_load = 0
         self._thread.exit()
 
     def start(self):

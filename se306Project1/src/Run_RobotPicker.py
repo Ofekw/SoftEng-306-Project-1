@@ -31,7 +31,7 @@ def main():
     #RobotNode_cmdvel = geometry_msgs.msg.Twist()
 
     moveAction = robot._actions_[0], [1000]
-    goToAction = robot._actions_[5], [robot.px, -13.5]
+    goToAction = robot._actions_[5], [robot.px, -13]
     turnAction = robot._actions_[2], [Entity.Direction.RIGHT]
 
     robot._actionsStack_.append(moveAction)
