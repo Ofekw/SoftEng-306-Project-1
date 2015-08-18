@@ -6,6 +6,8 @@ from Entity status files
 
 __author__ = 'harry'
 import os
+import ftplib
+
 
 
 """
@@ -80,7 +82,22 @@ def create_JSON_strings():
     print(JSON_string)
     return JSON_string
 
+
 #TODO WORKERS!
 
+def send_JSON_via_FTP(JSON_strings):
+    fn = os.path.join(os.path.dirname(__file__),"STATE_FILE.JSON")
+    output_file = open(fn, "w")
+    output_file.write(JSON_strings)
+    output_file.close()
+    session = ftplib.FTP('thinkscruffy.com','ros@thinkscruffy.com','network')
+    session.cwd("/public_html/ros/")
+    file = open("STATE_FILE.JSON", "rb")
+    session.storbinary('STOR STATE_FILE.JSON', file)     # send the file
+    file.close()                                    # close file and FTP
+    session.quit()
 
-create_JSON_strings()
+
+
+JSON_strings = create_JSON_strings()
+send_JSON_via_FTP(JSON_strings)
