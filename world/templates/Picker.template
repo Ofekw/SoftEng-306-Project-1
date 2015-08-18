@@ -28,7 +28,12 @@ def main():
     #RobotNode_cmdvel = geometry_msgs.msg.Twist()
 
     moveAction = robot._actions_[0], [1000]
+    goToAction = robot._actions_[5], [robot.px, -13.5]
+    turnAction = robot._actions_[2], [Entity.Direction.RIGHT]
+
     robot._actionsStack_.append(moveAction)
+    robot._actionsStack_.append(turnAction)
+    robot._actionsStack_.append(goToAction)
     robot.state = robot.PickerState.FINDING
 
     while not rospy.is_shutdown():
@@ -43,6 +48,7 @@ def main():
                 #if action completes succesfully pop it
                 if result == 0:
                     robot._actionsStack_.pop()
+                    robot.disableSideLaser = False
             except ActionInterruptException.ActionInterruptException as e:
                 print(e)
 
