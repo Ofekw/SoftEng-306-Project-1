@@ -8,13 +8,13 @@ $(document).ready(function(){
 
     window.setInterval(function(){
         loadAsyncData()
-    }, 5000);
+    }, 500);
 
     function loadAsyncData(){
-        console.log("test")
+        console.log("update:"+ new Date().getTime())
         table.ajax.url( '/ros/state_file.json' ).load();
     }
 
-
+    window.alert = function() {}; // dataTable throws crazy errors we need to throw
 
 });
