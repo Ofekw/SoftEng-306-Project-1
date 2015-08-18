@@ -12,6 +12,7 @@ import numpy.testing
 from Robot import Robot
 import os
 import ActionInterruptException
+import globals
 
 
 """
@@ -115,8 +116,12 @@ class RobotCarrier(Robot):
     """
     def pickerCallback(self, message):
         self.picker_robots[int(message.data.split(',')[0])] = message.data.split(',')[1] + "," + message.data.split(',')[2] + "," + message.data.split(',')[4]  # Should add element 3 here which is theta
-        #print("Picker array")
-        #print(', '.join(self.picker_robots))
+
+        for picker_index in range(len(self.picker_robots)):
+            if self.picker_robots[int(picker_index)].split(',')[2] == self.max_load:
+                if picker_index not in globals.picker_queue:
+                    globals.picker_queue.append(picker_index)
+
 
     """
     @function
@@ -128,8 +133,6 @@ class RobotCarrier(Robot):
         if (message.data != str(self.robot_id)):
             self.current_load = self.current_load + 100
             print("going to dropoff zone")
-            # self.nextRobotID = (self.nextRobotID + 1) % 3
-            # print("next robot is " + str(self.nextRobotID))
             self.returnToOrigin()
 
     """
@@ -188,21 +191,11 @@ class RobotCarrier(Robot):
     """
     @function
 
-    Gets the Closest robot to the carrier
-    Will need to change this method depending on how we want to implement multiple robots
-    Currently just goes to robot in array index 0
+    Gets the first full robot from the array, starting from the robot after the last robot
     """
-    def getClosest(self):
-        #print("Getting closest robot.....")
-        # for index, position in enumerate(self.picker_robots):
-        #     current = self.closestRobot
-        #     if (self.robot_id != index):
-        #         currentDist = self.get_distance(float(current.split(',')[0]), float(current.split(',')[1]))
-        #         newDist = self.get_distance(float(position.split(',')[0]), float(position.split(',')[1]))
-        #         if (newDist < currentDist):
-        #             self.closestRobot = position
-
-        #return robot ID 0
+    def get_next_in_queue(self):
+        self.nextRobotID = globals.picker_queue[0]
+        globals.picker_queue.pop(0)
         return self.nextRobotID
 
     """
@@ -220,8 +213,9 @@ class RobotCarrier(Robot):
             raise ActionInterruptException.ActionInterruptException("waitFor Stopped")
         else:
             if not(self.is_going_home):
-                self.getClosest()
-                if(int(self.picker_robots[self.closestRobotID].split(',')[2]) >= 100):
+                #needss to be foor loop
+                if(len(globals.picker_queue) > 0):
+                    self.get_next_in_queue()
                     self.goToClosest()
 
     """
