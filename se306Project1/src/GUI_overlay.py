@@ -837,15 +837,13 @@ class GUI_overlay(Tkinter.Tk):
         i=0
         self.after(200,self.update)
 
-if __name__ == '__main__':
-    gui = GUI_overlay()
-    gui.after(0,gui.update)
-    gui.mainloop()
-
 def delete_files():
     for file in os.listdir("./"):
         if file.endswith(".sta"):
             print(str(file) + " Deleted" )
-            os.remove(file)
+            os.remove("./" + file)
 
-atexit.register(delete_files())
+if __name__ == '__main__':
+    gui = GUI_overlay()
+    gui.after(0,gui.update)
+    gui.mainloop()
