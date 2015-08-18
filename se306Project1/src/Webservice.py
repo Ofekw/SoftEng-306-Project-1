@@ -1,6 +1,16 @@
+"""
+Webservice program that creates JSON Strings
+from Entity status files
+
+"""
+
 __author__ = 'harry'
 import os
 
+
+"""
+Creates JSON strings for each entity
+"""
 def create_JSON_strings():
     directory = "./"
     JSON_string = ""
@@ -67,25 +77,7 @@ def create_JSON_strings():
     JSON_string+="]}"
     print(JSON_string)
 
+#TODO WORKERS!
+
 
 create_JSON_strings()
-
-
-
-    #
-    # for file in os.listdir(directory):
-    #     if file.endswith("pic.sta"):
-    #         with open(file) as f:
-    #             for line in f:
-    #
-    #
-    # for file in os.listdir(directory):
-    #     if file.endswith("vis.sta"):
-    #         with open(file) as f:
-    #             for line in f:
-    #
-    # for file in os.listdir(directory):
-    #     if file.endswith("ani.sta"):
-    #         with open(file) as f:
-    #             for line in f:
-    #                 i+=1
