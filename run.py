@@ -10,22 +10,28 @@ import os
 def main(argv):
     testing = False
     debugging = False
+    webservice = False
+
 
     def cleanup():
       os.system("ps aux | grep python | grep -v 'grep python' | awk '{print $2}' | xargs kill -9")
 
     atexit.register(cleanup)
     try:
-        opts, args = getopt.getopt(argv,"dt")
+        opts, args = getopt.getopt(argv,"dtw")
     except getopt.GetoptError:
-        print 'test.py -d for debugger mode '
-        print 'test.py -t for debugger mode '
+        print 'run.py -d for debugger mode '
+        print 'run.py -t for testing mode '
+        print 'run.py -w for webservice mode '
         sys.exit(2)
     for opt, arg in opts:
         if opt == "-t":
             testing = True
         elif opt == "-d":
             debugging = True
+	elif opt == "-w":
+	  webservice = True
+	
     if testing == True:
         list = generateEntity.main(['-t'])
         process = subprocess.Popen("bash -c 'python generateWorldFile.py'", shell=True)
@@ -44,6 +50,8 @@ def main(argv):
         time.sleep(5)
         #execute GUI script
         gui = subprocess.call("./run_gui.sh")
+        if webservice == True:
+	  web = subprocess.call("./run_webservice.sh")
         while True:
             pass
 
