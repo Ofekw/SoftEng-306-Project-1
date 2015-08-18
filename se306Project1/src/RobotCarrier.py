@@ -51,9 +51,6 @@ class RobotCarrier(Robot):
 
         self.is_going_home = False
 
-
-
-
         #these variables are used to help the laser callback, it will help in dealing with entities/debris on
         # it's path to the picker robot
         #self.StageLaser_sub = rospy.Subscriber(self.robot_node_identifier+"/base_scan",sensor_msgs.msg.LaserScan,self.StageLaser_callback)
@@ -206,16 +203,15 @@ class RobotCarrier(Robot):
     Used to wait until a picker is ready for collection
     """
     def waitForPicker(self):
-        self.state = self.CarrierState.GOINGTOPICKER
+        self.state = self.CarrierState.WAITINGFORPICKER
         self.carrier_pub.publish(str(self.robot_id) + "," + str(self.px) + "," + str(self.py) + "," + str(self.theta))
         if self._stopCurrentAction_ == True:
             self._stopCurrentAction_ = False
             raise ActionInterruptException.ActionInterruptException("waitFor Stopped")
         else:
             if not(self.is_going_home):
-                #needss to be foor loop
-                if(len(globals.picker_queue) > 0):
-                    self.get_next_in_queue()
+                self.getClosest()
+                if(int(self.picker_robots[self.closestRobotID].split(',')[2]) >= self.max_load):
                     self.goToClosest()
 
     """
@@ -225,7 +221,7 @@ class RobotCarrier(Robot):
     Go to the full picker
     """
     def goToClosest(self):
-        self.state = self.CarrierState.WAITINGFORPICKER
+        self.state = self.CarrierState.GOINGTOPICKER
         action = self._actions_[5], [float(self.picker_robots[self.closestRobotID].split(',')[0]), float(self.picker_robots[self.closestRobotID].split(',')[1])-5.0]
         if action != self._actionsStack_[-1]:
             self._actionsStack_.append(action)
