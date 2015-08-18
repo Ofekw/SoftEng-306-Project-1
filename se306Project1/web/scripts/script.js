@@ -3,11 +3,18 @@ $(document).ready(function(){
     var data = [ ]
 
     var table = $('#table').DataTable({
-        ajax: '/ros/status.json'
+        ajax: '/ros/state_file.json'
     });
 
+    window.setInterval(function(){
+        loadAsyncData()
+    }, 5000);
 
-    table.ajax.url( '/ros/statusold.json' ).load();
+    function loadAsyncData(){
+        console.log("test")
+        table.ajax.url( '/ros/state_file.json' ).load();
+    }
+
 
 
 });
