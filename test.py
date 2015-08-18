@@ -1,12 +1,12 @@
 import subprocess
 import sys
-import os
-import atexit
+import time
 from os import listdir
 from os.path import isfile, join
 import time
 
 def main(argv):
+    global log
     processes = []
     mypath = 'se306Project1/test'
     test_files = []
@@ -15,11 +15,26 @@ def main(argv):
             if f.startswith('Test_'):
                 test_files.append(f)
 
+    #logging
+    log = open('test.log' ,'w+')
+
+    #build and generation test
+    test_build()
+
+    #start ros services
     start_services()
+
+    #generate entities
     setup(processes)
+
+    #run unit tests
     run_tests(processes, test_files)
 
-
+def test_build():
+    p = subprocess.Popen("bash -c 'python TestGenerateFiles.py'", shell=True, stdout=log, stderr=log)
+    p.wait()
+    if p.returncode == 0:
+        print("SUCCESS build tests all passed")
 
 def start_services():
     subprocess.check_output("rosmake se306Project1", shell=True)
@@ -29,20 +44,22 @@ def start_services():
 def setup(processes):
     processes.append(subprocess.Popen("bash -c 'sleep 2 && rosrun stage_ros stageros -g world/myworld.backup.world'", shell=True))
 
-    processes.append(subprocess.Popen("bash -c 'sleep 2 && rosrun se306Project1 Picker0_test.py'", shell=True))
-    # processes.append(subprocess.Popen("bash -c 'sleep 2 && rosrun se306Project1 Carrier0_test.py'", shell=True))
-    # processes.append(subprocess.Popen("bash -c 'sleep 2 && rosrun se306Project1 Animal0_test.py'", shell=True))
-    # processes.append(subprocess.Popen("bash -c 'sleep 2 && rosrun se306Project1 Visitor0_test.py'", shell=True))
-
 def cleanup(processes):
     for i in processes:
         i.kill()
     processes=[]
 
 def run_tests(processes, test_files):
-    time.sleep(5)
+    time.sleep(10)
+    spinner = spinning_cursor()
     for file in test_files:
-        p = subprocess.Popen("bash -c 'sleep 1 && rosrun se306Project1 "+file+"'", shell=True)
+        print("TESTING: " + file +'\n')
+        p = subprocess.Popen("bash -c 'sleep 1 && rosrun se306Project1 "+file+"'", shell=True,stdout=log, stderr=log)
+        for i in range(0,50):
+            sys.stdout.write(spinner.next())
+            sys.stdout.flush()
+            time.sleep(0.1)
+            sys.stdout.write('\b')
         p.wait()
         if p.returncode == 0:
             cleanup(processes)
@@ -50,6 +67,12 @@ def run_tests(processes, test_files):
             time.sleep(5)
 
     cleanup(processes)
+
+def spinning_cursor():
+    while True:
+        for cursor in '|/-\\':
+            yield cursor
+
 
 if __name__ == "__main__":
     main(sys.argv[1:])

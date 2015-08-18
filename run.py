@@ -12,9 +12,9 @@ def main(argv):
     debugging = False
 
     def cleanup():
-      os.system("ps aux | grep python | grep -v 'grep python' | awk '{print $2}' | xargs kill -9")
-
+        if not testing: os.system("ps aux | grep python | grep -v 'grep python' | awk '{print $2}' | xargs kill -9")
     atexit.register(cleanup)
+
     try:
         opts, args = getopt.getopt(argv,"dt")
     except getopt.GetoptError:
@@ -44,6 +44,7 @@ def main(argv):
         time.sleep(3)
         #execute GUI script
         gui = subprocess.call("./run_gui.sh")
+
         while True:
             pass
 

@@ -42,7 +42,7 @@ class Test_Robot_Setup(unittest.TestCase,TestModule):
         self.assertEqual(self.robot0.treeDetected, False, "Setting treeDetected")
         self.assertEqual(self.robot0.atOrchard, False, "Setting atOrchard")
         #Robot Picker Variables
-        self.assertEqual(self.robot0.max_load, 20, "Setting max_load")
+        self.assertEqual(self.robot0.max_load, 100, "Setting max_load")
         self.assertEqual(self.robot0.current_load, 0, "Setting current_load")
         self.assertEqual(self.robot0.firstLaserReading, [], "Setting firstLaserReading")
 
