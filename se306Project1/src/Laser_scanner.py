@@ -3,19 +3,20 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import os
+import string
 
 directory = "./"
 for file in os.listdir(directory):
-            if file.endswith("LASERSCAN.ls"):
+            if file.endswith("0laser.ls"):
                 f = open(file)
                 lines = f.read()
-                lines = lines[1:-1]
-                ranges_array = lines.split(",")
-                print(ranges_array[0])
-                ranges_array = [int(float(x)) for x in ranges_array]
+                lines = lines.translate(None, '\',[]')
+                floats = [float(x) for x in lines.split()]
+                print(len(floats))
+                print(floats)
 N = 180
 theta = np.linspace(0.0, np.pi, N, endpoint=False)
-radii =  ranges_array
+radii =  floats
 width = np.pi / 180
 
 ax = plt.subplot(111, polar=True)

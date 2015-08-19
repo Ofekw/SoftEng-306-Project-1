@@ -131,6 +131,16 @@ class RobotPicker(Robot):
     def StageLaser_callback(self, msg):
         barCount = 0
         found = False
+
+
+        #Write laser data for ranger
+        fn = os.path.join(os.path.dirname(__file__), str(self.robot_id)+"laser.ls")
+        output_file = open(fn, "w")
+        formatted_ranges = [ '%.2f' % elem for elem in msg.ranges ]
+        output_file.write(str(formatted_ranges))
+        output_file.close()
+
+
         if not self.disableLaser:
             for i in range(70, 110):
                 if msg.ranges[i]< 4.0:
