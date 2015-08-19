@@ -2,7 +2,8 @@ import unittest
 import re
 import os.path
 import run
-import generateRobotFile
+import generateEntity
+
 
 class TestGenerateFiles(unittest.TestCase):
     def setUp(self):
@@ -19,27 +20,27 @@ class TestGenerateFiles(unittest.TestCase):
     def test_worldContainsTemplate(self):
         world = open('world/myworld.world').read()
         worldTemplate = open('world/templates/myworld.template').read()
-        self.assertTrue(worldTemplate in world)
+        self.assertTrue(worldTemplate in world, "Testing worldfile exists")
 
     def test_worldContainsPicker(self):
         world = open('world/myworld.world').read()
-        self.assertTrue("picker( pose" in world)
+        self.assertTrue("picker( pose" in world, "Testing world file has picker")
 
     def test_worldContainsCarrier(self):
         world = open('world/myworld.world').read()
-        self.assertTrue("carrier( pose" in world)
+        self.assertTrue("carrier( pose" in world,"Testing world file has carrier")
 
     def test_worldContainsVistor(self):
         world = open('world/myworld.world').read()
-        self.assertTrue("visitor( pose" in world)
+        self.assertTrue("visitor( pose" in world,"Testing world file has visitor")
 
     def test_worldContainsRightTree(self):
         world = open('world/myworld.world').read()
-        self.assertTrue('name "treeRight"' in world)
+        self.assertTrue('name "treeRight"' in world, "Testing world file has right tree entity")
 
     def test_worldContainsLeftTree(self):
         world = open('world/myworld.world').read()
-        self.assertTrue('name "treeLeft"' in world)
+        self.assertTrue('name "treeLeft"' in world, "Testing world file has left tree enttity")
 
     def test_PickerRobotGenerated(self):
         number = 0
@@ -48,7 +49,7 @@ class TestGenerateFiles(unittest.TestCase):
         for i in os.listdir(path):
             if os.path.isfile(os.path.join(path, i)) and re.match('Picker\d.py',i):
                 number += 1
-        self.assertEqual(str(number), self.config.get('Picker.number').rstrip())
+        self.assertEqual(str(number), self.config.get('picker.number').rstrip(), "Testing picker files generated")
 
     def test_CarrierRobotGenerated(self):
         number = 0
@@ -57,7 +58,7 @@ class TestGenerateFiles(unittest.TestCase):
         for i in os.listdir(path):
             if os.path.isfile(os.path.join(path, i)) and re.match('Carrier\d.py',i):
                 number += 1
-        self.assertEqual(str(number), self.config.get('Carrier.number').rstrip())
+        self.assertEqual(str(number), self.config.get('carrier.number').rstrip(), "Testing carrier files generated")
 
     def test_AnimalGenerated(self):
         number = 0
@@ -66,7 +67,7 @@ class TestGenerateFiles(unittest.TestCase):
         for i in os.listdir(path):
             if os.path.isfile(os.path.join(path, i)) and re.match('Animal\d.py',i):
                 number += 1
-        self.assertEqual(str(number), self.config.get('Animal.number').rstrip())
+        self.assertEqual(str(number), self.config.get('animal.number').rstrip(), "Testing animal files generated")
 
     def test_VisitorGenerated(self):
         number = 0
@@ -75,10 +76,10 @@ class TestGenerateFiles(unittest.TestCase):
         for i in os.listdir(path):
             if os.path.isfile(os.path.join(path, i)) and re.match('Visitor\d.py',i):
                 number += 1
-        self.assertEqual(str(number), self.config.get('Visitor.number').rstrip())
+        self.assertEqual(str(number), self.config.get('visitor.number').rstrip(),"Testing visitor files generated")
 
     def tearDown(self):
-        generateRobotFile.delete_files(self.list)
+        generateEntity.exit_process(self.list)
 
 if __name__ == '__main__':
     unittest.main()
