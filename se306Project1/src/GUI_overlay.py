@@ -22,7 +22,9 @@ import time
 @author: Harry
 
 GUI overlay class which contains information about each working robot on the orchard, including name,
-type, position coordinates and also theta
+type, current action, current capacity (if applicable), position coordinates and also theta.
+
+It also displays the laser ranger for picker robots in a seperate tab
 
 """
 class GUI_overlay(Tkinter.Tk):
@@ -934,7 +936,11 @@ class GUI_overlay(Tkinter.Tk):
                     self.canvas4.get_tk_widget().pack(side=Tkinter.TOP, fill=Tkinter.BOTH, expand=1)
 
 
+    """
+    @function
 
+    Function called by thread to update laser information by reading in the data from the pickers
+    """
     def update_lasers(self):
         while True:
             directory = "./"
@@ -1016,7 +1022,12 @@ class GUI_overlay(Tkinter.Tk):
 
 
 
+    """
+    @function
 
+    Main GUI updater that grabs the Entity states and displays them every few milliseconds
+
+    """
     def update(self):
         i = 0
         for file in os.listdir(self.directory):
@@ -1041,6 +1052,7 @@ class GUI_overlay(Tkinter.Tk):
                         i+=1
         i=0
         self.after(100,self.update)
+
 
 def delete_files():
     for file in os.listdir("./"):
