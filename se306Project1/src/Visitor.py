@@ -168,7 +168,8 @@ class Visitor(Human):
                 #run aciton with paremeter
                 result = action[0](*action[1])
 
-                self._actionsStack_.pop()
+                del self._actionsStack_[self._actionsStack_.index(action)]
+
                 self._actionRunning_ = False
             except ActionInterruptException.ActionInterruptException as e:
                 ()
