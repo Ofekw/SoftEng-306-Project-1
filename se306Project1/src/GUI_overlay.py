@@ -1056,9 +1056,9 @@ class GUI_overlay(Tkinter.Tk):
 
 def delete_files():
     for file in os.listdir("./"):
-        if file.endswith(".sta"):
-            print(str(file) + " Deleted" )
+        if file.endswith(".sta") or file.endswith(".ls"):
             os.remove("./" + file)
+            print(str(file) + " Deleted" )
 
 if __name__ == '__main__':
     gui = GUI_overlay()
