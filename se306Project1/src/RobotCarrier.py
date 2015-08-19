@@ -12,6 +12,8 @@ import numpy.testing
 from Robot import Robot
 import os
 import ActionInterruptException
+import globals
+from collections import deque
 
 
 """
@@ -32,6 +34,7 @@ class RobotCarrier(Robot):
     def __init__(self,r_id,x_off,y_off,theta_off):
 
         Robot.__init__(self,r_id,x_off,y_off,theta_off)
+        globals.init()
 
         self.carrier_pub = rospy.Publisher("carrierPosition",String, queue_size=10)
         self.carrier_sub = rospy.Subscriber("carrierPosition", String, self.carrierCallback)
@@ -40,18 +43,14 @@ class RobotCarrier(Robot):
         self.kiwi_pub = rospy.Publisher("carrier_kiwiTransfer",String, queue_size=10)
 
 
-        self.closestRobotID = 0
-        self.nextRobotID = 0
+        self.next_robot_id = 0
         self.carrier_robots = ["0,0,0","0,0,0","0,0,0","0,0,0","0,0,0","0,0,0"]
         self.picker_robots = ["0,0,0","0,0,0","0,0,0","0,0,0","0,0,0","0,0,0"]
 
-        self.max_load = 100
-        self.current_load = 0
+        # self.max_load = 100
+        # self.current_load = 0
 
         self.is_going_home = False
-
-
-
 
         #these variables are used to help the laser callback, it will help in dealing with entities/debris on
         # it's path to the picker robot
@@ -114,9 +113,16 @@ class RobotCarrier(Robot):
     Sets the position of picker robots received from messages on the topic
     """
     def pickerCallback(self, message):
-        self.picker_robots[int(message.data.split(',')[0])] = message.data.split(',')[1] + "," + message.data.split(',')[2] + "," + message.data.split(',')[4]  # Should add element 3 here which is theta
-        #print("Picker array")
-        #print(', '.join(self.picker_robots))
+        picker_index = int(message.data.split(',')[0])
+        self.picker_robots[picker_index] = message.data.split(',')[1] + "," + message.data.split(',')[2] + "," + message.data.split(',')[4]  # Should add element 3 here which is theta
+
+        if int(self.picker_robots[picker_index].split(',')[2]) == self.max_load:
+            if picker_index not in globals.picker_queue:
+                print("Added picker " + str(picker_index) + " to queue")
+                globals.picker_queue.append(picker_index)
+                print(globals.picker_queue)
+
+
 
     """
     @function
@@ -125,11 +131,14 @@ class RobotCarrier(Robot):
     Displays info sent from a picker robot when transferring kiwis
     """
     def kiwi_callback(self, message):
-        if (message.data != str(self.robot_id)):
-            self.current_load = self.current_load + 100
+        if (int(message.data) == self.next_robot_id):
+            #message.data != str(self.robot_id) and
+            self.current_load = self.max_load # possible add max load here
+            # globals.targeted_pickers.remove(int(message.data))
+            globals.targeted_pickers.remove(globals.picker_queue.popleft())
+            if len(globals.picker_queue) > 0:
+                self.get_next_in_queue()
             print("going to dropoff zone")
-            # self.nextRobotID = (self.nextRobotID + 1) % 3
-            # print("next robot is " + str(self.nextRobotID))
             self.returnToOrigin()
 
     """
@@ -138,8 +147,8 @@ class RobotCarrier(Robot):
 
     Tells the picker robot to transfer kiwifruit
     """
-    def intiate_transfer(self):
-        self.kiwi_pub.publish(str(self.robot_id) + "," + str(self.nextRobotID))
+    def initiate_transfer(self):
+        self.kiwi_pub.publish(str(self.robot_id) + "," + str(self.next_robot_id))
         print("intitate transfer")
 
     """
@@ -188,22 +197,13 @@ class RobotCarrier(Robot):
     """
     @function
 
-    Gets the Closest robot to the carrier
-    Will need to change this method depending on how we want to implement multiple robots
-    Currently just goes to robot in array index 0
+    Sets the next robot in the picker queue
     """
-    def getClosest(self):
-        #print("Getting closest robot.....")
-        # for index, position in enumerate(self.picker_robots):
-        #     current = self.closestRobot
-        #     if (self.robot_id != index):
-        #         currentDist = self.get_distance(float(current.split(',')[0]), float(current.split(',')[1]))
-        #         newDist = self.get_distance(float(position.split(',')[0]), float(position.split(',')[1]))
-        #         if (newDist < currentDist):
-        #             self.closestRobot = position
-
-        #return robot ID 0
-        return self.nextRobotID
+    def get_next_in_queue(self):
+        for pickerid in globals.picker_queue:
+            if(pickerid not in globals.targeted_pickers):
+                self.next_robot_id = pickerid
+                globals.targeted_pickers.append(pickerid)
 
     """
     @function
@@ -213,16 +213,16 @@ class RobotCarrier(Robot):
     Used to wait until a picker is ready for collection
     """
     def waitForPicker(self):
-        self.state = self.CarrierState.GOINGTOPICKER
+        self.state = self.CarrierState.WAITINGFORPICKER
         self.carrier_pub.publish(str(self.robot_id) + "," + str(self.px) + "," + str(self.py) + "," + str(self.theta))
         if self._stopCurrentAction_ == True:
             self._stopCurrentAction_ = False
             raise ActionInterruptException.ActionInterruptException("waitFor Stopped")
         else:
             if not(self.is_going_home):
-                self.getClosest()
-                if(int(self.picker_robots[self.closestRobotID].split(',')[2]) >= 100):
-                    self.goToClosest()
+                if len(globals.picker_queue) > 0:
+                    self.get_next_in_queue()
+                    self.go_to_next_picker()
 
     """
     @function
@@ -230,9 +230,9 @@ class RobotCarrier(Robot):
 
     Go to the full picker
     """
-    def goToClosest(self):
-        self.state = self.CarrierState.WAITINGFORPICKER
-        action = self._actions_[5], [float(self.picker_robots[self.closestRobotID].split(',')[0]), float(self.picker_robots[self.closestRobotID].split(',')[1])-5.0]
+    def go_to_next_picker(self):
+        self.state = self.CarrierState.GOINGTOPICKER
+        action = self._actions_[5], [float(self.picker_robots[self.next_robot_id].split(',')[0]), float(self.picker_robots[self.next_robot_id].split(',')[1])-5.0]
         if action != self._actionsStack_[-1]:
             self._actionsStack_.append(action)
 
@@ -252,13 +252,13 @@ class RobotCarrier(Robot):
             self.is_going_home = True
 
         if (self.is_going_home):
-            xgoal = float(self.picker_robots[self.closestRobotID].split(',')[0])
-            ygoal = float(self.picker_robots[self.closestRobotID].split(',')[1])
+            xgoal = float(self.picker_robots[self.next_robot_id].split(',')[0])
+            ygoal = float(self.picker_robots[self.next_robot_id].split(',')[1])
             xabsolute = abs(xgoal - self.px)
             yabsolute = abs(ygoal - self.py)
-            if (xabsolute < 0.5 and yabsolute < 6):
-                if (int(self.picker_robots[self.closestRobotID].split(',')[2]) == 100):
-                    self.intiate_transfer()
+            if (xabsolute < 2 and yabsolute < 6):
+                if (int(self.picker_robots[self.next_robot_id].split(',')[2]) == self.max_load):
+                    self.initiate_transfer()
 
     """
     @function

@@ -12,6 +12,8 @@ processes = []
 def main(argv):
     testing = False
     debugging = False
+    webservice = False
+
 
     config = {}
     with open("config.properties", "r") as f:
@@ -19,16 +21,20 @@ def main(argv):
             property = line.split('=')
             config[property[0]] = property[1]
     try:
-        opts, args = getopt.getopt(argv,"dt")
+        opts, args = getopt.getopt(argv,"dtw")
     except getopt.GetoptError:
-        print 'test.py -d for debugger mode '
-        print 'test.py -t for debugger mode '
+        print 'run.py -d for debugger mode '
+        print 'run.py -t for testing mode '
+        print 'run.py -w for webservice mode '
         sys.exit(2)
     for opt, arg in opts:
         if opt == "-t":
             testing = True
         elif opt == "-d":
             debugging = True
+        elif opt == "-w":
+            webservice = True
+	
     if testing == True:
         list = generateEntity.main(['-t'], config)
         generateWorldFile.main(config)
@@ -47,6 +53,8 @@ def main(argv):
         #execute GUI script
         processes.append(subprocess.Popen(['python', 'GUI_overlay.py'], cwd=r'./se306Project1/src'))
         atexit.register(kill_GUI)
+        if webservice == True:
+            web = subprocess.call("./run_webservice.sh")
         while True:
             pass
 
