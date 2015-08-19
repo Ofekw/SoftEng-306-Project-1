@@ -6,10 +6,16 @@ import Tkinter
 import multiprocessing
 import os
 import atexit
-
-
+from matplotlib.figure import Figure
+from numpy import arange, sin, pi
 from Tkinter import *
 import ttk
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2TkAgg
+import numpy as np
+import matplotlib.pyplot as plt
+import os
+import string
+import time
 
 
 """
@@ -27,11 +33,12 @@ class GUI_overlay(Tkinter.Tk):
         self.directory = "./"
 
     def initialize(self):
-
         self.title('Mission Control: Fl0PPY D15K')
         geom = "500x850+603+196"
         self.geometry(geom)
         self.label_list = list()
+        self.f = Figure(figsize=(5,4), dpi=100)
+
 
         self._bgcolor = '#d9d9d9'  # X11 color: 'gray85'
         self._fgcolor = '#003399'  # X11 color: 'black'
@@ -53,11 +60,13 @@ class GUI_overlay(Tkinter.Tk):
         robot_tab = Frame(nb)
         human_tab = Frame(nb)
         animal_tab = Frame(nb)
+        self.laser_tab = Frame(nb)
 
         # create the tabs
         nb.add(robot_tab, text='Robot')
         nb.add(human_tab, text='Humans')
         nb.add(animal_tab, text='Animals')
+        nb.add(self.laser_tab, text='Laser-rangers')
 
         #BEGIN ROBOTS
 
@@ -68,6 +77,11 @@ class GUI_overlay(Tkinter.Tk):
 
         # BEGIN ANIMALS _______________________________________________________-
         self.animal_label_list = self.setup_animals(nb,animal_tab)
+
+        # BEGIN LASERS
+        self.setup_lasers()
+
+
 
 
     def setup_robots(self,nb,robot_tab):
@@ -811,6 +825,69 @@ class GUI_overlay(Tkinter.Tk):
 
         return animal_label_list
 
+    def setup_lasers(self):
+
+        LaserFrame1 = ttk.Labelframe(self.laser_tab)
+        LaserFrame1.place(relx=0.02, rely=0.03, relheight=0.5
+                 , relwidth=0.95)
+        LaserFrame1.configure(relief=RAISED)
+        LaserFrame1.configure(text='''Lasers''')
+        LaserFrame1.configure(relief=RAISED)
+        LaserFrame1.configure(width=390)
+
+        # f = Figure(figsize=(5,4), dpi=100)
+        # f = Figure(figsize=(5,4), dpi=100)
+        # a = f.add_subplot(111)
+        # t = arange(0.0,3.0,0.01)
+        # s = sin(2*pi*t)
+        # a.plot(t,s)
+        # canvas = FigureCanvasTkAgg(f, master=LaserFrame1)
+        # canvas.show()
+        # canvas.get_tk_widget().pack(side=Tkinter.TOP, fill=Tkinter.BOTH, expand=1)
+        directory = "./"
+        for file in os.listdir(directory):
+            if file.endswith("0laser.ls"):
+                f = open(file)
+                lines = f.read()
+                if (len(lines)==180):
+                    lines = lines.translate(None, '\',[]')
+                    floats = [float(x) for x in lines.split()]
+                    N = 180
+                    self.theta = np.linspace(0.0, np.pi, N, endpoint=False)
+                    radii =  floats
+                    self.width = np.pi / N
+                    self.f = Figure(figsize=(5,4), dpi=100)
+                    self.a = self.f.add_subplot(111, polar=True)
+                    self.bars = self.a.bar(self.theta, radii, color='g',width=self.width, bottom=0.0)
+                    # Use custom colors and opacity
+                    # for r, bar in zip(radii, self.bars):
+                    #     bar.set_facecolor(plt.cm.jet(r / 10.))
+                    #     bar.set_alpha(0.5)
+
+                    self.canvas = FigureCanvasTkAgg(self.f, master=LaserFrame1)
+                    self.canvas.show()
+                    self.canvas.get_tk_widget().pack(side=Tkinter.TOP, fill=Tkinter.BOTH, expand=1)
+
+
+    def update_lasers(self):
+        directory = "./"
+
+        while True:
+            time.sleep(0.5)
+            for file in os.listdir(directory):
+                if file.endswith("0laser.ls"):
+                    f = open(file)
+                    lines = f.read()
+                    if (len(lines)==180):
+                        lines = lines.translate(None, '\',[]')
+                        floats = [float(x) for x in lines.split()]
+                        r =  floats
+                        self.a.clear()
+                        self.bars = self.a.bar(self.theta, r, color='g',width=self.width, bottom=0.0)
+                        self.canvas.draw()
+
+
+
 
     def update(self):
         i = 0
@@ -835,7 +912,7 @@ class GUI_overlay(Tkinter.Tk):
                         self.animal_label_list[i].configure(text=str(line))
                         i+=1
         i=0
-        self.after(200,self.update)
+        self.after(100,self.update)
 
 def delete_files():
     for file in os.listdir("./"):
@@ -845,5 +922,7 @@ def delete_files():
 
 if __name__ == '__main__':
     gui = GUI_overlay()
+    t1 = threading.Thread(target=gui.update_lasers, args=[])
+    t1.start()
     gui.after(0,gui.update)
     gui.mainloop()
