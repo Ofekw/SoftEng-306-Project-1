@@ -34,7 +34,7 @@ class GUI_overlay(Tkinter.Tk):
 
     def initialize(self):
         self.title('Mission Control: Fl0PPY D15K')
-        geom = "500x850+603+196"
+        geom = "700x850+603+196"
         self.geometry(geom)
         self.label_list = list()
         self.f = Figure(figsize=(5,4), dpi=100)
@@ -828,12 +828,37 @@ class GUI_overlay(Tkinter.Tk):
     def setup_lasers(self):
 
         LaserFrame1 = ttk.Labelframe(self.laser_tab)
-        LaserFrame1.place(relx=0.02, rely=0.03, relheight=0.5
-                 , relwidth=0.95)
+        LaserFrame1.place(relx=0.02, rely=0.03, relheight=0.46
+                 , relwidth=0.46)
         LaserFrame1.configure(relief=RAISED)
         LaserFrame1.configure(text='''Lasers''')
         LaserFrame1.configure(relief=RAISED)
         LaserFrame1.configure(width=390)
+
+        LaserFrame2 = ttk.Labelframe(self.laser_tab)
+        LaserFrame2.place(relx=0.52, rely=0.03, relheight=0.46
+                 , relwidth=0.46)
+        LaserFrame2.configure(relief=RAISED)
+        LaserFrame2.configure(text='''Lasers''')
+        LaserFrame2.configure(relief=RAISED)
+        LaserFrame2.configure(width=390)
+
+        LaserFrame3 = ttk.Labelframe(self.laser_tab)
+        LaserFrame3.place(relx=0.02, rely=0.51, relheight=0.46
+                 , relwidth=0.46)
+        LaserFrame3.configure(relief=RAISED)
+        LaserFrame3.configure(text='''Lasers''')
+        LaserFrame3.configure(relief=RAISED)
+        LaserFrame3.configure(width=390)
+
+        LaserFrame4 = ttk.Labelframe(self.laser_tab)
+        LaserFrame4.place(relx=0.52, rely=0.51, relheight=0.46
+                 , relwidth=0.46)
+        LaserFrame4.configure(relief=RAISED)
+        LaserFrame4.configure(text='''Lasers''')
+        LaserFrame4.configure(relief=RAISED)
+        LaserFrame4.configure(width=390)
+
 
         directory = "./"
         for file in os.listdir(directory):
@@ -845,17 +870,12 @@ class GUI_overlay(Tkinter.Tk):
                 N = 180
                 self.theta = np.linspace(0.0, np.pi, N, endpoint=False)
                 radii =  floats
-                self.width = np.pi / N
+                self.width = np.pi / 180
                 self.f = Figure(figsize=(5,4), dpi=100)
                 self.a = self.f.add_subplot(111, polar=True)
                 if (len(radii)==180):
-                    self.bars = self.a.bar(self.theta, radii, color='g',width=self.width, bottom=0.0)
-                    # Use custom colors and opacity
-                    # for r, bar in zip(radii, self.bars):
-                    #     bar.set_facecolor(plt.cm.jet(r / 10.))
-                    #     bar.set_alpha(0.5)
-
-                    self.canvas = FigureCanvasTkAgg(self.f, master=LaserFrame1)
+                    self.bars = self.a.bar(self.theta, radii, color='g',width=self.width, bottom=0.0,edgecolor='none' )
+                    self.canvas = FigureCanvasTkAgg(self.f, master=LaserFrame2)
                     self.canvas.show()
                     self.canvas.get_tk_widget().pack(side=Tkinter.TOP, fill=Tkinter.BOTH, expand=1)
 
