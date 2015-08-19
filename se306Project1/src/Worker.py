@@ -12,6 +12,7 @@ import numpy.testing
 from Human import Human
 import ActionInterruptException
 import os
+import time
 
 """
 @class
@@ -31,7 +32,8 @@ class Worker(Human):
 
     WorkerState = enum(PATROLLING_ORCHARD="Moving up and down row",
                         GOING_TO_EMPTY_ORCHARD="Navigating to empty orchard",
-                        AVOIDING_ROBOT="Detected robot, leaivng row")
+                        AVOIDING_ROBOT="Detected robot, leaving row",
+                       WAITING_FOR_EMPTY_ROW="Waiting for row to become empty")
 
 
     def __init__(self, r_id, x_off, y_off, theta_offset):
@@ -41,7 +43,7 @@ class Worker(Human):
 
         self.robot_locations = {}
 
-        self.orchard_row_gaps = []
+        self.orchard_row_gaps = [[-22, 0], [6, 22]]
 
         self.config = {}
 
@@ -49,6 +51,17 @@ class Worker(Human):
 
         self.sub_to_picker_positions = rospy.Subscriber("pickerPosition", String, self.Robot_Locations_Callback)
         self.sub_to_carrier_positions = rospy.Subscriber("carrierPosition", String, self.Robot_Locations_Callback)
+
+        self._actions_ = {
+            0: self.move_forward,
+            1: self.goto_yx,
+            2: self.goto_xy,
+            3: self.turn,
+            4: self.stop,
+            5: self.go_to_empty_orchard_row,
+            6: self.patrol_orchard,
+            7: self.avoid_robot
+        }
 
     def StageOdom_callback(self, msg):
         #Update the px and py values
@@ -70,9 +83,10 @@ class Worker(Human):
         output_file.write(str(round(self.theta,2)) + "\n")
         output_file.close()
 
-        print(str(self.worker_state))
+        #print(str(self.worker_state) + ", " + self.state)
 
     def StageLaser_callback(self, msg):
+
         for i in range(60, 120):
             if (msg.ranges[i] < 4 and self.disableLaser == False):
                 self._stopCurrentAction_ = True
@@ -82,7 +96,6 @@ class Worker(Human):
                 self._actionsStack_.append(turn2)
 
                 return
-
 
     def Robot_Locations_Callback(self, message):
         msg = message.data
@@ -98,9 +111,6 @@ class Worker(Human):
 
         self.check_robot_locations()
 
-        #print(self.worker_state)
-
-
     def go_to_empty_orchard_row(self):
         self.worker_state = self.WorkerState.GOING_TO_EMPTY_ORCHARD
         empty_orchard_row_x = self.px
@@ -113,33 +123,45 @@ class Worker(Human):
                 if (g[0] - 6) <= r_coord[0] <= (g[1] + 6):
                     unpopulated = False
 
-            if (unpopulated):
+            if unpopulated:
                 print "Unpopulated"
                 empty_orchard_row_x = g[0]
                 found_row = True
                 break
 
         if found_row == False:
-            ()
-            #return self.go_to_empty_orchard_row()
+            #If empty row not found, then wait 10 seconds then try again
+            self.worker_state = self.WorkerState.WAITING_FOR_EMPTY_ROW
+            time.sleep(10)
+            return self.go_to_empty_orchard_row
 
-        goto_x_action = self.goto_xy(empty_orchard_row_x, self.py)
-        goto_y_action = self.goto_yx(empty_orchard_row_x, -10)
-        patrol_action = self.patrol_orchard()
+        goto_x_action = self._actions_[1], [empty_orchard_row_x, self.py]
+        goto_y_action = self._actions_[1], [empty_orchard_row_x, -10]
+        patrol_action = self._actions_[6], []
+
+        # goto_x_action = self.goto_yx(empty_orchard_row_x, self.py)
+        # goto_y_action = self.goto_yx(empty_orchard_row_x, -10)
+        # patrol_action = self.patrol_orchard()
 
         self._actionsStack_.append(patrol_action)
         self._actionsStack_.append(goto_y_action)
         self._actionsStack_.append(goto_x_action)
-
 
         return 0
 
     def patrol_orchard(self):
         self.worker_state = self.WorkerState.PATROLLING_ORCHARD
 
-        while self._stopCurrentAction_ == False or self.worker_state != Worker.WorkerState.AVOIDING_ROBOT:
-            self.goto_yx(self.px, 40)
-            self.goto_yx(self.px, -10)
+        go_north = self._actions_[1], [self.px, 40]
+        go_south = self._actions_[1], [self.px, -10]
+
+        # go_north = self.goto_yx(self.px, 40)
+        # go_south = self.goto_yx(self.px, -10)
+
+        self._actionsStack_.append(go_south)
+        self._actionsStack_.append(go_north)
+
+        return 0
 
     def define_orchard_row_gaps(self):
         path_to_config = os.path.abspath(os.path.abspath(os.pardir)) + "/config.properties"
@@ -166,15 +188,21 @@ class Worker(Human):
 
             self.orchard_row_gaps.append([x_left, x_right])
 
-    def avoid_robot(self, robot_py):
-        if robot_py > self.py:
-            self._actionsStack_ = []
-            self.goto_yx(self.px, -15)
-        else:
-            self._actionsStack_ = []
-            self.goto_yx(self.px, 52)
+    def avoid_robot(self):
+        self.worker_state = Worker.WorkerState.AVOIDING_ROBOT
 
-        self._actionsStack_.append(self.go_to_empty_orchard_row())
+        go_south = self._actions_[1], [self.px, -20]
+        go_east = self._actions_[1], [30, -20]
+
+        go_south = self.goto_yx(self.px, -20)
+        go_east = self.goto_yx(30, -20)
+
+        self._actionsStack_.append(go_east)
+        self._actionsStack_.append(go_south)
+
+        self._stopCurrentAction_ = False
+
+        return 0
 
     def check_robot_locations(self):
         for r_coord in self.robot_locations.itervalues():
@@ -183,17 +211,19 @@ class Worker(Human):
 
             if self.px - 3 <= r_px <= self.px + 5 and self.worker_state == self.WorkerState.PATROLLING_ORCHARD:
                 if -10 <= r_py <= 48:
-                    self.worker_state = Worker.WorkerState.AVOIDING_ROBOT
+                    self._stopCurrentAction_ = True
 
-                    avoid_robot_action = self.avoid_robot(r_py)
+                    avoid_action = self._actions_[7], []
 
-                    self._actionsStack_.append(avoid_robot_action)
+                    self._actionsStack_.append(avoid_action)
 
                     return
 
     def worker_specific_function(self):
+
         if len(self._actionsStack_) == 0:
-            self._actionsStack_.append(self.go_to_empty_orchard_row())
+            init_action = self._actions_[5], []
+            self._actionsStack_.append(init_action)
 
         #While there are actions on the stack and no action is currently running
         while (len(self._actionsStack_) > 0 and not self._actionRunning_):
@@ -201,15 +231,30 @@ class Worker(Human):
             #get top action on stack
             action = self._actionsStack_[-1]
 
+            if (action == 0):
+                #Clear action stack and then break out of loop
+                del self._actionsStack_[:]
+                break
+
             try:
                 self._actionRunning_ = True
+
+                print("running " + str(action))
 
                 #run aciton with paremeter
                 result = action[0](*action[1])
 
-                self._actionsStack_.pop()
+                print("popping " + str(self._actionsStack_[self._actionsStack_.index(action)]))
+
+                del self._actionsStack_[self._actionsStack_.index(action)]
+
                 self._actionRunning_ = False
+
+                if len(self._actionsStack_) == 0 and self.worker_state == self.WorkerState.PATROLLING_ORCHARD:
+                    patrol_action = self._actions_[6], []
+                    self._actionsStack_.append(patrol_action)
+
             except ActionInterruptException.ActionInterruptException as e:
-                pass
+                print(str(e))
 
 

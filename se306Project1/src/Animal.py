@@ -146,9 +146,12 @@ class Animal(Entity):
         if (self.dict_of_visitors.__len__() > 0):
             self.animal_state = self.AnimalState.GOING_TO_VISITOR
 
-            visitor_coord = self.dict_of_visitors["5"]
-            visitor_x = visitor_coord[0]
-            visitor_y = visitor_coord[1]
+            visitor_x = self.dict_of_visitors.values()[0][0]
+            visitor_y = self.dict_of_visitors.values()[0][1]
+
+            # visitor_coord = self.dict_of_visitors["5"]
+            # visitor_x = visitor_coord[0]
+            # visitor_y = visitor_coord[1]
 
             print("Going to visitor " + str(visitor_x) + " " + str(visitor_y))
 
@@ -158,7 +161,7 @@ class Animal(Entity):
 
         random_action_int = random.randint(0, 10)
 
-        if (random_action_int < 3):
+        if (random_action_int < 5):
             for i in range(0, 10):
                 action_init = self.go_to_visitor, []
                 self._actionsStack_.append(action_init)
