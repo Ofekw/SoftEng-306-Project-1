@@ -42,7 +42,7 @@ class RobotCarrier(Robot):
         self.kiwi_pub = rospy.Publisher("carrier_kiwiTransfer",String, queue_size=10)
 
 
-        self.next_robot_id = 0
+        self.next_robot_id = None
         self.carrier_robots = ["0,0,0","0,0,0","0,0,0","0,0,0","0,0,0","0,0,0"]
         self.picker_robots = ["0,0,0","0,0,0","0,0,0","0,0,0","0,0,0","0,0,0"]
 
@@ -119,9 +119,10 @@ class RobotCarrier(Robot):
             globals.globals_lock.acquire()
             try:
                 if picker_index not in globals.picker_queue:
-                    print("Added picker " + str(picker_index) + " to queue by " + str(self.robot_id))
-                    globals.picker_queue.append(picker_index)
-                    print(globals.picker_queue)
+                    if picker_index not in globals.targeted_pickers:
+                        print("Added picker " + str(picker_index) + " to queue by " + str(self.robot_id))
+                        globals.picker_queue.append(picker_index)
+                        self.printLists()
             finally:
                 globals.globals_lock.release()
 
@@ -139,7 +140,8 @@ class RobotCarrier(Robot):
             # globals.targeted_pickers.remove(int(message.data))
             globals.globals_lock.acquire()
             try:
-                globals.targeted_pickers.remove(globals.picker_queue.popleft())
+                globals.targeted_pickers.remove(self.next_robot_id)
+                self.printLists()
                 if len(globals.picker_queue) > 0:
                     self.get_next_in_queue()
                 print("going to dropoff zone")
@@ -211,8 +213,12 @@ class RobotCarrier(Robot):
             print(str(self) + " next")
             for pickerid in globals.picker_queue:
                 if(pickerid not in globals.targeted_pickers):
+                    self.printLists()
                     self.next_robot_id = pickerid
                     globals.targeted_pickers.append(pickerid)
+                    globals.picker_queue.popleft()
+                    self.printLists()
+                    return
         finally:
             globals.globals_lock.release()
 
@@ -234,7 +240,9 @@ class RobotCarrier(Robot):
                 globals.globals_lock.acquire()
                 try:
                     if len(globals.picker_queue) > 0:
-                        self.get_next_in_queue()
+                        self.printLists()
+                        if(self.next_robot_id == None):
+                            self.get_next_in_queue()
                         self.go_to_next_picker()
                 finally:
                     globals.globals_lock.release()
@@ -287,3 +295,7 @@ class RobotCarrier(Robot):
         self.is_going_home = True;
         self._stopCurrentAction_ = False
         self._actionsStack_.append(action)
+
+    def printLists(self):
+        print("picker queue is " + str(globals.picker_queue))
+        print("targeted queue is " + str(globals.targeted_pickers))
