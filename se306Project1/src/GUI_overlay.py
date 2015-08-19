@@ -835,15 +835,6 @@ class GUI_overlay(Tkinter.Tk):
         LaserFrame1.configure(relief=RAISED)
         LaserFrame1.configure(width=390)
 
-        # f = Figure(figsize=(5,4), dpi=100)
-        # f = Figure(figsize=(5,4), dpi=100)
-        # a = f.add_subplot(111)
-        # t = arange(0.0,3.0,0.01)
-        # s = sin(2*pi*t)
-        # a.plot(t,s)
-        # canvas = FigureCanvasTkAgg(f, master=LaserFrame1)
-        # canvas.show()
-        # canvas.get_tk_widget().pack(side=Tkinter.TOP, fill=Tkinter.BOTH, expand=1)
         directory = "./"
         for file in os.listdir(directory):
             if file.endswith("0laser.ls"):
