@@ -53,7 +53,6 @@ class Webservice():
         JSON_string = JSON_string[:-1]
         JSON_string+="]}"
         JSON_string = "{\"sEcho\": 1,\"iTotalRecords\": " + str(count)+","+"\"iTotalDisplayRecords\": 50,\"" + JSON_string
-        print(JSON_string)
         return JSON_string
 
 
@@ -73,7 +72,6 @@ class Webservice():
 
 
     def updater(self):
-        print("UPDATER")
         JSON_strings = self.create_JSON_strings()
         self.send_JSON_via_FTP(JSON_strings)
 
