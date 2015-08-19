@@ -849,15 +849,15 @@ class GUI_overlay(Tkinter.Tk):
             if file.endswith("0laser.ls"):
                 f = open(file)
                 lines = f.read()
-                if (len(lines)==180):
-                    lines = lines.translate(None, '\',[]')
-                    floats = [float(x) for x in lines.split()]
-                    N = 180
-                    self.theta = np.linspace(0.0, np.pi, N, endpoint=False)
-                    radii =  floats
-                    self.width = np.pi / N
-                    self.f = Figure(figsize=(5,4), dpi=100)
-                    self.a = self.f.add_subplot(111, polar=True)
+                lines = lines.translate(None, '\',[]')
+                floats = [float(x) for x in lines.split()]
+                N = 180
+                self.theta = np.linspace(0.0, np.pi, N, endpoint=False)
+                radii =  floats
+                self.width = np.pi / N
+                self.f = Figure(figsize=(5,4), dpi=100)
+                self.a = self.f.add_subplot(111, polar=True)
+                if (len(radii)==180):
                     self.bars = self.a.bar(self.theta, radii, color='g',width=self.width, bottom=0.0)
                     # Use custom colors and opacity
                     # for r, bar in zip(radii, self.bars):
@@ -870,20 +870,18 @@ class GUI_overlay(Tkinter.Tk):
 
 
     def update_lasers(self):
-        directory = "./"
-
         while True:
-            time.sleep(0.5)
+            directory = "./"
             for file in os.listdir(directory):
                 if file.endswith("0laser.ls"):
                     f = open(file)
                     lines = f.read()
-                    if (len(lines)==180):
-                        lines = lines.translate(None, '\',[]')
-                        floats = [float(x) for x in lines.split()]
-                        r =  floats
-                        self.a.clear()
-                        self.bars = self.a.bar(self.theta, r, color='g',width=self.width, bottom=0.0)
+                    lines = lines.translate(None, '\',[]')
+                    floats = [float(x) for x in lines.split()]
+                    r =  floats
+                    if (len(r)==180):
+                        for bar, radius in zip(self.bars, r):
+                            bar.set_height(radius)
                         self.canvas.draw()
 
 
