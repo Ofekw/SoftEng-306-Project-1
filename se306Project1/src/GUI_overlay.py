@@ -1038,7 +1038,7 @@ class GUI_overlay(Tkinter.Tk):
                         i+=1
         i=0
         for file in os.listdir(self.directory):
-            if file.endswith("vis.sta"):
+            if file.endswith("vis.sta") or file.endswith("wor.sta"):
                 with open(file) as f:
                     for line in f:
                         self.human_label_list[i].configure(text=str(line))

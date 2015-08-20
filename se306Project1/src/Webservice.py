@@ -34,7 +34,7 @@ class Webservice():
 
 
         for file in os.listdir(directory):
-            if file.endswith("vis.sta") or file.endswith("ani.sta"):
+            if file.endswith("vis.sta") or file.endswith("wor.sta") or file.endswith("ani.sta"):
                 count+=1
                 f=open(file)
                 lines=f.readlines()
@@ -52,10 +52,6 @@ class Webservice():
         JSON_string+="]}"
         JSON_string = "{\"sEcho\": 1,\"iTotalRecords\": " + str(count)+","+"\"iTotalDisplayRecords\": 50,\"" + JSON_string
         return JSON_string
-
-
-    #TODO WORKERS!
-    #TODO fix really ugly JSON parsing
 
     def send_JSON_via_FTP(self,JSON_strings):
         fn = os.path.join(os.path.dirname(__file__),"state_file.json")
