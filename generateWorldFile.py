@@ -4,15 +4,9 @@ import sys
 
 def main(config):
     #read config file and save properties into hashmap
-    config = {}
     left_tree = open('world/templates/leftTree.template').read()
     right_tree = open('world/templates/rightTree.template').read()
     world_template = open('world/templates/myworld.template').read()
-    with open("config.properties", "r") as f:
-        for line in f:
-            property = line.split('=')
-            config[property[0]] = property[1]
-
     #get number of orchard rows
     rows = int(config.get('orchard.number'))
 
@@ -34,9 +28,9 @@ def main(config):
     for x in range(-WORLD_WIDTH/2 + width_between_rows/2,WORLD_WIDTH/2 - width_between_rows/2 + 1, width_between_rows): #x co-cordinates step size
         row_values.append(x)
         tree_column = []
-        for y in range(-10, 50, 2):  #safe zone is at -12, so orchard will go from 46 to -12
+        for y in range(-10, 40, 2):  #safe zone is at -12, so orchard will go from 46 to -12
             temp_left_tree = left_tree.replace('x',str(x-3))
-            temp_left_tree = temp_left_tree.replace('y',str(y-2))
+            temp_left_tree = temp_left_tree.replace('y',str(y-1))
             temp_right_tree = right_tree.replace('x',str(x+3))
             temp_right_tree = temp_right_tree.replace('y',str(y+2))
             tree_column.append(temp_left_tree)
