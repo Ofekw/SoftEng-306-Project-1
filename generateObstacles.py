@@ -8,15 +8,11 @@ def main(row_values, config):
     string = ""
     x_values = []
     for i in row_values:
-        x_values.append(i-5)
-        x_values.append(i+5)
+        x_values.append(i-4.5)
+        x_values.append(i+4.5)
     obstacle_coordinates = []
     for i in range(0, number):
-        rand = random.randint(0, 1)
-        if rand == 1:
-            temp = obstacle.replace("obstacle", "rock")
-        else:
-            temp = obstacle.replace("obstacle", "weed")
+        temp = obstacle.replace("obstacle", "rock")
 
         obstacle_tooNear = True
         while obstacle_tooNear:
@@ -35,5 +31,3 @@ def main(row_values, config):
 
     myworld.write(string)
     myworld.close()
-
-
