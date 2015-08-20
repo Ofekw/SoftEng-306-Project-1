@@ -101,3 +101,5 @@ se306Project1/build/
 *.ipr
 *.iws
 
+*.log
+

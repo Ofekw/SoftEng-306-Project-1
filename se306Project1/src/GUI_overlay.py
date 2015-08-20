@@ -6,17 +6,25 @@ import Tkinter
 import multiprocessing
 import os
 import atexit
-
-
+from matplotlib.figure import Figure
+from numpy import arange, sin, pi
 from Tkinter import *
 import ttk
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2TkAgg
+import numpy as np
+import matplotlib.pyplot as plt
+import os
+import string
+import time
 
 
 """
 @author: Harry
 
 GUI overlay class which contains information about each working robot on the orchard, including name,
-type, position coordinates and also theta
+type, current action, current capacity (if applicable), position coordinates and also theta.
+
+It also displays the laser ranger for picker robots in a seperate tab
 
 """
 class GUI_overlay(Tkinter.Tk):
@@ -27,11 +35,12 @@ class GUI_overlay(Tkinter.Tk):
         self.directory = "./"
 
     def initialize(self):
-
         self.title('Mission Control: Fl0PPY D15K')
-        geom = "500x850+603+196"
+        geom = "700x850+603+196"
         self.geometry(geom)
         self.label_list = list()
+        self.f = Figure(figsize=(5,4), dpi=100)
+
 
         self._bgcolor = '#d9d9d9'  # X11 color: 'gray85'
         self._fgcolor = '#003399'  # X11 color: 'black'
@@ -53,11 +62,13 @@ class GUI_overlay(Tkinter.Tk):
         robot_tab = Frame(nb)
         human_tab = Frame(nb)
         animal_tab = Frame(nb)
+        self.laser_tab = Frame(nb)
 
         # create the tabs
         nb.add(robot_tab, text='Robot')
         nb.add(human_tab, text='Humans')
         nb.add(animal_tab, text='Animals')
+        nb.add(self.laser_tab, text='Laser-rangers')
 
         #BEGIN ROBOTS
 
@@ -68,6 +79,11 @@ class GUI_overlay(Tkinter.Tk):
 
         # BEGIN ANIMALS _______________________________________________________-
         self.animal_label_list = self.setup_animals(nb,animal_tab)
+
+        # BEGIN LASERS
+        self.setup_lasers()
+
+
 
 
     def setup_robots(self,nb,robot_tab):
@@ -811,7 +827,207 @@ class GUI_overlay(Tkinter.Tk):
 
         return animal_label_list
 
+    #Setup those laser rangers
+    def setup_lasers(self):
 
+        self.LaserFrame1 = ttk.Labelframe(self.laser_tab)
+        self.LaserFrame1.place(relx=0.02, rely=0.03, relheight=0.46
+                 , relwidth=0.46)
+        self.LaserFrame1.configure(relief=RAISED)
+        self.LaserFrame1.configure(text='''Lasers''')
+        self.LaserFrame1.configure(relief=RAISED)
+        self.LaserFrame1.configure(width=390)
+
+        self.LaserFrame2 = ttk.Labelframe(self.laser_tab)
+        self.LaserFrame2.place(relx=0.52, rely=0.03, relheight=0.46
+                 , relwidth=0.46)
+        self.LaserFrame2.configure(relief=RAISED)
+        self.LaserFrame2.configure(text='''Lasers''')
+        self.LaserFrame2.configure(relief=RAISED)
+        self.LaserFrame2.configure(width=390)
+
+        self.LaserFrame3 = ttk.Labelframe(self.laser_tab)
+        self.LaserFrame3.place(relx=0.02, rely=0.51, relheight=0.46
+                 , relwidth=0.46)
+        self.LaserFrame3.configure(relief=RAISED)
+        self.LaserFrame3.configure(text='''Lasers''')
+        self.LaserFrame3.configure(relief=RAISED)
+        self.LaserFrame3.configure(width=390)
+
+        self.LaserFrame4 = ttk.Labelframe(self.laser_tab)
+        self.LaserFrame4.place(relx=0.52, rely=0.51, relheight=0.46
+                 , relwidth=0.46)
+        self.LaserFrame4.configure(relief=RAISED)
+        self.LaserFrame4.configure(text='''Lasers''')
+        self.LaserFrame4.configure(relief=RAISED)
+        self.LaserFrame4.configure(width=390)
+
+
+        directory = "./"
+        count = 0
+        for file in os.listdir(directory):
+            if (file.endswith("laser.ls")) and (count == 0):
+                count+=1
+                f = open(file)
+                lines = f.read()
+                lines = lines.translate(None, '\',[]')
+                floats = [float(x) for x in lines.split()]
+                N = 180
+                self.theta = np.linspace(0.0, np.pi, N, endpoint=False)
+                radii = floats
+                self.width = np.pi / 180
+                self.f1 = Figure(figsize=(5,4), dpi=100)
+                self.a1 = self.f1.add_subplot(111, polar=True)
+                if (len(radii)==180):
+                    self.bars1 = self.a1.bar(self.theta, radii, color='g',width=self.width, bottom=0.0,edgecolor='none' )
+                    self.canvas1 = FigureCanvasTkAgg(self.f1, master=self.LaserFrame1)
+                    self.canvas1.show()
+                    self.canvas1.get_tk_widget().pack(side=Tkinter.TOP, fill=Tkinter.BOTH, expand=1)
+            elif (file.endswith("laser.ls")) and (count == 1):
+                count+=1
+                f = open(file)
+                lines = f.read()
+                lines = lines.translate(None, '\',[]')
+                floats = [float(x) for x in lines.split()]
+                N = 180
+                self.theta = np.linspace(0.0, np.pi, N, endpoint=False)
+                radii = floats
+                self.width = np.pi / 180
+                self.f2 = Figure(figsize=(5,4), dpi=100)
+                self.a2 = self.f2.add_subplot(111, polar=True)
+                if (len(radii)==180):
+                    self.bars2 = self.a2.bar(self.theta, radii, color='g',width=self.width, bottom=0.0,edgecolor='none' )
+                    self.canvas2 = FigureCanvasTkAgg(self.f2, master=self.LaserFrame2)
+                    self.canvas2.show()
+                    self.canvas2.get_tk_widget().pack(side=Tkinter.TOP, fill=Tkinter.BOTH, expand=1)
+            elif (file.endswith("laser.ls")) and (count == 2):
+                count+=1
+                f = open(file)
+                lines = f.read()
+                lines = lines.translate(None, '\',[]')
+                floats = [float(x) for x in lines.split()]
+                N = 180
+                self.theta = np.linspace(0.0, np.pi, N, endpoint=False)
+                radii =  floats
+                self.width = np.pi / 180
+                self.f3 = Figure(figsize=(5,4), dpi=100)
+                self.a3 = self.f3.add_subplot(111, polar=True)
+                if (len(radii)==180):
+                    self.bars3 = self.a3.bar(self.theta, radii, color='g',width=self.width, bottom=0.0,edgecolor='none' )
+                    self.canvas3 = FigureCanvasTkAgg(self.f3, master=self.LaserFrame3)
+                    self.canvas3.show()
+                    self.canvas3.get_tk_widget().pack(side=Tkinter.TOP, fill=Tkinter.BOTH, expand=1)
+            elif (file.endswith("laser.ls")) and (count == 3):
+                count+=1
+                f = open(file)
+                lines = f.read()
+                lines = lines.translate(None, '\',[]')
+                floats = [float(x) for x in lines.split()]
+                N = 180
+                self.theta = np.linspace(0.0, np.pi, N, endpoint=False)
+                radii =  floats
+                self.width = np.pi / 180
+                self.f4 = Figure(figsize=(5,4), dpi=100)
+                self.a4 = self.f4.add_subplot(111, polar=True)
+                if (len(radii)==180):
+                    self.bars4 = self.a4.bar(self.theta, radii, color='g',width=self.width, bottom=0.0,edgecolor='none' )
+                    self.canvas4 = FigureCanvasTkAgg(self.f4, master=self.LaserFrame4)
+                    self.canvas4.show()
+                    self.canvas4.get_tk_widget().pack(side=Tkinter.TOP, fill=Tkinter.BOTH, expand=1)
+
+
+    """
+    @function
+
+    Function called by thread to update laser information by reading in the data from the pickers
+    """
+    def update_lasers(self):
+        while True:
+            directory = "./"
+            count=0
+            for file in os.listdir(directory):
+                if (file.endswith("laser.ls")) and (count == 0):
+                    try:
+                        self.LaserFrame1.configure(text="Robot Picker "+str(file[0]))
+                    except RuntimeError:
+                        pass
+                    count+=1
+                    f = open(file)
+                    lines = f.read()
+                    lines = lines.translate(None, '\',[]')
+                    floats = [float(x) for x in lines.split()]
+                    r =  floats
+                    if (len(r)==180):
+                        for bar, radius in zip(self.bars1, r):
+                            bar.set_height(radius)
+                        try:
+                            self.canvas1.draw()
+                        except RuntimeError:
+                            pass
+                elif (file.endswith("laser.ls")) and (count == 1):
+                    try:
+                        self.LaserFrame2.configure(text="Robot Picker "+str(file[0]))
+                    except RuntimeError:
+                        pass
+                    count+=1
+                    f = open(file)
+                    lines = f.read()
+                    lines = lines.translate(None, '\',[]')
+                    floats = [float(x) for x in lines.split()]
+                    r =  floats
+                    if (len(r)==180):
+                        for bar, radius in zip(self.bars2, r):
+                            bar.set_height(radius)
+                        try:
+                            self.canvas2.draw()
+                        except RuntimeError:
+                            pass
+                elif (file.endswith("laser.ls")) and (count == 2):
+                    try:
+                        self.LaserFrame3.configure(text="Robot Picker "+str(file[0]))
+                    except RuntimeError:
+                        pass
+                    count+=1
+                    f = open(file)
+                    lines = f.read()
+                    lines = lines.translate(None, '\',[]')
+                    floats = [float(x) for x in lines.split()]
+                    r =  floats
+                    if (len(r)==180):
+                        for bar, radius in zip(self.bars3, r):
+                            bar.set_height(radius)
+                        try:
+                            self.canvas3.draw()
+                        except RuntimeError:
+                            pass
+                elif (file.endswith("laser.ls")) and (count == 3):
+                    try:
+                        self.LaserFrame4.configure(text="Robot Picker "+str(file[0]))
+                    except RuntimeError:
+                        pass
+                    count+=1
+                    f = open(file)
+                    lines = f.read()
+                    lines = lines.translate(None, '\',[]')
+                    floats = [float(x) for x in lines.split()]
+                    r =  floats
+                    if (len(r)==180):
+                        for bar, radius in zip(self.bars4, r):
+                            bar.set_height(radius)
+                        try:
+                            self.canvas4.draw()
+                        except RuntimeError:
+                            pass
+
+
+
+
+    """
+    @function
+
+    Main GUI updater that grabs the Entity states and displays them every few milliseconds
+
+    """
     def update(self):
         i = 0
         for file in os.listdir(self.directory):
@@ -835,17 +1051,18 @@ class GUI_overlay(Tkinter.Tk):
                         self.animal_label_list[i].configure(text=str(line))
                         i+=1
         i=0
-        self.after(200,self.update)
+        self.after(100,self.update)
 
-if __name__ == '__main__':
-    gui = GUI_overlay()
-    gui.after(0,gui.update)
-    gui.mainloop()
 
 def delete_files():
     for file in os.listdir("./"):
-        if file.endswith(".sta"):
+        if file.endswith(".sta") or file.endswith(".ls"):
+            os.remove("./" + file)
             print(str(file) + " Deleted" )
-            os.remove(file)
-            
-atexit.register(delete_files())
+
+if __name__ == '__main__':
+    gui = GUI_overlay()
+    t1 = threading.Thread(target=gui.update_lasers, args=[])
+    t1.start()
+    gui.after(0,gui.update)
+    gui.mainloop()
