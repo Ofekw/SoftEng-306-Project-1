@@ -1,11 +1,14 @@
 #!/usr/bin/env python
+if __name__ == '__main__' and __package__ is None:
+    from os import sys, path
+    sys.path.append(path.abspath(path.join(path.dirname(__file__), '..')))
 import sys
 import unittest
 import rospy
 from std_msgs.msg import *
 import sensor_msgs.msg
 import time
-from se306Project1.src.RobotPicker import RobotPicker
+from src.RobotPicker import RobotPicker
 import math
 import logging
 from TestModule import TestModule

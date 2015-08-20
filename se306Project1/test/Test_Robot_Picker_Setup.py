@@ -1,14 +1,14 @@
 #!/usr/bin/env python
+if __name__ == '__main__' and __package__ is None:
+    from os import sys, path
+    sys.path.append(path.abspath(path.join(path.dirname(__file__), '..')))
 import sys
 import unittest
 import rospy
 from std_msgs.msg import *
 import sensor_msgs.msg
-import time
-from se306Project1.src.RobotPicker import RobotPicker
-from se306Project1.src.RobotCarrier import RobotCarrier
+from src.RobotPicker import RobotPicker
 import math
-import logging
 from TestModule import TestModule
 import inspect
 
@@ -42,7 +42,7 @@ class Test_Robot_Setup(unittest.TestCase,TestModule):
         self.assertEqual(self.robot0.treeDetected, False, "Setting treeDetected")
         self.assertEqual(self.robot0.atOrchard, False, "Setting atOrchard")
         #Robot Picker Variables
-        self.assertEqual(self.robot0.max_load, 20, "Setting max_load")
+        self.assertEqual(self.robot0.max_load, 100, "Setting max_load")
         self.assertEqual(self.robot0.current_load, 0, "Setting current_load")
         self.assertEqual(self.robot0.firstLaserReading, [], "Setting firstLaserReading")
 

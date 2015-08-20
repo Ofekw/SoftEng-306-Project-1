@@ -9,8 +9,9 @@ import getopt
 directory = "./se306Project1/src/"
 debug_text1 = "    debug = Debugger(robot)"
 debug_text2 = "    debug.start()"
+processes = []
 
-def main(argv):
+def main(argv, config):
     testing = False
     debugging = False
     try:
@@ -31,11 +32,6 @@ def main(argv):
     #Types of robots that the script reads the config file for
     robot_type = ["Picker", "Carrier", "Visitor", "Animal"]
     #Loads the fields in the config file
-    config = {}
-    with open("config.properties", "r") as f:
-        for line in f:
-            property = line.split('=')
-            config[property[0]] = property[1]
 
     #Creates or overwrites the myworld.world file
     myworld = open('world/myworld.world','w')
@@ -78,15 +74,17 @@ def main(argv):
     if testing == False:
         for name in file_name:
             #Runs all the temporary robot files created
-            command = "bash -c 'sleep 3 && rosrun se306Project1 " + name + "'"
-            subprocess.Popen(command, shell=True)
+            command = ["rosrun", "se306Project1", name]
+            processes.append(subprocess.Popen(command, shell=False))
     return file_name
 
-def delete_files(file_name):
+def exit_process(file_name):
     #This function is called when the process is killed. The function will delete all the temporary robot files and the myworld.world file
     os.remove('./world/myworld.world')
     for name in file_name:
         os.remove(directory+name)
+    for process in processes:
+        process.kill()
 
 if __name__ == "__main__":
     main(sys.argv[1:])
