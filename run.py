@@ -5,48 +5,65 @@ import getopt
 import sys
 import atexit
 import generateEntity
-import os
+import generateWorldFile
+
+processes = []
 
 def main(argv):
     testing = False
     debugging = False
+    webservice = False
 
-    def cleanup():
-      os.system("ps aux | grep python | grep -v 'grep python' | awk '{print $2}' | xargs kill -9")
 
-    atexit.register(cleanup)
+    config = {}
+    with open("config.properties", "r") as f:
+        for line in f:
+            property = line.split('=')
+            config[property[0]] = property[1]
     try:
-        opts, args = getopt.getopt(argv,"dt")
+        opts, args = getopt.getopt(argv,"dtw")
     except getopt.GetoptError:
-        print 'test.py -d for debugger mode '
-        print 'test.py -t for debugger mode '
+        print 'run.py -d for debugger mode '
+        print 'run.py -t for testing mode '
+        print 'run.py -w for webservice mode '
         sys.exit(2)
     for opt, arg in opts:
         if opt == "-t":
             testing = True
         elif opt == "-d":
             debugging = True
+        elif opt == "-w":
+            webservice = True
+	
     if testing == True:
-        list = generateEntity.main(['-t'])
-        process = subprocess.Popen("bash -c 'python generateWorldFile.py'", shell=True)
-        process.wait()
+        list = generateEntity.main(['-t'], config)
+        generateWorldFile.main(config)
         return list
     else:
         if debugging == True:
             list = generateEntity.main(["-d"])
         else:
-            list = generateEntity.main([""])
-        atexit.register(generateEntity.delete_files, list)
-        subprocess.Popen("bash -c 'python generateWorldFile.py'", shell=True)
-        subprocess.check_output("rosmake se306Project1", shell=True)
-        subprocess.Popen("bash -c 'roscore'", shell=True)
-        subprocess.Popen("bash -c 'sleep 2 && rosrun stage_ros stageros world/myworld.world'", shell=True)
+            list = generateEntity.main([""], config)
+        atexit.register(generateEntity.exit_process, list)
+        generateWorldFile.main(config)
+        processes.append(subprocess.Popen(["roscore"], shell=False))
+        processes.append(subprocess.Popen(["rosrun", "stage_ros", "stageros", "world/myworld.world"], shell=False))
         time.sleep(5)
+        atexit.register(kill_process)
         #execute GUI script
-        gui = subprocess.call("./run_gui.sh")
+        processes.append(subprocess.Popen(['python', 'GUI_overlay.py'], cwd=r'./se306Project1/src'))
+        atexit.register(kill_GUI)
+        if webservice == True:
+            web = subprocess.call("./run_webservice.sh")
         while True:
             pass
 
+def kill_GUI():
+    subprocess.Popen(['python', '-c', 'import GUI_overlay; GUI_overlay.delete_files()'], cwd=r'./se306Project1/src')
+
+def kill_process():
+    for i in range(0, processes.__len__()):
+        processes[i].terminate()
 
 if __name__ == "__main__":
     main(sys.argv[1:])

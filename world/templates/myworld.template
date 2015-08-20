@@ -3,6 +3,8 @@ include "objects/tree.inc"
 include "objects/visitor.inc"
 include "objects/carrier.inc"
 include "objects/animal.inc"
+include "objects/rock.inc"
+include "objects/weed.inc"
 
 define floorplan model
 (
