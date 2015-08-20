@@ -12,7 +12,6 @@ import numpy.testing
 from Robot import Robot
 import os
 import ActionInterruptException
-import globals
 from collections import deque
 import threading
 
@@ -37,26 +36,17 @@ class RobotCarrier(Robot):
         Robot.__init__(self,r_id,x_off,y_off,theta_off)
         #globals.init()
 
-        self.carrier_pub = rospy.Publisher("carrierPosition",String, queue_size=10)
-        self.carrier_sub = rospy.Subscriber("carrierPosition", String, self.carrierCallback)
-        self.picker_sub = rospy.Subscriber("pickerPosition", String, self.pickerCallback)
-        self.kiwi_sub = rospy.Subscriber("picker_kiwiTransfer", String, self.kiwi_callback)
-        self.kiwi_pub = rospy.Publisher("carrier_kiwiTransfer",String, queue_size=10)
+        self.carrier_pub = rospy.Publisher("carrier_position",String, queue_size=10)
+        self.carrier_sub = rospy.Subscriber("carrier_position", String, self.carrier_callback)
+        self.picker_sub = rospy.Subscriber("picker_position", String, self.picker_callback)
+        self.kiwi_sub = rospy.Subscriber("picker_kiwi_transfer", String, self.kiwi_callback)
+        self.kiwi_pub = rospy.Publisher("carrier_kiwi_transfer",String, queue_size=10)
         self.queue_pub = rospy.Publisher("carrier_allocation_request", String, queue_size=10)
         self.queue_sub = rospy.Subscriber("carrier_allocation_response", String, self.queue_callback)
 
         self.next_robot_id = None
         self.carrier_robots = ["0,0,0","0,0,0","0,0,0","0,0,0","0,0,0","0,0,0"]
         self.picker_robots = ["0,0,0","0,0,0","0,0,0","0,0,0","0,0,0","0,0,0"]
-
-        global picker_queue
-        picker_queue = deque([])
-
-        global targeted_pickers
-        targeted_pickers = []
-
-        global globals_lock
-        globals_lock = threading.RLock()
 
         # self.max_load = 100
         # self.current_load = 0
@@ -112,7 +102,7 @@ class RobotCarrier(Robot):
 
     Sets the position of carrier robots received from messages on the topic
     """
-    def carrierCallback(self, message):
+    def carrier_callback(self, message):
         self.carrier_robots[int(message.data.split(',')[0])] = message.data.split(',')[1] + "," + message.data.split(',')[2] #+ "," + message.data.split(',')[4]  # Should add element 4 here which is theta
         # print("Carrier array")
         # print ', '.join(self.carrier_robots)
@@ -123,45 +113,41 @@ class RobotCarrier(Robot):
 
     Sets the position of picker robots received from messages on the topic
     """
-    def pickerCallback(self, message):
+    def picker_callback(self, message):
         picker_index = int(message.data.split(',')[0])
         self.picker_robots[picker_index] = message.data.split(',')[1] + "," + message.data.split(',')[2] + "," + message.data.split(',')[4]  # Should add element 3 here which is theta
-
-        # if int(self.picker_robots[picker_index].split(',')[2]) == self.max_load:
-        #     globals_lock.acquire()
-        #     try:
-        #         if picker_index not in picker_queue:
-        #             if picker_index not in targeted_pickers:
-        #                 print("Added picker " + str(picker_index) + " to queue by " + str(self.robot_id))
-        #                 picker_queue.append(picker_index)
-        #                 self.printLists()
-        #     finally:
-        #         globals_lock.release()
-
 
     """
     @function
     @parameter: message
 
-    Displays info sent from a picker robot when transferring kiwis
+    Callback from the picker for confirmation of transfer
+    Carrier publishes to the carrier_queue that it has completed
     """
     def kiwi_callback(self, message):
+        # if the id of the picker robot == the robot id it is supposed to go to
         if (int(message.data) == self.next_robot_id):
-            #message.data != str(self.robot_id) and
             self.current_load = self.max_load # possible add max load here
-            # globals.targeted_pickers.remove(int(message.data))
-            # globals_lock.acquire()
-            # try:
-            #     targeted_pickers.remove(self.next_robot_id)
-            #     self.printLists()
-            #     if len(picker_queue) > 0:
-            #         self.get_next_in_queue()
+
+            # signal queue that transfer has completed
             self.queue_pub.publish(str(self.robot_id) + ",arrived," + str(self.next_robot_id))
             self.next_robot_id = None
             print("going to dropoff zone")
             self.returnToOrigin()
-            # finally:
-            #     globals_lock.release()
+
+    """
+    @function
+    @parameter: message
+
+    Callback from carrier_queue to let the carrier know which robot to go to next
+    Then goes to that robot if it is not going home
+    """
+    def queue_callback(self, message):
+        #self.carrier_robots[int(message.data.split(',')[0])] = message.data.split(',')[1] + "," + message.data.split(',')[2] #+ "," + message.data.split(',')[4]  # Should add element 4 here which is theta
+        if(int(message.data.split(',')[0]) == self.robot_id):
+            self.next_robot_id = int(message.data.split(',')[1])
+            if not(self.is_going_home):
+                self.go_to_next_picker()
 
     """
     @function
@@ -218,30 +204,10 @@ class RobotCarrier(Robot):
 
     """
     @function
-
-    Sets the next robot in the picker queue
-    """
-    def get_next_in_queue(self):
-        globals_lock.acquire()
-        try:
-            print(str(self) + " next")
-            for pickerid in picker_queue:
-                if(pickerid not in targeted_pickers):
-                    self.printLists()
-                    self.next_robot_id = pickerid
-                    targeted_pickers.append(pickerid)
-                    picker_queue.popleft()
-                    self.printLists()
-                    return
-        finally:
-            globals_lock.release()
-
-    """
-    @function
     @parameter: message
 
     Default action for picker
-    Used to wait until a picker is ready for collection
+    Constantly publishes itself to carrier_pub and asks the carrier_queue if there is something to do
     """
     def waitForPicker(self):
         self.state = self.CarrierState.WAITINGFORPICKER
@@ -251,24 +217,16 @@ class RobotCarrier(Robot):
             raise ActionInterruptException.ActionInterruptException("waitFor Stopped")
         else:
             if not(self.is_going_home):
-                # globals_lock.acquire()
-                # try:
-                #     if len(picker_queue) > 0:
-                #         self.printLists()
-                #         if(self.next_robot_id == None):
-                #             self.get_next_in_queue()
-                # finally:
-                #     globals_lock.release()
                 if(self.next_robot_id == None):
                     self.queue_pub.publish(str(self.robot_id) + ",waiting,"  + str(self.next_robot_id))
-                    rospy.sleep(0.5)
+                    rospy.sleep(0.5) # without the sleep it publishes many times making the system slow down
 
 
     """
     @function
     @parameter: message
 
-    Go to the full picker
+    Go to the next picker as denoted by next_robot_id
     """
     def go_to_next_picker(self):
         self.state = self.CarrierState.GOINGTOPICKER
@@ -280,7 +238,9 @@ class RobotCarrier(Robot):
     @function
     @parameter: message
 
-    Robot has arrived at point, then decides whether to wait or go to drop off
+    Robot has arrived at point, then decides if it has arrived at the picker or at home
+    If at home, it finishes and waitForPicker is called again
+    If at picker, it initiates transfer
     """
     def arrivedAtPoint(self):
         xabsolute = abs(self.goalx - self.px)
@@ -291,7 +251,7 @@ class RobotCarrier(Robot):
         else:
             self.is_going_home = True
 
-        if (self.is_going_home):
+        if (self.is_going_home):    # may be redundent check?
             xgoal = float(self.picker_robots[self.next_robot_id].split(',')[0])
             ygoal = float(self.picker_robots[self.next_robot_id].split(',')[1])
             xabsolute = abs(xgoal - self.px)
@@ -317,10 +277,3 @@ class RobotCarrier(Robot):
         #print("picker queue is " + str(picker_queue))
         #print("targeted queue is " + str(targeted_pickers))
         pass
-
-    def queue_callback(self,message):
-        #self.carrier_robots[int(message.data.split(',')[0])] = message.data.split(',')[1] + "," + message.data.split(',')[2] #+ "," + message.data.split(',')[4]  # Should add element 4 here which is theta
-        if(int(message.data.split(',')[0]) == self.robot_id):
-            self.next_robot_id = int(message.data.split(',')[1])
-            if not(self.is_going_home):
-                self.go_to_next_picker()
