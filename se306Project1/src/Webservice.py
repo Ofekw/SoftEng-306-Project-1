@@ -3,8 +3,6 @@ Webservice program that creates JSON Strings
 from Entity status files
 
 """
-
-__author__ = 'harry'
 import os
 import ftplib
 import time
@@ -57,14 +55,15 @@ class Webservice():
 
 
     #TODO WORKERS!
+    #TODO fix really ugly JSON parsing
 
     def send_JSON_via_FTP(self,JSON_strings):
         fn = os.path.join(os.path.dirname(__file__),"state_file.json")
         output_file = open(fn, "w")
         output_file.write(JSON_strings)
         output_file.close()
-        session = ftplib.FTP('thinkscruffy.com','ros@thinkscruffy.com','network')
-        session.cwd("/public_html/ros/")
+        session = ftplib.FTP('ofek.io','ros@ofek.io','network')
+        session.cwd("/")
         file = open("state_file.json", "rb")
         session.storbinary('STOR state_file.json', file)     # send the file
         file.close()                                    # close file and FTP
