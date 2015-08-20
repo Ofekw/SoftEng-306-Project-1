@@ -1767,75 +1767,78 @@ class GUI_overlay(Tkinter.Tk):
 
         directory = "./"
         count = 0
-        for file in os.listdir(directory):
-            if (file.endswith("laser.ls")) and (count == 0):
-                count+=1
-                f = open(file)
-                lines = f.read()
-                lines = lines.translate(None, '\',[]')
-                floats = [float(x) for x in lines.split()]
-                N = 180
-                self.theta = np.linspace(0.0, np.pi, N, endpoint=False)
-                radii = floats
-                self.width = np.pi / 180
-                self.f1 = Figure(figsize=(5,4), dpi=100)
-                self.a1 = self.f1.add_subplot(111, polar=True)
-                if (len(radii)==180):
-                    self.bars1 = self.a1.bar(self.theta, radii, color='g',width=self.width, bottom=0.0,edgecolor='none' )
-                    self.canvas1 = FigureCanvasTkAgg(self.f1, master=self.LaserFrame1)
-                    self.canvas1.show()
-                    self.canvas1.get_tk_widget().pack(side=Tkinter.TOP, fill=Tkinter.BOTH, expand=1)
-            elif (file.endswith("laser.ls")) and (count == 1):
-                count+=1
-                f = open(file)
-                lines = f.read()
-                lines = lines.translate(None, '\',[]')
-                floats = [float(x) for x in lines.split()]
-                N = 180
-                self.theta = np.linspace(0.0, np.pi, N, endpoint=False)
-                radii = floats
-                self.width = np.pi / 180
-                self.f2 = Figure(figsize=(5,4), dpi=100)
-                self.a2 = self.f2.add_subplot(111, polar=True)
-                if (len(radii)==180):
-                    self.bars2 = self.a2.bar(self.theta, radii, color='g',width=self.width, bottom=0.0,edgecolor='none' )
-                    self.canvas2 = FigureCanvasTkAgg(self.f2, master=self.LaserFrame2)
-                    self.canvas2.show()
-                    self.canvas2.get_tk_widget().pack(side=Tkinter.TOP, fill=Tkinter.BOTH, expand=1)
-            elif (file.endswith("laser.ls")) and (count == 2):
-                count+=1
-                f = open(file)
-                lines = f.read()
-                lines = lines.translate(None, '\',[]')
-                floats = [float(x) for x in lines.split()]
-                N = 180
-                self.theta = np.linspace(0.0, np.pi, N, endpoint=False)
-                radii =  floats
-                self.width = np.pi / 180
-                self.f3 = Figure(figsize=(5,4), dpi=100)
-                self.a3 = self.f3.add_subplot(111, polar=True)
-                if (len(radii)==180):
-                    self.bars3 = self.a3.bar(self.theta, radii, color='g',width=self.width, bottom=0.0,edgecolor='none' )
-                    self.canvas3 = FigureCanvasTkAgg(self.f3, master=self.LaserFrame3)
-                    self.canvas3.show()
-                    self.canvas3.get_tk_widget().pack(side=Tkinter.TOP, fill=Tkinter.BOTH, expand=1)
-            elif (file.endswith("laser.ls")) and (count == 3):
-                count+=1
-                f = open(file)
-                lines = f.read()
-                lines = lines.translate(None, '\',[]')
-                floats = [float(x) for x in lines.split()]
-                N = 180
-                self.theta = np.linspace(0.0, np.pi, N, endpoint=False)
-                radii =  floats
-                self.width = np.pi / 180
-                self.f4 = Figure(figsize=(5,4), dpi=100)
-                self.a4 = self.f4.add_subplot(111, polar=True)
-                if (len(radii)==180):
-                    self.bars4 = self.a4.bar(self.theta, radii, color='g',width=self.width, bottom=0.0,edgecolor='none' )
-                    self.canvas4 = FigureCanvasTkAgg(self.f4, master=self.LaserFrame4)
-                    self.canvas4.show()
-                    self.canvas4.get_tk_widget().pack(side=Tkinter.TOP, fill=Tkinter.BOTH, expand=1)
+        read = False
+        while read == False:
+            for file in os.listdir(directory):
+                if (file.endswith("laser.ls")) and (count == 0):
+                    read = True
+                    count+=1
+                    f = open(file)
+                    lines = f.read()
+                    lines = lines.translate(None, '\',[]')
+                    floats = [float(x) for x in lines.split()]
+                    N = 180
+                    self.theta = np.linspace(0.0, np.pi, N, endpoint=False)
+                    radii = floats
+                    self.width = np.pi / 180
+                    self.f1 = Figure(figsize=(5,4), dpi=100)
+                    self.a1 = self.f1.add_subplot(111, polar=True)
+                    if (len(radii)==180):
+                        self.bars1 = self.a1.bar(self.theta, radii, color='g',width=self.width, bottom=0.0,edgecolor='none' )
+                        self.canvas1 = FigureCanvasTkAgg(self.f1, master=self.LaserFrame1)
+                        self.canvas1.show()
+                        self.canvas1.get_tk_widget().pack(side=Tkinter.TOP, fill=Tkinter.BOTH, expand=1)
+                elif (file.endswith("laser.ls")) and (count == 1):
+                    count+=1
+                    f = open(file)
+                    lines = f.read()
+                    lines = lines.translate(None, '\',[]')
+                    floats = [float(x) for x in lines.split()]
+                    N = 180
+                    self.theta = np.linspace(0.0, np.pi, N, endpoint=False)
+                    radii = floats
+                    self.width = np.pi / 180
+                    self.f2 = Figure(figsize=(5,4), dpi=100)
+                    self.a2 = self.f2.add_subplot(111, polar=True)
+                    if (len(radii)==180):
+                        self.bars2 = self.a2.bar(self.theta, radii, color='g',width=self.width, bottom=0.0,edgecolor='none' )
+                        self.canvas2 = FigureCanvasTkAgg(self.f2, master=self.LaserFrame2)
+                        self.canvas2.show()
+                        self.canvas2.get_tk_widget().pack(side=Tkinter.TOP, fill=Tkinter.BOTH, expand=1)
+                elif (file.endswith("laser.ls")) and (count == 2):
+                    count+=1
+                    f = open(file)
+                    lines = f.read()
+                    lines = lines.translate(None, '\',[]')
+                    floats = [float(x) for x in lines.split()]
+                    N = 180
+                    self.theta = np.linspace(0.0, np.pi, N, endpoint=False)
+                    radii =  floats
+                    self.width = np.pi / 180
+                    self.f3 = Figure(figsize=(5,4), dpi=100)
+                    self.a3 = self.f3.add_subplot(111, polar=True)
+                    if (len(radii)==180):
+                        self.bars3 = self.a3.bar(self.theta, radii, color='g',width=self.width, bottom=0.0,edgecolor='none' )
+                        self.canvas3 = FigureCanvasTkAgg(self.f3, master=self.LaserFrame3)
+                        self.canvas3.show()
+                        self.canvas3.get_tk_widget().pack(side=Tkinter.TOP, fill=Tkinter.BOTH, expand=1)
+                elif (file.endswith("laser.ls")) and (count == 3):
+                    count+=1
+                    f = open(file)
+                    lines = f.read()
+                    lines = lines.translate(None, '\',[]')
+                    floats = [float(x) for x in lines.split()]
+                    N = 180
+                    self.theta = np.linspace(0.0, np.pi, N, endpoint=False)
+                    radii =  floats
+                    self.width = np.pi / 180
+                    self.f4 = Figure(figsize=(5,4), dpi=100)
+                    self.a4 = self.f4.add_subplot(111, polar=True)
+                    if (len(radii)==180):
+                        self.bars4 = self.a4.bar(self.theta, radii, color='g',width=self.width, bottom=0.0,edgecolor='none' )
+                        self.canvas4 = FigureCanvasTkAgg(self.f4, master=self.LaserFrame4)
+                        self.canvas4.show()
+                        self.canvas4.get_tk_widget().pack(side=Tkinter.TOP, fill=Tkinter.BOTH, expand=1)
 
 
     """
