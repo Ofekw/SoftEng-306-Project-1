@@ -1338,8 +1338,9 @@ class GUI_overlay(Tkinter.Tk):
         human_tab.TLabel30.configure(relief=FLAT)
 
 
-        human_label_list = [human_tab.TLabel1,human_tab.TLabel2,human_tab.TLabel3,human_tab.TLabel4,human_tab.TLabel5,human_tab.TLabel6,human_tab.TLabel8,human_tab.TLabel9,human_tab.TLabel10,human_tab.TLabel11,human_tab.TLabel12,human_tab.TLabel14,human_tab.TLabel15,human_tab.TLabel16,human_tab.TLabel17,human_tab.TLabel18,human_tab.TLabel20,human_tab.TLabel21,human_tab.TLabel22,human_tab.TLabel23,human_tab.TLabel24,human_tab.TLabel26,human_tab.TLabel27,human_tab.TLabel28,human_tab.TLabel29,human_tab.TLabel30]
-
+        human_label_list = [human_tab.TLabel1,human_tab.TLabel2,human_tab.TLabel3,human_tab.TLabel4,human_tab.TLabel5,human_tab.TLabel6, human_tab.TLabel7,human_tab.TLabel8,human_tab.TLabel9,human_tab.TLabel10,human_tab.TLabel11,human_tab.TLabel12,
+                             human_tab.TLabel13,human_tab.TLabel14,human_tab.TLabel15,human_tab.TLabel16,human_tab.TLabel17,human_tab.TLabel18,human_tab.TLabel19,human_tab.TLabel20,human_tab.TLabel21,human_tab.TLabel22,human_tab.TLabel23,human_tab.TLabel24,
+                             human_tab.TLabel25,human_tab.TLabel26,human_tab.TLabel27,human_tab.TLabel28,human_tab.TLabel29,human_tab.TLabel30]
 
         return human_label_list
 
@@ -1721,8 +1722,11 @@ class GUI_overlay(Tkinter.Tk):
         animal_tab.TLabel30.configure(foreground="#006600")
         animal_tab.TLabel30.configure(relief=FLAT)
 
-        animal_label_list = [animal_tab.TLabel1,animal_tab.TLabel2,animal_tab.TLabel3,animal_tab.TLabel4,animal_tab.TLabel5,animal_tab.TLabel6,animal_tab.TLabel8,animal_tab.TLabel9,animal_tab.TLabel10,animal_tab.TLabel11,animal_tab.TLabel12,animal_tab.TLabel14,animal_tab.TLabel15,animal_tab.TLabel16,animal_tab.TLabel17,animal_tab.TLabel18,animal_tab.TLabel20,animal_tab.TLabel21,animal_tab.TLabel22,animal_tab.TLabel23,animal_tab.TLabel24,animal_tab.TLabel26,animal_tab.TLabel27,animal_tab.TLabel28,animal_tab.TLabel29,animal_tab.TLabel30]
 
+
+        animal_label_list = [animal_tab.TLabel1,animal_tab.TLabel2,animal_tab.TLabel3,animal_tab.TLabel4,animal_tab.TLabel5,animal_tab.TLabel6, animal_tab.TLabel7,animal_tab.TLabel8,animal_tab.TLabel9,animal_tab.TLabel10,animal_tab.TLabel11,animal_tab.TLabel12,
+                             animal_tab.TLabel13,animal_tab.TLabel14,animal_tab.TLabel15,animal_tab.TLabel16,animal_tab.TLabel17,animal_tab.TLabel18,animal_tab.TLabel19,animal_tab.TLabel20,animal_tab.TLabel21,animal_tab.TLabel22,animal_tab.TLabel23,animal_tab.TLabel24,
+                             animal_tab.TLabel25,animal_tab.TLabel26,animal_tab.TLabel27,animal_tab.TLabel28,animal_tab.TLabel29,animal_tab.TLabel30]
         return animal_label_list
 
     #Setup those laser rangers
