@@ -4,15 +4,9 @@ import sys
 
 def main(config):
     #read config file and save properties into hashmap
-    config = {}
     left_tree = open('world/templates/leftTree.template').read()
     right_tree = open('world/templates/rightTree.template').read()
     world_template = open('world/templates/myworld.template').read()
-    with open("config.properties", "r") as f:
-        for line in f:
-            property = line.split('=')
-            config[property[0]] = property[1]
-
     #get number of orchard rows
     rows = int(config.get('orchard.number'))
 
