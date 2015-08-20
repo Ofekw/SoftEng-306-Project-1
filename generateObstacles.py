@@ -8,8 +8,8 @@ def main(row_values, config):
     string = ""
     x_values = []
     for i in row_values:
-        x_values.append(i-4.5)
-        x_values.append(i+4.5)
+        x_values.append(i-4.2)
+        x_values.append(i+4.2)
     obstacle_coordinates = []
     for i in range(0, number):
         temp = obstacle.replace("obstacle", "rock")
