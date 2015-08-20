@@ -66,11 +66,11 @@ class GUI_overlay(Tkinter.Tk):
         self.laser_tab = Frame(nb)
 
         # create the tabs
-        nb.add(robot_tab, text='Pickers')
-        nb.add(robot_tab2, text='Carriers')
+        nb.add(robot_tab, text='Robot Pickers')
+        nb.add(robot_tab2, text='Robot Carriers')
         nb.add(human_tab, text='Humans')
         nb.add(animal_tab, text='Animals')
-        nb.add(self.laser_tab, text='Laser-rangers')
+        nb.add(self.laser_tab, text='Laser-Rangers')
 
         #BEGIN ROBOTS
 
@@ -1108,14 +1108,244 @@ class GUI_overlay(Tkinter.Tk):
         human_tab.TLabel12.configure(relief=FLAT)
 
 
+#HUMAN 3 ________________________________________________________
 
-        human_label_list = [human_tab.TLabel1,human_tab.TLabel2,human_tab.TLabel3,human_tab.TLabel4,human_tab.TLabel5,human_tab.TLabel6,human_tab.TLabel8,human_tab.TLabel9,human_tab.TLabel10,human_tab.TLabel11]
+        TLabelframe3 = ttk.Labelframe(human_tab)
+        TLabelframe3.place(relx=0.02, rely=0.41, relheight=0.17
+                 , relwidth=0.95)
+        TLabelframe3.configure(relief=RAISED)
+        TLabelframe3.configure(text="Human Report")
+        TLabelframe3.configure(relief=RAISED)
+        TLabelframe3.configure(width=390)
+
+        human_tab.Label15 = Label(TLabelframe3)
+        human_tab.Label15.place(relx=0.025, rely=0.15, height=19, width=74)
+        human_tab.Label15.configure(activebackground="#f9f9f9")
+        human_tab.Label15.configure(text='''Name (ID):''')
+
+        human_tab.Label16 = Label(TLabelframe3)
+        human_tab.Label16.place(relx=0.54, rely=0.07, height=19, width=66)
+        human_tab.Label16.configure(activebackground="#f9f9f9")
+        human_tab.Label16.configure(text='''X Position:''')
+
+        human_tab.Label17 = Label(TLabelframe3)
+        human_tab.Label17.place(relx=0.54, rely=0.22, height=19, width=65)
+        human_tab.Label17.configure(activebackground="#f9f9f9")
+        human_tab.Label17.configure(text='''Y Position:''')
+
+        human_tab.Label18 = Label(TLabelframe3)
+        human_tab.Label18.place(relx=0.54, rely=0.37, height=19, width=85)
+        human_tab.Label18.configure(activebackground="#f9f9f9")
+        human_tab.Label18.configure(text='''Theta (Rads):''')
+
+        human_tab.Label19 = Label(TLabelframe3)
+        human_tab.Label19.place(relx=0.03, rely=0.3, height=19, width=37)
+        human_tab.Label19.configure(activebackground="#f9f9f9")
+        human_tab.Label19.configure(text='''Type:''')
+
+        human_tab.Label20 = Label(TLabelframe3)
+        human_tab.Label20.place(relx=0.03, rely=0.52, height=19, width=95)
+        human_tab.Label20.configure(activebackground="#f9f9f9")
+        human_tab.Label20.configure(text='''Current action:''')
+
+        human_tab.TLabel13 = ttk.Label(TLabelframe3)
+        human_tab.TLabel13.place(relx=0.26, rely=0.15, height=17, width=50)
+        human_tab.TLabel13.configure(background=self._bgcolor)
+        human_tab.TLabel13.configure(foreground="#0066FF")
+        human_tab.TLabel13.configure(relief=FLAT)
+
+        human_tab.TLabel14 = ttk.Label(TLabelframe3)
+        human_tab.TLabel14.place(relx=0.26, rely=0.3, height=17, width=50)
+        human_tab.TLabel14.configure(background=self._bgcolor)
+        human_tab.TLabel14.configure(foreground="#0066FF")
+        human_tab.TLabel14.configure(relief=FLAT)
+
+        human_tab.TLabel15 = ttk.Label(TLabelframe3)
+        human_tab.TLabel15.place(relx=0.31, rely=0.52, height=17, width=200)
+        human_tab.TLabel15.configure(background=self._bgcolor)
+        human_tab.TLabel15.configure(foreground="#0066FF")
+        human_tab.TLabel15.configure(relief=FLAT)
+
+        human_tab.TLabel16 = ttk.Label(TLabelframe3)
+        human_tab.TLabel16.place(relx=0.79, rely=0.07, height=17, width=50)
+        human_tab.TLabel16.configure(background=self._bgcolor)
+        human_tab.TLabel16.configure(foreground="#006600")
+        human_tab.TLabel16.configure(relief=FLAT)
+
+        human_tab.TLabel17 = ttk.Label(TLabelframe3)
+        human_tab.TLabel17.place(relx=0.79, rely=0.22, height=17, width=50)
+        human_tab.TLabel17.configure(background=self._bgcolor)
+        human_tab.TLabel17.configure(foreground="#006600")
+        human_tab.TLabel17.configure(relief=FLAT)
+
+        human_tab.TLabel18 = ttk.Label(TLabelframe3)
+        human_tab.TLabel18.place(relx=0.79, rely=0.37, height=17, width=50)
+        human_tab.TLabel18.configure(background=self._bgcolor)
+        human_tab.TLabel18.configure(foreground="#006600")
+        human_tab.TLabel18.configure(relief=FLAT)
+
+        #HUMAN 4 ___________________________________________________________
+
+        TLabelframe4 = ttk.Labelframe(human_tab)
+        TLabelframe4.place(relx=0.02, rely=0.6, relheight=0.17
+                 , relwidth=0.95)
+        TLabelframe4.configure(relief=RAISED)
+        TLabelframe4.configure(text='''Human Report''')
+        TLabelframe4.configure(relief=RAISED)
+        TLabelframe4.configure(width=390)
+
+        human_tab.Label22 = Label(TLabelframe4)
+        human_tab.Label22.place(relx=0.025, rely=0.15, height=19, width=74)
+        human_tab.Label22.configure(activebackground="#f9f9f9")
+        human_tab.Label22.configure(text='''Name (ID):''')
+
+        human_tab.Label23 = Label(TLabelframe4)
+        human_tab.Label23.place(relx=0.54, rely=0.07, height=19, width=66)
+        human_tab.Label23.configure(activebackground="#f9f9f9")
+        human_tab.Label23.configure(text='''X Position:''')
+
+        human_tab.Label24 = Label(TLabelframe4)
+        human_tab.Label24.place(relx=0.54, rely=0.22, height=19, width=65)
+        human_tab.Label24.configure(activebackground="#f9f9f9")
+        human_tab.Label24.configure(text='''Y Position:''')
+
+        human_tab.Label25 = Label(TLabelframe4)
+        human_tab.Label25.place(relx=0.54, rely=0.37, height=19, width=85)
+        human_tab.Label25.configure(activebackground="#f9f9f9")
+        human_tab.Label25.configure(text='''Theta (Rads):''')
+
+        human_tab.Label26 = Label(TLabelframe4)
+        human_tab.Label26.place(relx=0.03, rely=0.3, height=19, width=37)
+        human_tab.Label26.configure(activebackground="#f9f9f9")
+        human_tab.Label26.configure(text='''Type:''')
+
+        human_tab.Label27 = Label(TLabelframe4)
+        human_tab.Label27.place(relx=0.03, rely=0.52, height=19, width=95)
+        human_tab.Label27.configure(activebackground="#f9f9f9")
+        human_tab.Label27.configure(text='''Current action:''')
+
+        human_tab.TLabel19 = ttk.Label(TLabelframe4)
+        human_tab.TLabel19.place(relx=0.26, rely=0.15, height=17, width=50)
+        human_tab.TLabel19.configure(background=self._bgcolor)
+        human_tab.TLabel19.configure(foreground="#0066FF")
+        human_tab.TLabel19.configure(relief=FLAT)
+
+        human_tab.TLabel20 = ttk.Label(TLabelframe4)
+        human_tab.TLabel20.place(relx=0.26, rely=0.3, height=17, width=50)
+        human_tab.TLabel20.configure(background=self._bgcolor)
+        human_tab.TLabel20.configure(foreground="#0066FF")
+        human_tab.TLabel20.configure(relief=FLAT)
+
+        human_tab.TLabel21 = ttk.Label(TLabelframe4)
+        human_tab.TLabel21.place(relx=0.31, rely=0.52, height=17, width=200)
+        human_tab.TLabel21.configure(background=self._bgcolor)
+        human_tab.TLabel21.configure(foreground="#0066FF")
+        human_tab.TLabel21.configure(relief=FLAT)
+
+        human_tab.TLabel22 = ttk.Label(TLabelframe4)
+        human_tab.TLabel22.place(relx=0.79, rely=0.07, height=17, width=50)
+        human_tab.TLabel22.configure(background=self._bgcolor)
+        human_tab.TLabel22.configure(foreground="#006600")
+        human_tab.TLabel22.configure(relief=FLAT)
+
+        human_tab.TLabel23 = ttk.Label(TLabelframe4)
+        human_tab.TLabel23.place(relx=0.79, rely=0.22, height=17, width=50)
+        human_tab.TLabel23.configure(background=self._bgcolor)
+        human_tab.TLabel23.configure(foreground="#006600")
+        human_tab.TLabel23.configure(relief=FLAT)
+
+        human_tab.TLabel24 = ttk.Label(TLabelframe4)
+        human_tab.TLabel24.place(relx=0.79, rely=0.37, height=17, width=50)
+        human_tab.TLabel24.configure(background=self._bgcolor)
+        human_tab.TLabel24.configure(foreground="#006600")
+        human_tab.TLabel24.configure(relief=FLAT)
+
+        #HUMAN 5 ___________________________________________________________
+
+        TLabelframe5 = ttk.Labelframe(human_tab)
+        TLabelframe5.place(relx=0.02, rely=0.79, relheight=0.17
+                 , relwidth=0.95)
+        TLabelframe5.configure(relief=RAISED)
+        TLabelframe5.configure(text='''Human Report''')
+        TLabelframe5.configure(relief=RAISED)
+        TLabelframe5.configure(width=390)
+
+        human_tab.Label29 = Label(TLabelframe5)
+        human_tab.Label29.place(relx=0.025, rely=0.15, height=19, width=74)
+        human_tab.Label29.configure(activebackground="#f9f9f9")
+        human_tab.Label29.configure(text='''Name (ID):''')
+
+        human_tab.Label30 = Label(TLabelframe5)
+        human_tab.Label30.place(relx=0.54, rely=0.07, height=19, width=66)
+        human_tab.Label30.configure(activebackground="#f9f9f9")
+        human_tab.Label30.configure(text='''X Position:''')
+
+        human_tab.Label31 = Label(TLabelframe5)
+        human_tab.Label31.place(relx=0.54, rely=0.22, height=19, width=65)
+        human_tab.Label31.configure(activebackground="#f9f9f9")
+        human_tab.Label31.configure(text='''Y Position:''')
+
+        human_tab.Label32 = Label(TLabelframe5)
+        human_tab.Label32.place(relx=0.54, rely=0.37, height=19, width=85)
+        human_tab.Label32.configure(activebackground="#f9f9f9")
+        human_tab.Label32.configure(text='''Theta (Rads):''')
+
+        human_tab.Label33 = Label(TLabelframe5)
+        human_tab.Label33.place(relx=0.03, rely=0.3, height=19, width=50)
+        human_tab.Label33.configure(activebackground="#f9f9f9")
+        human_tab.Label33.configure(text='''Type:''')
+
+        human_tab.Label34 = Label(TLabelframe5)
+        human_tab.Label34.place(relx=0.03, rely=0.52, height=19, width=95)
+        human_tab.Label34.configure(activebackground="#f9f9f9")
+        human_tab.Label34.configure(text='''Current action:''')
+
+
+        human_tab.TLabel25 = ttk.Label(TLabelframe5)
+        human_tab.TLabel25.place(relx=0.26, rely=0.15, height=17, width=50)
+        human_tab.TLabel25.configure(background=self._bgcolor)
+        human_tab.TLabel25.configure(foreground="#0066FF")
+        human_tab.TLabel25.configure(relief=FLAT)
+
+        human_tab.TLabel26 = ttk.Label(TLabelframe5)
+        human_tab.TLabel26.place(relx=0.26, rely=0.3, height=17, width=50)
+        human_tab.TLabel26.configure(background=self._bgcolor)
+        human_tab.TLabel26.configure(foreground="#0066FF")
+        human_tab.TLabel26.configure(relief=FLAT)
+
+        human_tab.TLabel27 = ttk.Label(TLabelframe5)
+        human_tab.TLabel27.place(relx=0.31, rely=0.52, height=17, width=200)
+        human_tab.TLabel27.configure(background=self._bgcolor)
+        human_tab.TLabel27.configure(foreground="#0066FF")
+        human_tab.TLabel27.configure(relief=FLAT)
+
+        human_tab.TLabel28 = ttk.Label(TLabelframe5)
+        human_tab.TLabel28.place(relx=0.79, rely=0.07, height=17, width=50)
+        human_tab.TLabel28.configure(background=self._bgcolor)
+        human_tab.TLabel28.configure(foreground="#006600")
+        human_tab.TLabel28.configure(relief=FLAT)
+
+        human_tab.TLabel29 = ttk.Label(TLabelframe5)
+        human_tab.TLabel29.place(relx=0.79, rely=0.22, height=17, width=50)
+        human_tab.TLabel29.configure(background=self._bgcolor)
+        human_tab.TLabel29.configure(foreground="#006600")
+        human_tab.TLabel29.configure(relief=FLAT)
+
+        human_tab.TLabel30 = ttk.Label(TLabelframe5)
+        human_tab.TLabel30.place(relx=0.79, rely=0.37, height=17, width=50)
+        human_tab.TLabel30.configure(background=self._bgcolor)
+        human_tab.TLabel30.configure(foreground="#006600")
+        human_tab.TLabel30.configure(relief=FLAT)
+
+
+        human_label_list = [human_tab.TLabel1,human_tab.TLabel2,human_tab.TLabel3,human_tab.TLabel4,human_tab.TLabel5,human_tab.TLabel6,human_tab.TLabel8,human_tab.TLabel9,human_tab.TLabel10,human_tab.TLabel11,human_tab.TLabel12,human_tab.TLabel14,human_tab.TLabel15,human_tab.TLabel16,human_tab.TLabel17,human_tab.TLabel18,human_tab.TLabel20,human_tab.TLabel21,human_tab.TLabel22,human_tab.TLabel23,human_tab.TLabel24,human_tab.TLabel26,human_tab.TLabel27,human_tab.TLabel28,human_tab.TLabel29,human_tab.TLabel30]
+
 
         return human_label_list
 
     def setup_animals(self,nb,animal_tab):
 
-        #ANIMAL 1 ___________________________________________________________
+               #ANIMAL 1 ___________________________________________________________
 
         TLabelframe1 = ttk.Labelframe(animal_tab)
         TLabelframe1.place(relx=0.02, rely=0.03, relheight=0.17
@@ -1185,6 +1415,7 @@ class GUI_overlay(Tkinter.Tk):
         animal_tab.TLabel6.configure(foreground="#006600")
         animal_tab.TLabel6.configure(relief=FLAT)
 
+
         #ANIMAL 2 ___________________________________________________________
 
         TLabelframe2 = ttk.Labelframe(animal_tab)
@@ -1238,7 +1469,7 @@ class GUI_overlay(Tkinter.Tk):
         animal_tab.TLabel8.configure(relief=FLAT)
 
         animal_tab.TLabel9 = ttk.Label(TLabelframe2)
-        animal_tab.TLabel9.place(relx=0.31, rely=0.6, height=17, width=50)
+        animal_tab.TLabel9.place(relx=0.31, rely=0.6, height=17, width=200)
         animal_tab.TLabel9.configure(background=self._bgcolor)
         animal_tab.TLabel9.configure(foreground="#0066FF")
         animal_tab.TLabel9.configure(relief=FLAT)
@@ -1262,7 +1493,235 @@ class GUI_overlay(Tkinter.Tk):
         animal_tab.TLabel12.configure(relief=FLAT)
 
 
-        animal_label_list = [animal_tab.TLabel1,animal_tab.TLabel2,animal_tab.TLabel3,animal_tab.TLabel4,animal_tab.TLabel5,animal_tab.TLabel6,animal_tab.TLabel8,animal_tab.TLabel9,animal_tab.TLabel10,animal_tab.TLabel11,animal_tab.TLabel12]
+#ANIMAL 3 ________________________________________________________
+
+        TLabelframe3 = ttk.Labelframe(animal_tab)
+        TLabelframe3.place(relx=0.02, rely=0.41, relheight=0.17
+                 , relwidth=0.95)
+        TLabelframe3.configure(relief=RAISED)
+        TLabelframe3.configure(text="Animal Report")
+        TLabelframe3.configure(relief=RAISED)
+        TLabelframe3.configure(width=390)
+
+        animal_tab.Label15 = Label(TLabelframe3)
+        animal_tab.Label15.place(relx=0.025, rely=0.15, height=19, width=74)
+        animal_tab.Label15.configure(activebackground="#f9f9f9")
+        animal_tab.Label15.configure(text='''Name (ID):''')
+
+        animal_tab.Label16 = Label(TLabelframe3)
+        animal_tab.Label16.place(relx=0.54, rely=0.07, height=19, width=66)
+        animal_tab.Label16.configure(activebackground="#f9f9f9")
+        animal_tab.Label16.configure(text='''X Position:''')
+
+        animal_tab.Label17 = Label(TLabelframe3)
+        animal_tab.Label17.place(relx=0.54, rely=0.22, height=19, width=65)
+        animal_tab.Label17.configure(activebackground="#f9f9f9")
+        animal_tab.Label17.configure(text='''Y Position:''')
+
+        animal_tab.Label18 = Label(TLabelframe3)
+        animal_tab.Label18.place(relx=0.54, rely=0.37, height=19, width=85)
+        animal_tab.Label18.configure(activebackground="#f9f9f9")
+        animal_tab.Label18.configure(text='''Theta (Rads):''')
+
+        animal_tab.Label19 = Label(TLabelframe3)
+        animal_tab.Label19.place(relx=0.03, rely=0.3, height=19, width=37)
+        animal_tab.Label19.configure(activebackground="#f9f9f9")
+        animal_tab.Label19.configure(text='''Type:''')
+
+        animal_tab.Label20 = Label(TLabelframe3)
+        animal_tab.Label20.place(relx=0.03, rely=0.52, height=19, width=95)
+        animal_tab.Label20.configure(activebackground="#f9f9f9")
+        animal_tab.Label20.configure(text='''Current action:''')
+
+        animal_tab.TLabel13 = ttk.Label(TLabelframe3)
+        animal_tab.TLabel13.place(relx=0.26, rely=0.15, height=17, width=50)
+        animal_tab.TLabel13.configure(background=self._bgcolor)
+        animal_tab.TLabel13.configure(foreground="#0066FF")
+        animal_tab.TLabel13.configure(relief=FLAT)
+
+        animal_tab.TLabel14 = ttk.Label(TLabelframe3)
+        animal_tab.TLabel14.place(relx=0.26, rely=0.3, height=17, width=50)
+        animal_tab.TLabel14.configure(background=self._bgcolor)
+        animal_tab.TLabel14.configure(foreground="#0066FF")
+        animal_tab.TLabel14.configure(relief=FLAT)
+
+        animal_tab.TLabel15 = ttk.Label(TLabelframe3)
+        animal_tab.TLabel15.place(relx=0.31, rely=0.52, height=17, width=200)
+        animal_tab.TLabel15.configure(background=self._bgcolor)
+        animal_tab.TLabel15.configure(foreground="#0066FF")
+        animal_tab.TLabel15.configure(relief=FLAT)
+
+        animal_tab.TLabel16 = ttk.Label(TLabelframe3)
+        animal_tab.TLabel16.place(relx=0.79, rely=0.07, height=17, width=50)
+        animal_tab.TLabel16.configure(background=self._bgcolor)
+        animal_tab.TLabel16.configure(foreground="#006600")
+        animal_tab.TLabel16.configure(relief=FLAT)
+
+        animal_tab.TLabel17 = ttk.Label(TLabelframe3)
+        animal_tab.TLabel17.place(relx=0.79, rely=0.22, height=17, width=50)
+        animal_tab.TLabel17.configure(background=self._bgcolor)
+        animal_tab.TLabel17.configure(foreground="#006600")
+        animal_tab.TLabel17.configure(relief=FLAT)
+
+        animal_tab.TLabel18 = ttk.Label(TLabelframe3)
+        animal_tab.TLabel18.place(relx=0.79, rely=0.37, height=17, width=50)
+        animal_tab.TLabel18.configure(background=self._bgcolor)
+        animal_tab.TLabel18.configure(foreground="#006600")
+        animal_tab.TLabel18.configure(relief=FLAT)
+
+        #ANIMAL 4 ___________________________________________________________
+
+        TLabelframe4 = ttk.Labelframe(animal_tab)
+        TLabelframe4.place(relx=0.02, rely=0.6, relheight=0.17
+                 , relwidth=0.95)
+        TLabelframe4.configure(relief=RAISED)
+        TLabelframe4.configure(text='''Animal Report''')
+        TLabelframe4.configure(relief=RAISED)
+        TLabelframe4.configure(width=390)
+
+        animal_tab.Label22 = Label(TLabelframe4)
+        animal_tab.Label22.place(relx=0.025, rely=0.15, height=19, width=74)
+        animal_tab.Label22.configure(activebackground="#f9f9f9")
+        animal_tab.Label22.configure(text='''Name (ID):''')
+
+        animal_tab.Label23 = Label(TLabelframe4)
+        animal_tab.Label23.place(relx=0.54, rely=0.07, height=19, width=66)
+        animal_tab.Label23.configure(activebackground="#f9f9f9")
+        animal_tab.Label23.configure(text='''X Position:''')
+
+        animal_tab.Label24 = Label(TLabelframe4)
+        animal_tab.Label24.place(relx=0.54, rely=0.22, height=19, width=65)
+        animal_tab.Label24.configure(activebackground="#f9f9f9")
+        animal_tab.Label24.configure(text='''Y Position:''')
+
+        animal_tab.Label25 = Label(TLabelframe4)
+        animal_tab.Label25.place(relx=0.54, rely=0.37, height=19, width=85)
+        animal_tab.Label25.configure(activebackground="#f9f9f9")
+        animal_tab.Label25.configure(text='''Theta (Rads):''')
+
+        animal_tab.Label26 = Label(TLabelframe4)
+        animal_tab.Label26.place(relx=0.03, rely=0.3, height=19, width=37)
+        animal_tab.Label26.configure(activebackground="#f9f9f9")
+        animal_tab.Label26.configure(text='''Type:''')
+
+        animal_tab.Label27 = Label(TLabelframe4)
+        animal_tab.Label27.place(relx=0.03, rely=0.52, height=19, width=95)
+        animal_tab.Label27.configure(activebackground="#f9f9f9")
+        animal_tab.Label27.configure(text='''Current action:''')
+
+        animal_tab.TLabel19 = ttk.Label(TLabelframe4)
+        animal_tab.TLabel19.place(relx=0.26, rely=0.15, height=17, width=50)
+        animal_tab.TLabel19.configure(background=self._bgcolor)
+        animal_tab.TLabel19.configure(foreground="#0066FF")
+        animal_tab.TLabel19.configure(relief=FLAT)
+
+        animal_tab.TLabel20 = ttk.Label(TLabelframe4)
+        animal_tab.TLabel20.place(relx=0.26, rely=0.3, height=17, width=50)
+        animal_tab.TLabel20.configure(background=self._bgcolor)
+        animal_tab.TLabel20.configure(foreground="#0066FF")
+        animal_tab.TLabel20.configure(relief=FLAT)
+
+        animal_tab.TLabel21 = ttk.Label(TLabelframe4)
+        animal_tab.TLabel21.place(relx=0.31, rely=0.52, height=17, width=200)
+        animal_tab.TLabel21.configure(background=self._bgcolor)
+        animal_tab.TLabel21.configure(foreground="#0066FF")
+        animal_tab.TLabel21.configure(relief=FLAT)
+
+        animal_tab.TLabel22 = ttk.Label(TLabelframe4)
+        animal_tab.TLabel22.place(relx=0.79, rely=0.07, height=17, width=50)
+        animal_tab.TLabel22.configure(background=self._bgcolor)
+        animal_tab.TLabel22.configure(foreground="#006600")
+        animal_tab.TLabel22.configure(relief=FLAT)
+
+        animal_tab.TLabel23 = ttk.Label(TLabelframe4)
+        animal_tab.TLabel23.place(relx=0.79, rely=0.22, height=17, width=50)
+        animal_tab.TLabel23.configure(background=self._bgcolor)
+        animal_tab.TLabel23.configure(foreground="#006600")
+        animal_tab.TLabel23.configure(relief=FLAT)
+
+        animal_tab.TLabel24 = ttk.Label(TLabelframe4)
+        animal_tab.TLabel24.place(relx=0.79, rely=0.37, height=17, width=50)
+        animal_tab.TLabel24.configure(background=self._bgcolor)
+        animal_tab.TLabel24.configure(foreground="#006600")
+        animal_tab.TLabel24.configure(relief=FLAT)
+
+        #ANIMAL 5 ___________________________________________________________
+
+        TLabelframe5 = ttk.Labelframe(animal_tab)
+        TLabelframe5.place(relx=0.02, rely=0.79, relheight=0.17
+                 , relwidth=0.95)
+        TLabelframe5.configure(relief=RAISED)
+        TLabelframe5.configure(text='''Animal Report''')
+        TLabelframe5.configure(relief=RAISED)
+        TLabelframe5.configure(width=390)
+
+        animal_tab.Label29 = Label(TLabelframe5)
+        animal_tab.Label29.place(relx=0.025, rely=0.15, height=19, width=74)
+        animal_tab.Label29.configure(activebackground="#f9f9f9")
+        animal_tab.Label29.configure(text='''Name (ID):''')
+
+        animal_tab.Label30 = Label(TLabelframe5)
+        animal_tab.Label30.place(relx=0.54, rely=0.07, height=19, width=66)
+        animal_tab.Label30.configure(activebackground="#f9f9f9")
+        animal_tab.Label30.configure(text='''X Position:''')
+
+        animal_tab.Label31 = Label(TLabelframe5)
+        animal_tab.Label31.place(relx=0.54, rely=0.22, height=19, width=65)
+        animal_tab.Label31.configure(activebackground="#f9f9f9")
+        animal_tab.Label31.configure(text='''Y Position:''')
+
+        animal_tab.Label32 = Label(TLabelframe5)
+        animal_tab.Label32.place(relx=0.54, rely=0.37, height=19, width=85)
+        animal_tab.Label32.configure(activebackground="#f9f9f9")
+        animal_tab.Label32.configure(text='''Theta (Rads):''')
+
+        animal_tab.Label33 = Label(TLabelframe5)
+        animal_tab.Label33.place(relx=0.03, rely=0.3, height=19, width=50)
+        animal_tab.Label33.configure(activebackground="#f9f9f9")
+        animal_tab.Label33.configure(text='''Type:''')
+
+        animal_tab.Label34 = Label(TLabelframe5)
+        animal_tab.Label34.place(relx=0.03, rely=0.52, height=19, width=95)
+        animal_tab.Label34.configure(activebackground="#f9f9f9")
+        animal_tab.Label34.configure(text='''Current action:''')
+
+        animal_tab.TLabel25 = ttk.Label(TLabelframe5)
+        animal_tab.TLabel25.place(relx=0.26, rely=0.15, height=17, width=50)
+        animal_tab.TLabel25.configure(background=self._bgcolor)
+        animal_tab.TLabel25.configure(foreground="#0066FF")
+        animal_tab.TLabel25.configure(relief=FLAT)
+
+        animal_tab.TLabel26 = ttk.Label(TLabelframe5)
+        animal_tab.TLabel26.place(relx=0.26, rely=0.3, height=17, width=50)
+        animal_tab.TLabel26.configure(background=self._bgcolor)
+        animal_tab.TLabel26.configure(foreground="#0066FF")
+        animal_tab.TLabel26.configure(relief=FLAT)
+
+        animal_tab.TLabel27 = ttk.Label(TLabelframe5)
+        animal_tab.TLabel27.place(relx=0.31, rely=0.52, height=17, width=200)
+        animal_tab.TLabel27.configure(background=self._bgcolor)
+        animal_tab.TLabel27.configure(foreground="#0066FF")
+        animal_tab.TLabel27.configure(relief=FLAT)
+
+        animal_tab.TLabel28 = ttk.Label(TLabelframe5)
+        animal_tab.TLabel28.place(relx=0.79, rely=0.07, height=17, width=50)
+        animal_tab.TLabel28.configure(background=self._bgcolor)
+        animal_tab.TLabel28.configure(foreground="#006600")
+        animal_tab.TLabel28.configure(relief=FLAT)
+
+        animal_tab.TLabel29 = ttk.Label(TLabelframe5)
+        animal_tab.TLabel29.place(relx=0.79, rely=0.22, height=17, width=50)
+        animal_tab.TLabel29.configure(background=self._bgcolor)
+        animal_tab.TLabel29.configure(foreground="#006600")
+        animal_tab.TLabel29.configure(relief=FLAT)
+
+        animal_tab.TLabel30 = ttk.Label(TLabelframe5)
+        animal_tab.TLabel30.place(relx=0.79, rely=0.37, height=17, width=50)
+        animal_tab.TLabel30.configure(background=self._bgcolor)
+        animal_tab.TLabel30.configure(foreground="#006600")
+        animal_tab.TLabel30.configure(relief=FLAT)
+
+        animal_label_list = [animal_tab.TLabel1,animal_tab.TLabel2,animal_tab.TLabel3,animal_tab.TLabel4,animal_tab.TLabel5,animal_tab.TLabel6,animal_tab.TLabel8,animal_tab.TLabel9,animal_tab.TLabel10,animal_tab.TLabel11,animal_tab.TLabel12,animal_tab.TLabel14,animal_tab.TLabel15,animal_tab.TLabel16,animal_tab.TLabel17,animal_tab.TLabel18,animal_tab.TLabel20,animal_tab.TLabel21,animal_tab.TLabel22,animal_tab.TLabel23,animal_tab.TLabel24,animal_tab.TLabel26,animal_tab.TLabel27,animal_tab.TLabel28,animal_tab.TLabel29,animal_tab.TLabel30]
 
         return animal_label_list
 
