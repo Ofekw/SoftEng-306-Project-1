@@ -1,10 +1,12 @@
+#!/usr/bin/env python
+
 import threading
 from collections import deque
 import rospy
 from std_msgs.msg import*
 
 
-class My_Singleton():
+class My_Singleton:
 
     # def __init__(self, decorated):
     #     self._decorated = decorated
@@ -20,6 +22,7 @@ class My_Singleton():
     #         return self._instance
 
     def __init__(self):
+        rospy.init_node("Singleton")
         self.picker_queue = deque([])
         self.targeted_pickers = []
         self.lock = threading.RLock()
@@ -31,6 +34,8 @@ class My_Singleton():
         self.queue_sub = rospy.Subscriber("carrier_allocation_request", String, self.request_callback)
 
         self.picker_sub = rospy.Subscriber("pickerPosition", String, self.pickerCallback)
+
+        rospy.init_node('Singleton')
 
 
 
@@ -44,17 +49,13 @@ class My_Singleton():
         carrier_id = message.data.split(",")[0]
         requested_action = message.data.split(",")[1]
         next_robot_id = message.data.split(",")[2]
-
         if(requested_action == "waiting"):
             if len(self.picker_queue) > 0:
                 self.printLists()
-                self.queue_pub.publish(carrier_id + "," + self.get_next_in_queue())
-
+                self.queue_pub.publish(str(carrier_id) + "," + str(self.get_next_in_queue()))
         elif (requested_action == "arrived"):
-            self.targeted_pickers.remove(next_robot_id)
-
-
-
+            if(next_robot_id != "None"):
+                self.targeted_pickers.remove(int(next_robot_id))
         # carrier receives (own_id, picker_id)
 
 
@@ -99,41 +100,7 @@ class My_Singleton():
             finally:
                 self.lock.release()
 
-
-
-
-
-
     def printLists(self):
-        #print("picker queue is " + str(picker_queue))
-        #print("targeted queue is " + str(targeted_pickers))
+        print("picker queue is " + str(self.picker_queue))
+        print("targeted queue is " + str(self.targeted_pickers))
         pass
-
-
-
-
-
-
-    # __instance = None
-    #
-    # def __new__(cls):
-    #     if cls.__instance == None:
-    #         __instance = type.__new__(cls)
-    #         __instance.name = "The one"
-    #     return __instance
-    #
-    # def __call__(self):
-    #     raise TypeError('Singletons must be accessed through `Instance()`.')
-    #
-    # def __instancecheck__(self, inst):
-    #     return isinstance(inst, self._decorated)
-    #
-    # def get_lock(self):
-    #     return self.lock
-    #
-    # def get_picker_queue(self):
-    #     return self.picker_queue
-    #
-    # def get_targeted_pickers(self):
-    #     return self.targeted_pickers
-    

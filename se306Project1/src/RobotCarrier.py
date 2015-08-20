@@ -259,9 +259,10 @@ class RobotCarrier(Robot):
                 #             self.get_next_in_queue()
                 # finally:
                 #     globals_lock.release()
-                if(self.next_robot_id != None):
-                    self.go_to_next_picker()
+                if(self.next_robot_id == None):
                     self.queue_pub.publish(str(self.robot_id) + ",waiting,"  + str(self.next_robot_id))
+                    rospy.sleep(0.5)
+
 
     """
     @function
@@ -320,5 +321,6 @@ class RobotCarrier(Robot):
     def queue_callback(self,message):
         #self.carrier_robots[int(message.data.split(',')[0])] = message.data.split(',')[1] + "," + message.data.split(',')[2] #+ "," + message.data.split(',')[4]  # Should add element 4 here which is theta
         if(int(message.data.split(',')[0]) == self.robot_id):
-            self.next_robot_id = message.data.split(',')[1]
-            self.go_to_next_picker()
+            self.next_robot_id = int(message.data.split(',')[1])
+            if not(self.is_going_home):
+                self.go_to_next_picker()
