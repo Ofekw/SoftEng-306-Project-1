@@ -54,7 +54,7 @@ def main(argv):
         processes.append(subprocess.Popen(['python', 'GUI_overlay.py'], cwd=r'./se306Project1/src'))
         atexit.register(kill_GUI)
         if webservice == True:
-            web = subprocess.call("./run_webservice.sh")
+            processes.append(subprocess.Popen(['python', 'Webservice.py'], cwd=r'./se306Project1/src'))
         while True:
             pass
 
