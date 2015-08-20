@@ -23,6 +23,10 @@ class Debugger:
                 for i in self.robot.picker_robots:
                     data = i.split(",")
                     print(data[0])
+            elif self.user_input[0] == "load":
+                print(self.robot.current_load)
+            elif self.user_input[0] == "state":
+                print(self.robot.state)
         self._thread.exit()
 
     def start(self):
