@@ -10,7 +10,7 @@ import math
 import numpy.testing
 from RobotCarrier import RobotCarrier
 from Debugger import Debugger
-from My_Singleton import My_Singleton
+from Carrier_Queue import Carrier_Queue
 
 """
 @MAIN
@@ -23,7 +23,7 @@ def main():
     #Construction of Robot objects take 3 params... Robot ID, Start X, Start Y. Start X and Start Y correlates to the myworld.world file
     #Can't create more than one robot per main() .... ie can't run more than one robot per terminal running
 
-    singleton = My_Singleton()
+    carrier_queue = Carrier_Queue()
 
     rospy.Rate(100)
     rospy.sleep(0.1)

@@ -6,7 +6,7 @@ import rospy
 from std_msgs.msg import*
 
 
-class My_Singleton:
+class Carrier_Queue:
 
     # def __init__(self, decorated):
     #     self._decorated = decorated
@@ -22,7 +22,7 @@ class My_Singleton:
     #         return self._instance
 
     def __init__(self):
-        rospy.init_node("Singleton")
+        rospy.init_node("Carrier_Queue")
         self.picker_queue = deque([])
         self.targeted_pickers = []
         self.lock = threading.RLock()
@@ -34,9 +34,6 @@ class My_Singleton:
         self.queue_sub = rospy.Subscriber("carrier_allocation_request", String, self.request_callback)
 
         self.picker_sub = rospy.Subscriber("pickerPosition", String, self.pickerCallback)
-
-        rospy.init_node('Singleton')
-
 
 
     """
