@@ -37,7 +37,7 @@ define animal position
 	point[2] [0.65 1]
 	point[3] [0.65 0]
 	z [0.45 1]
-	color "black"
+	color "sienna"
   )
 
   # neck
@@ -108,4 +108,42 @@ define animal position
 	z [0 0.45]
   )
 
+  # tail
+  block
+  (
+	points 4
+	point[0] [0 0.4]
+	point[1] [0 0.6]
+	point[2] [0.1 0.6]
+	point[3] [0.1 0.4]
+	z [1 1.3]
+	color "saddle brown"
+  )
+
+  # ear 1
+  block
+  (
+	points 4
+	point[0] [0.7 0]
+	point[1] [0.7 0.2]
+	point[2] [0.75 0.2]
+	point[3] [0.75 0]
+	z [1 1.1]
+	color "saddle brown"
+  )
+
+  # ear 2
+  block
+  (
+	points 4
+	point[0] [0.7 0.8]
+	point[1] [0.7 1]
+	point[2] [0.75 1]
+	point[3] [0.75 0.8]
+	z [1 1.1]
+	color "saddle brown"
+
+  )
+
+  
 )
