@@ -49,7 +49,7 @@ define animal position
 	point[2] [0.7 0.75]
 	point[3] [0.7 0.25]
 	z [0.65 0.9]
-	color "brown"
+	color "saddle brown"
   )
 
   # head
@@ -61,7 +61,7 @@ define animal position
 	point[2] [1 1]
 	point[3] [1 0]
 	z [0.6 1]
-	color "brown"
+	color "saddle brown"
   )
 
   # leg 1
@@ -73,6 +73,7 @@ define animal position
 	point[0] [0.1 0.2]
 	point[0] [0.1 0]
 	z [0 0.45]
+	color "saddle brown"
   )
 
   # leg 2
@@ -84,6 +85,7 @@ define animal position
 	point[2] [0.1 1]
 	point[3] [0.1 0.8]
 	z [0 0.45]
+	color "saddle brown"
   )
 
   # leg 3
@@ -95,6 +97,7 @@ define animal position
 	point[2] [0.65 1]
 	point[3] [0.65 0.8]
 	z [0 0.45]
+	color "saddle brown"
   )
 
   # leg 4
@@ -106,6 +109,7 @@ define animal position
 	point[2] [0.65 0.2]
 	point[3] [0.65 0]
 	z [0 0.45]
+	color "saddle brown"
   )
 
   # tail
@@ -144,6 +148,9 @@ define animal position
 	color "saddle brown"
 
   )
+<<<<<<< HEAD
 
   
+=======
+>>>>>>> Worker
 )
