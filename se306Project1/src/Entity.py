@@ -33,7 +33,7 @@ class Entity:
     Angle = enum(DEGREES="degrees", RADIANS="radians")
     State = enum(STOPPED="Stopped", TURNING="Turning", CORRECTING="Aligning to cardinal direction",
                  DETECTING="Detecting entity type", FIN="Finished Picking")
-    def __init__(self,r_id,x_off,y_off, theta_off):
+    def __init__(self,r_name,r_id,x_off,y_off, theta_off):
 
 
 
@@ -52,8 +52,8 @@ class Entity:
         self.x_off = x_off
         self.y_off = y_off
         self.robot_id = r_id
-        self.robot_node_name = ("RobotNode" +str(self.robot_id))
-        self.robot_node_identifier = ("robot_"+ str(self.robot_id))
+        self.robot_node_name = r_name
+        self.robot_node_identifier = ("robot_"+ str(r_id))
         self.goalx = self.px
         self.goaly = self.py
         self.state = self.State.STOPPED

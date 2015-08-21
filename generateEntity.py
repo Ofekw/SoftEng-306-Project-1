@@ -53,7 +53,7 @@ def main(argv, config):
             constructor_name = "Robot" + type
             if type == "Visitor" or type == "Animal":
                 constructor_name = constructor_name.replace("Robot", "")
-            constructor = "    robot = " + constructor_name + "(" + str(total_robots) + ", " + str(x_value) + ", -28, math.pi/2)"
+            constructor = "    robot = " + constructor_name + "(\"" + type + str(i) + "\", " + str(total_robots) + ", " + str(x_value) + ", -28, math.pi/2)"
             if debugging == True:
                 constructor = constructor + "\n" + debug_text1 + "\n" + debug_text2
             name = type + str(i) + ".py" #Name of the robot files

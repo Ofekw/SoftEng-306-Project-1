@@ -31,9 +31,9 @@ class RobotCarrier(Robot):
     CarrierState = enum(WAITINGFORPICKER="Waiting for picker",
                               GOINGTOPICKER="Going to picker", GOTODROPOFF="Going to dropoff")
 
-    def __init__(self,r_id,x_off,y_off,theta_off):
+    def __init__(self,r_name,r_id,x_off,y_off,theta_off):
 
-        Robot.__init__(self,r_id,x_off,y_off,theta_off)
+        Robot.__init__(self,r_name,r_id,x_off,y_off,theta_off)
         globals.init()
 
         self.carrier_pub = rospy.Publisher("carrierPosition",String, queue_size=10)

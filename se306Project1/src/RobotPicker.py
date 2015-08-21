@@ -27,10 +27,11 @@ class RobotPicker(Robot):
         return type('Enum', (), enums)
 
     PickerState = enum(PICKING="Picking Fruit",
-                              FINDING="Finding Orchard", WAITINGFORCOLLECTION="Waiting for collection")
+                              FINDING="Finding Orchard", WAITINGFORCOLLECTION="Waiting for collection",
+                       PATH="Path finding")
 
-    def __init__(self,r_id,x_off,y_off,theta_off):
-        Robot.__init__(self,r_id,x_off,y_off,theta_off)
+    def __init__(self,r_name,r_id,x_off,y_off,theta_off):
+        Robot.__init__(self,r_name,r_id,x_off,y_off,theta_off)
         self.picker_pub = rospy.Publisher("pickerPosition",String, queue_size=10)
 
         # self.max_load = 100
@@ -38,6 +39,9 @@ class RobotPicker(Robot):
         self.firstLaserReading = []
         self.timeLastAdded = time.clock()
 
+
+        self.pathTurnCount = 0
+        self.pastCount = 0
         self.disableSideLaser = False
 
         self.kiwi_sub = rospy.Subscriber("carrier_kiwiTransfer", String, self.kiwi_callback)
@@ -146,7 +150,20 @@ class RobotPicker(Robot):
                 if msg.ranges[i]< 4.0:
                     #check if dynamic entity
                     self._stopCurrentAction_ = True
-                    if self.firstLaserReading == []:
+                    if self.state == self.PickerState.PATH and self.pathTurnCount == 3:
+                        self.pastCount += 1
+                        if self.pastCount > 2:
+                            self._stopCurrentAction_ = True
+                            turnAction = self._actions_[2], [Entity.Direction.RIGHT]
+                            self._actionsStack_.append(turnAction)
+                            #path turn count counts number of turns the robot has done.
+                            #3 are required to navigate around an obstacle
+                            self.pathTurnCount = 0
+                            self.pastCount = 0
+                            self.state = self.PickerState.PICKING
+                            self.firstLaserReading = []
+                        return
+                    elif self.firstLaserReading == []:
                         self.disableLaser = True
                         #read 0-110 lasers into array
                         self.read(msg.ranges, self.firstLaserReading)
@@ -167,26 +184,57 @@ class RobotPicker(Robot):
                                 #reset laserReading
                                 self.firstLaserReading = []
                                 return
+                        if self.state != self.PickerState.PATH:
+                            laserCount = 0
+                            for i in self.firstLaserReading:
+                                if i < 5:
+                                    laserCount += 1
+                            if laserCount == 40:
+                                print("Returning home to restart")
+                                action = self._actions_[1], [self.init_x, self.init_y]
+                                goToAction = self._actions_[5], [self.init_x, -13]
+                                turnAction = self._actions_[2], [Entity.Direction.RIGHT]
+                                #check if action already exists in stack, otherwise laser will spam rotates
+                                if action != self._actionsStack_[-1]:
+                                    #stop moving foward and add turn action
+                                    self._stopCurrentAction_ = True
+                                    self._actionsStack_.append(turnAction)
+                                    self._actionsStack_.append(goToAction)
+                                    self._actionsStack_.append(action)
+                                    self.firstLaserReading = []
+                                    return
+                                return
+                            else:
+                                print("Obstacle found, path finding round")
+                                self.state = self.PickerState.PATH
+                                self._stopCurrentAction_ = True
+                                turnAction = self._actions_[2], [Entity.Direction.RIGHT]
+                                self._actionsStack_.append(turnAction)
+                                #path turn count counts number of turns the robot has done.
+                                #3 are required to navigate around an obstacle
+                                self.pathTurnCount += 1
+                                self.firstLaserReading = []
 
-                        print("static")
-                        # action = self._actions_[2], [Entity.Direction.RIGHT]
-                        action = self._actions_[1], [self.init_x, self.init_y]
-                        goToAction = self._actions_[5], [self.init_x, -13.5]
-                        turnAction = self._actions_[2], [Entity.Direction.RIGHT]
-                        #check if action already exists in stack, otherwise laser will spam rotates
-                        if action != self._actionsStack_[-1]:
-                            #stop moving foward and add turn action
-                            self._stopCurrentAction_ = True
-                            self._actionsStack_.append(turnAction)
-                            self._actionsStack_.append(goToAction)
-                            self._actionsStack_.append(action)
-                            self.firstLaserReading = []
-                            return
-                        return
-
+            if self.state == self.PickerState.PATH:
+                if self.pathTurnCount < 3:
+                    rangeCount = 0
+                    for i in range(160,180):
+                        if msg.ranges[i]<5.0:
+                            rangeCount += 1
+                    if (self.pastCount > 12 and self.pathTurnCount == 1) or (self.pastCount > 18 and self.pathTurnCount == 2):
+                        self._stopCurrentAction_ = True
+                        turnAction = self._actions_[2], [Entity.Direction.LEFT]
+                        self._actionsStack_.append(turnAction)
+                        self.pastCount = 0
+                        self.pathTurnCount += 1
+                    # driven past obstacle
+                    elif rangeCount == 0:
+                        self.pastCount += 1
+                    elif rangeCount != 0:
+                        self.pastCount = 0
 
             #check that all lasers in 0-20 range are not hitting object
-            if not self.disableSideLaser:
+            elif not self.disableSideLaser:
                 rangeCount = 0
                 for i in range(160,180):
                     if msg.ranges[i]<5.0:
@@ -210,7 +258,7 @@ class RobotPicker(Robot):
                     for i in range(len(self.picker_robots)):
                         data = self.picker_robots[i].split(",")
                         #check if
-                        if self.px-0.5 <= float(data[0]) +i*10 <= self.px+0.5 and self.py-1 <= float(data[1] <= self.py+1):
+                        if self.px-0.5 <= float(data[0]) +i*10 <= self.px+0.5 and self.py-1 <= float(data[1]) <= self.py+1:
                             continue
                         elif self.px-10 < float(data[0]) +i*10 < self.px+2 and self.py < float(data[1]) and float(data[0]) != 0:
                             self.noMoreTrees = 0
@@ -220,8 +268,11 @@ class RobotPicker(Robot):
                             self._actionsStack_.append(goToAction)
                             return
 
+                    self.noMoreTrees = 0
+                    self.disableSideLaser = True
                     turnAction = self._actions_[2], [Entity.Direction.LEFT]
                     self._actionsStack_.append(turnAction)
+
                 elif rangeCount == 0:
                     self.noMoreTrees +=1
                     self.treeDetected = False
@@ -230,7 +281,6 @@ class RobotPicker(Robot):
                     self.state = self.PickerState.PICKING
                     self.treeDetected = True
                     self.noMoreTrees=0
-                    #print("Found Tree")
                     self.addKiwi(time.clock())
                 elif rangeCount == 20:
                     pass
