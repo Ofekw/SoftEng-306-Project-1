@@ -218,7 +218,6 @@ class Entity:
         previousY = self.py
 
 
-        print("Moving Forward")
         #While the distance that the Entity has gained has not exceeded the given distance, continue to move the Entity forward
         while (dist_gained < dist and not self._stopCurrentAction_):
 
@@ -277,7 +276,6 @@ class Entity:
     Turn function which allows the Entity to turn 90 degrees ( a right angle) either left or right.
     """
     def turn(self, direction):
-        print("Turning "+ direction)
         pi = math.pi
 
         if (direction == Direction.LEFT):
@@ -400,7 +398,6 @@ class Entity:
 
     """
     def face_direction(self, direction_to_face):
-        print("Running Function face_direction")
         current_direction = self.get_current_direction()
 
         #print("Currently facing:" + current_direction)
@@ -469,12 +466,10 @@ class Entity:
     A
     """
     def goto_yx(self, x_coord, y_coord):
-        print ("Going To : ("+str(x_coord)+","+str(y_coord)+")")
         #try run the goto command
         try:
 
             if (abs(x_coord-self.px)<=0.3 and abs(y_coord-self.py)<=0.2 ):
-                print("Already at coordinate!")
                 return 0
 
             x_difference = x_coord - self.px
@@ -543,11 +538,8 @@ class Entity:
         finally:
 
             if self._stopCurrentAction_:
-                print("Halted at destination:", self.px, self.py)
-                print("Go To: Stopped due to potential collision")
                 return 2
             else:
-                print("Arrived at destination:", self.px, self.py)
                 return 0
 
 
@@ -570,12 +562,10 @@ class Entity:
 
     """
     def goto_xy(self, x_coord, y_coord):
-        print ("Going To : ("+str(x_coord)+","+str(y_coord)+")")
         #try run the goto command
         try:
 
             if (abs(x_coord-self.px)<=0.3 and abs(y_coord-self.py)<=0.2 ):
-                print("Already at coordinate!")
                 return 0
 
             x_difference = x_coord - self.px
@@ -639,16 +629,12 @@ class Entity:
                     return 0
 
         except ActionInterruptException.ActionInterruptException as e:
-            print(e.message)
             return 1
         finally:
 
             if self._stopCurrentAction_:
-                print("Halted at destination:", self.px, self.py)
-                print ("Go To: Stopped due to potential collision")
                 return 2
             else:
-                print("Arrived at destination:", self.px, self.py)
                 return 0
 
     """
@@ -670,7 +656,6 @@ class Entity:
         elif (abs(self.theta- math.pi)<=0.1 or abs(self.theta+math.pi)<=0.1):
             current_direction = Direction.WEST
         else:
-            print("Current direction not one of the four cardinal directions")
             current_direction = self.correct_theta()
 
         return current_direction
