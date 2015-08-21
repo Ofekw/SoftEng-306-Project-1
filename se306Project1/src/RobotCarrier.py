@@ -104,8 +104,6 @@ class RobotCarrier(Robot):
     """
     def carrier_callback(self, message):
         self.carrier_robots[int(message.data.split(',')[0])] = message.data.split(',')[1] + "," + message.data.split(',')[2] #+ "," + message.data.split(',')[4]  # Should add element 4 here which is theta
-        # print("Carrier array")
-        # print ', '.join(self.carrier_robots)
 
     """
     @function

@@ -4,6 +4,7 @@ import threading
 from collections import deque
 import rospy
 from std_msgs.msg import*
+import os
 
 
 class Carrier_Queue:
@@ -20,6 +21,8 @@ class Carrier_Queue:
         self.lock = threading.RLock()
         self.picker_robots = ["0,0,0","0,0,0","0,0,0","0,0,0","0,0,0","0,0,0"]
         self.max_load = 20
+        self.total_kiwis_collected = 0
+        self.total_collections = 0
 
         self.queue_pub = rospy.Publisher("carrier_allocation_response",String, queue_size=10)
         self.queue_sub = rospy.Subscriber("carrier_allocation_request", String, self.request_callback)
@@ -29,7 +32,9 @@ class Carrier_Queue:
     @function
     @parameter: message
 
-    Sets the position of carrier robots received from messages on the topic
+    Callback when a carrier makes a request
+    If carrier is waiting, and there is something in the queue, it will post the id of the next waiting picker to the carrier
+    If it arrived at the picker, it will remove the picker id from the targeted queue
     """
     def request_callback(self, message):
         carrier_id = message.data.split(",")[0]
@@ -37,42 +42,41 @@ class Carrier_Queue:
         next_robot_id = message.data.split(",")[2]
 
         # if the carrier is waiting
-        # if there is something in the queue, it will post it to the carrier
         if(requested_action == "waiting"):
             if len(self.picker_queue) > 0:
                 self.lock.acquire()
                 try:
-                    self.printLists()
                     self.queue_pub.publish(str(carrier_id) + "," + str(self.get_next_in_queue()))
+                    self.post_to_file()
                 finally:
                     self.lock.release()
 
         # if the carrier has arrived at the picker
-        # if at the correct picker, the picker will be removed from the targeted list
         elif (requested_action == "arrived"):
             if(next_robot_id != "None"):
                 self.lock.acquire()
                 try:
                     self.targeted_pickers.remove(int(next_robot_id))
+                    self.total_kiwis_collected += self.max_load
+                    self.total_collections += 1
+                    self.post_to_file()
                 finally:
                     self.lock.release()
 
     """
     @function
 
-    Sets the next robot in the picker queue
+    Adds the picker id to the targeted queue
+    Removes the next picker id in the queue
+    Returns the picker id of the next robot on the queue
     """
     def get_next_in_queue(self):
         self.lock.acquire()
         try:
-            print(str(self) + " next")
             for pickerid in self.picker_queue:
                 if(pickerid not in self.targeted_pickers):
-                    self.printLists()
-                    # self.next_robot_id = pickerid
                     self.targeted_pickers.append(pickerid)
                     self.picker_queue.popleft()
-                    self.printLists()
                     return pickerid
         finally:
             self.lock.release()
@@ -81,7 +85,8 @@ class Carrier_Queue:
     @function
     @parameter: message
 
-    Sets the position of picker robots received from messages on the topic
+    Sets the position of the picker robot
+    If it is full and not in any of the queues, it will append it to the picker queue
     """
     def picker_callback(self, message):
         picker_index = int(message.data.split(',')[0])
@@ -92,13 +97,22 @@ class Carrier_Queue:
             try:
                 if picker_index not in self.picker_queue:
                     if picker_index not in self.targeted_pickers:
-                        print("Added picker " + str(picker_index) + " to queue by queue master")
                         self.picker_queue.append(picker_index)
-                        self.printLists()
             finally:
                 self.lock.release()
 
-    def printLists(self):
-        print(self.picker_queue)
-        print(self.targeted_pickers)
-        pass
+
+    """
+    @function
+
+    Posts the carriers status to a file for the gui
+    """
+    def post_to_file(self):
+        fn = os.path.join(os.path.dirname(__file__), "carrier.que")
+        output_file = open(fn, "w")
+        output_file.write("Carrier Queue\n")
+        output_file.write(str(list(self.picker_queue)) + "\n")
+        output_file.write(str(self.targeted_pickers) + "\n")
+        output_file.write(str(self.total_kiwis_collected) + "\n")
+        output_file.write(str(self.total_collections) + "\n")
+        output_file.close()
