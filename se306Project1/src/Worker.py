@@ -78,7 +78,7 @@ class Worker(Human):
     @function
 
     Call back function to update position values. Also will write current state information to a wor.sta file which
-    is to be used by the gui
+    is to be used by the GUI
     """
     def StageOdom_callback(self, msg):
         #Update the px and py values
