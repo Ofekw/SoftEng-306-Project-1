@@ -34,7 +34,6 @@ class RobotCarrier(Robot):
     def __init__(self,r_id,x_off,y_off,theta_off):
 
         Robot.__init__(self,r_id,x_off,y_off,theta_off)
-        #globals.init()
 
         self.carrier_pub = rospy.Publisher("carrier_position",String, queue_size=10)
         self.carrier_sub = rospy.Subscriber("carrier_position", String, self.carrier_callback)
