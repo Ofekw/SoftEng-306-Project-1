@@ -79,7 +79,6 @@ class GUI_overlay(Tkinter.Tk):
         #BEGIN ROBOTS
 
         self.robot_label_list = self.setup_pickers(nb,robot_tab)
-
         self.robot2_label_list = self.setup_carriers(nb,robot_tab2)
 
         # BEGIN HUMANS ________________________________________________________
@@ -89,7 +88,7 @@ class GUI_overlay(Tkinter.Tk):
         self.animal_label_list = self.setup_animals(nb,animal_tab)
 
         # BEGIN LASERS
-        if self.directory != "./":
+        if self.directory == "./":
             #only sets up lasers if NOT in testing mode. (in testing mode, a custom directory is passed in.
             self.setup_lasers()
 
@@ -1778,7 +1777,7 @@ class GUI_overlay(Tkinter.Tk):
             for file in os.listdir(directory):
                 if (file.endswith("laser.ls")) and (count == 0):
                     read = True
-                    time.sleep(5)
+                    time.sleep(3)
                     count+=1
                     f = open(file)
                     lines = f.read()
