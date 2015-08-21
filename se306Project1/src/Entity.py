@@ -32,7 +32,7 @@ class Entity:
     Direction = enum(NORTH="north",EAST="east",SOUTH="south",WEST="west",LEFT="left",RIGHT="right")
     Angle = enum(DEGREES="degrees", RADIANS="radians")
     State = enum(STOPPED="Stopped", TURNING="Turning", CORRECTING="Aligning to cardinal direction",
-                 DETECTING="Detecting entity type")
+                 DETECTING="Detecting entity type", FIN="Finished Picking")
     def __init__(self,r_id,x_off,y_off, theta_off):
 
 
@@ -71,7 +71,8 @@ class Entity:
             4: self.wait,
             5: self.goto_xy,
             6: self.waitForPicker,
-            7: self.pickerWait
+            7: self.pickerWait,
+            8: self.finish()
         }
 
         #Enums for direction and angles
@@ -298,7 +299,6 @@ class Entity:
         #disable laser as don't want to be checking for collisions when turning as
         #robot will not cause collision while turning
         self.disableLaser = True
-        self.state=self.State.TURNING
         while (abs(self.theta - thetaTarg) > 0.01 and not (self._stopCurrentAction_)):
             thetaDiff = abs(self.theta - thetaTarg)
 
@@ -700,7 +700,6 @@ class Entity:
 
     """
     def correct_theta(self):
-        self.state = self.State.CORRECTING
         current_direction="NoDirect"
         if (abs(self.theta-math.pi/2)<=0.4):
             self.rotate_relative(math.pi/2-self.theta,Angle.RADIANS)
@@ -737,7 +736,6 @@ class Entity:
     """
     def wait(self, waitTime):
         self.RobotNode_cmdvel.linear.x = 0.0
-        self.state = self.State.DETECTING
         time.sleep(waitTime)
         self.disableLaser = False
         return 0
@@ -773,3 +771,7 @@ class Entity:
     """
     def pickerWait(self):
         pass
+
+    def finish(self):
+        self.State = self.State.FIN
+        return -1
