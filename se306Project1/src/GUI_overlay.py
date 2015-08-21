@@ -29,10 +29,14 @@ It also displays the laser ranger for picker robots in a seperate tab
 """
 class GUI_overlay(Tkinter.Tk):
 
-    def __init__(self):
+    def __init__(self,custom_dir="./"):
         Tkinter.Tk.__init__(self)
+        #Custom _dir is for testing, it just allows a different directory to be passed in
+        #if nothing is passed in... ie GUI_overlay(), it will just default to "./"
+        self.directory = custom_dir
         self.initialize()
-        self.directory = "./"
+
+
 
     def initialize(self):
         self.title('Mission Control: Fl0PPY D15K')
@@ -85,7 +89,9 @@ class GUI_overlay(Tkinter.Tk):
         self.animal_label_list = self.setup_animals(nb,animal_tab)
 
         # BEGIN LASERS
-        self.setup_lasers()
+        if self.directory != "./":
+            #only sets up lasers if NOT in testing mode. (in testing mode, a custom directory is passed in.
+            self.setup_lasers()
 
 
 
@@ -1937,28 +1943,28 @@ class GUI_overlay(Tkinter.Tk):
         i = 0
         for file in os.listdir(self.directory):
             if file.endswith("pic.sta"):
-                with open(file) as f:
+                with open(self.directory+file) as f:
                     for line in f:
                         self.robot_label_list[i].configure(text=str(line))
                         i+=1
         i=0
         for file in os.listdir(self.directory):
             if file.endswith("car.sta"):
-                with open(file) as f:
+                with open(self.directory+file) as f:
                     for line in f:
                         self.robot2_label_list[i].configure(text=str(line))
                         i+=1
         i=0
         for file in os.listdir(self.directory):
             if file.endswith("vis.sta") or file.endswith("wor.sta"):
-                with open(file) as f:
+                with open(self.directory+file) as f:
                     for line in f:
                         self.human_label_list[i].configure(text=str(line))
                         i+=1
         i=0
         for file in os.listdir(self.directory):
             if file.endswith("ani.sta"):
-                with open(file) as f:
+                with open(self.directory+file) as f:
                     for line in f:
                         self.animal_label_list[i].configure(text=str(line))
                         i+=1
