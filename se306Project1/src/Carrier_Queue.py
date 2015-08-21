@@ -20,7 +20,7 @@ class Carrier_Queue:
 
         self.lock = threading.RLock()
         self.picker_robots = ["0,0,0","0,0,0","0,0,0","0,0,0","0,0,0","0,0,0"]
-        self.max_load = 20
+        self.max_load = 50
         self.total_kiwis_collected = 0
         self.total_collections = 0
 
