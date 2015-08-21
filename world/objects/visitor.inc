@@ -24,7 +24,7 @@ define visitor position
 
   localization "gps"         	  
 
-  size [1 1 3]
+  size [0.6 0.8 2.6]
   #origin [-0.25 -0.25 0 0 ]
 
   mylaser(pose [ 0.000 0.000 -2.5 0.000 ])
@@ -63,7 +63,7 @@ define visitor position
 	point[2] [0.6 1]
 	point[3] [0.6 0.6]
 	z [0.05 0.4]
-	color "blue"
+	color "navy"
   )
 
   # left leg
@@ -75,7 +75,7 @@ define visitor position
 	point[2] [0.6 0.4]
 	point[3] [0.6 0]
 	z [0.05 0.4]
-	color "blue"
+	color "navy"
   )
 
   # torso
