@@ -72,13 +72,13 @@ class Worker(Human):
             5: self.go_to_empty_orchard_row,
             6: self.patrol_orchard,
             7: self.avoid_robot
-        }
+         }
 
     """
     @function
 
     Call back function to update position values. Also will write current state information to a wor.sta file which
-    is to be used by the gui
+    is to be used by the GUI
     """
     def StageOdom_callback(self, msg):
         #Update the px and py values
@@ -118,7 +118,7 @@ class Worker(Human):
 
                 #Create actions to turn right and move forward
                 move1 = self._actions_[0], [3]
-                turn2 = self._actions_[2], ["right"]
+                turn2 = self._actions_[3], ["right"]
 
                 #Append actions to stack
                 self._actionsStack_.append(move1)
@@ -163,6 +163,8 @@ class Worker(Human):
 
         #Set the path to the config.properties file
         path_to_config = os.path.abspath(os.path.abspath(os.getcwd())) + "/config.properties"
+
+        print(path_to_config)
 
         #Store each property in a dictionary
         with open(path_to_config, "r") as f:

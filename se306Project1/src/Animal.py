@@ -51,6 +51,12 @@ class Animal(Entity):
             5: self.go_to_visitor
         }
 
+    """
+    @function
+
+    Call back function to update position values. Also will write current state information to a wor.sta file which
+    is to be used by the GUI
+    """
     def StageOdom_callback(self, msg):
         #Update the px and py values
         self.update_position(msg.pose.pose.position.x, msg.pose.pose.position.y)
@@ -74,9 +80,9 @@ class Animal(Entity):
 
     """
     @function
-    @parameter: Sensor_Msg.LaserScan msg
-    Callback function used when data from the laser is sent. If it detects an object in front of it that is less than
-    2m away, it will attempt to navigate away from the object.
+
+    Call back function for the laser messages. When this entity detects a object in front of it,
+    it will stop current action, then turn right and move forward.
     """
     def StageLaser_callback(self, msg):
         #Define objects being in front of the Animal as being within a 30 degree radius
@@ -96,8 +102,15 @@ class Animal(Entity):
 
                 return
 
+    """
+    @function
+
+    Callback function that is invoked when the Visitor publishes its location. It will store the location
+    into a dictionary of visitor locations.
+    """
     def Visitor_Subscription(self, visitor_message):
 
+        #Obtain the message and the corresponding message values
         msg = "" + visitor_message.data
         visitor_values = msg.split(":", 3)
 
@@ -107,9 +120,15 @@ class Animal(Entity):
 
         position = [v_x, v_y]
 
+        #Place the location into the dictionary using the visitor id as the key
         self.dict_of_visitors[v_id] = position
 
 
+    """
+    @function
+
+    Create a set of goto functions that will move to the given coordinate
+    """
     def go_to_location(self, x, y):
 
         print("Attempting to go to " + str(x) + ", " + str(y))
@@ -131,32 +150,45 @@ class Animal(Entity):
         self._actionsStack_.append(move_to_x)
         self._actionsStack_.append(move_to_y)
 
+    """
+    @function
+
+    Go to a randomly generated coordinate
+    """
     def go_to_rand_location(self):
+        #Generate random x and y coordinate
         random_x = random.randint(-40, 40)
         random_y = random.randint(-40, 40)
 
+        #Set state
         self.animal_state = self.AnimalState.NAVIGATING_RANDOM
 
         self.go_to_location(random_x, random_y)
 
+    """
+    @function
+
+    Obtain a coordinate value from the dictionary of visitor coordinates. Then use the go_to_location to navigate
+    to that coordinate
+    """
     def go_to_visitor(self):
-        #visitor_x = self.dict_of_visitors.values()[0][0]
-        #visitor_y = self.dict_of_visitors.values()[0][1]
 
         if (self.dict_of_visitors.__len__() > 0):
             self.animal_state = self.AnimalState.GOING_TO_VISITOR
 
-            visitor_x = self.dict_of_visitors.values()[0][0]
-            visitor_y = self.dict_of_visitors.values()[0][1]
-
-            # visitor_coord = self.dict_of_visitors["5"]
-            # visitor_x = visitor_coord[0]
-            # visitor_y = visitor_coord[1]
-
-            print("Going to visitor " + str(visitor_x) + " " + str(visitor_y))
+            #Obtain any value from the visitor dictionary
+            coord = self.dict_of_visitors.values()[0]
+            visitor_x = coord[0]
+            visitor_y = coord[1]
 
             self.go_to_location(visitor_x, visitor_y)
 
+    """
+    @function
+
+    Function that will be repeatedly called in the main while loop of the Run_Animal.py script.
+    
+    """
     def animal_specific_function(self):
 
         random_action_int = random.randint(0, 10)
