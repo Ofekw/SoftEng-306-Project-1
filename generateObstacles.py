@@ -6,27 +6,28 @@ def main(row_values, config):
     obstacle = open('world/templates/obstacle.template','r').read()
     myworld = open('world/myworld.world','a+')
     string = ""
+    x_values = []
+    for i in row_values:
+        x_values.append(i-4.2)
+        x_values.append(i+4.2)
+    obstacle_coordinates = []
     for i in range(0, number):
-        rand = random.randint(0, 1)
-        if rand == 1:
-            temp = obstacle.replace("obstacle", "rock")
-        else:
-            temp = obstacle.replace("obstacle", "weed")
-        invalid_value = True
-        while invalid_value == True:
-            collide_tree = False
-            x = random.randint(-40, 40)
-            for value in row_values:
-                if value in range(x-3, x+3):
-                    collide_tree = True
-            if collide_tree == False:
-                temp = temp.replace("x", str(x))
-                invalid_value = False
-            temp = temp.replace("y", str(random.randint(-12, 46)))
+        temp = obstacle.replace("obstacle", "rock")
+
+        obstacle_tooNear = True
+        while obstacle_tooNear:
+            x = x_values[random.randint(0, x_values.__len__()-1)]
+            y = random.randint(-4, 33)
+            obstacle_tooNear = False
+            for j in obstacle_coordinates:
+                if j[0] == x and abs(y - j[1]) < 16:
+                    obstacle_tooNear = True
+        obstacle_coordinates.append([x,y])
+
+        temp = temp.replace("x", str(x))
+        temp = temp.replace("y", str(y))
 
         string = string + '\n' + temp
 
     myworld.write(string)
     myworld.close()
-
-

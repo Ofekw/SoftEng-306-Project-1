@@ -267,7 +267,7 @@ class Worker(Human):
         self.worker_state = self.WorkerState.PATROLLING_ORCHARD
 
         #Create actions to move north then south
-        go_north = self._actions_[1], [self.px, 40]
+        go_north = self._actions_[1], [self.px, 48]
         go_south = self._actions_[1], [self.px, -10]
 
         #Append actions to stack
@@ -279,21 +279,25 @@ class Worker(Human):
 
     """
     @function
-    This function is called when a robot enters the row that the worker is currently in
+    This function is called when a robot enters the row that the worker is currently in. It will create
+    and append actions in order to move the worker out of the row.
     """
-    def avoid_robot(self):
+    def avoid_robot(self, robot_py):
         #Set state to AVOIDING_ROBOT
         self.worker_state = Worker.WorkerState.AVOIDING_ROBOT
 
-        #Create action to leave the row by going south
-        go_south = self._actions_[1], [self.px, -20]
-
-        #Create action that will move the worker to the bottom right corner
-        go_east = self._actions_[1], [30, -20]
+        if robot_py < self.py:
+            #Create action to leave the row by going  then head east
+            leave_row = self._actions_[1], [self.px, -20]
+            go_east = self._actions_[1], [30, -20]
+        else:
+            #Create action to leave the row by going north then head east
+            leave_row = self._actions_[1], [self.px, 48]
+            go_east = self._actions_[1], [30, 48]
 
         #Append actions
         self._actionsStack_.append(go_east)
-        self._actionsStack_.append(go_south)
+        self._actionsStack_.append(leave_row)
 
         #Set stopCurrentAction to false
         self._stopCurrentAction_ = False
@@ -317,13 +321,13 @@ class Worker(Human):
             #Check if the x coordinate is within the current orchard row
             if self.empty_row_target[0] <= r_px <= self.empty_row_target[1]:
                 #Check if the robot has actually entered the orchard row as well
-                if -10 <= r_py <= 48:
+                if -10 <= r_py <= 39:
 
                     #Stop current action
                     self._stopCurrentAction_ = True
 
                     #Set and append avoid action
-                    avoid_action = self._actions_[7], []
+                    avoid_action = self._actions_[7], [r_py]
                     self._actionsStack_.append(avoid_action)
 
                     return
