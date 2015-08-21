@@ -1975,7 +1975,7 @@ class GUI_overlay(Tkinter.Tk):
 
 def delete_files():
     for file in os.listdir("./"):
-        if file.endswith(".sta") or file.endswith(".ls"):
+        if file.endswith(".sta") or file.endswith(".ls") or file.endswith(".que"):
             os.remove("./" + file)
             print(str(file) + " Deleted" )
 
