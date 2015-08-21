@@ -30,7 +30,7 @@ def main(argv, config):
     file_name = []
     x_value = -40
     #Types of robots that the script reads the config file for
-    robot_type = ["Picker", "Carrier", "Visitor", "Animal"]
+    robot_type = ["Picker", "Carrier", "Visitor", "Worker", "Animal"]
     #Loads the fields in the config file
 
     #Creates or overwrites the myworld.world file
@@ -51,7 +51,7 @@ def main(argv, config):
             robot = robot + type.lower() + "( pose [ " + str(x_value)  +  " -28 0.000 90 ] name \"r" + str(total_robots) + "\")" + "\n"
             #The constructor of that robot type with the robot_id and the x y positions
             constructor_name = "Robot" + type
-            if type == "Visitor" or type == "Animal":
+            if type == "Visitor" or type == "Animal" or type == "Worker":
                 constructor_name = constructor_name.replace("Robot", "")
             constructor = "    robot = " + constructor_name + "(\"" + type + str(i) + "\", " + str(total_robots) + ", " + str(x_value) + ", -28, math.pi/2)"
             if debugging == True:
