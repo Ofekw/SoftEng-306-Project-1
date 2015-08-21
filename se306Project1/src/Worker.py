@@ -118,7 +118,7 @@ class Worker(Human):
 
                 #Create actions to turn right and move forward
                 move1 = self._actions_[0], [3]
-                turn2 = self._actions_[2], ["right"]
+                turn2 = self._actions_[3], ["right"]
 
                 #Append actions to stack
                 self._actionsStack_.append(move1)

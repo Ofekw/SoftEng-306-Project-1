@@ -148,9 +148,4 @@ define animal position
 	color "saddle brown"
 
   )
-<<<<<<< HEAD
-
-  
-=======
->>>>>>> Worker
 )
