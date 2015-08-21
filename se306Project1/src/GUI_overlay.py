@@ -16,6 +16,7 @@ import matplotlib.pyplot as plt
 import os
 import string
 import time
+import tkFont
 
 
 """
@@ -1754,6 +1755,9 @@ class GUI_overlay(Tkinter.Tk):
         output_file.write("0\n")
         output_file.close()
 
+        labelTFont = tkFont.Font(family="Helvetica",size=16,weight="bold")
+        labelBFont = tkFont.Font(family="Helvetica",size=14)
+
         TLabelframe1 = ttk.Labelframe(status_tab)
         TLabelframe1.place(relx=0.02, rely=0.1, relheight=0.4,relwidth=0.95)
         TLabelframe1.configure(relief=RAISED)
@@ -1762,44 +1766,60 @@ class GUI_overlay(Tkinter.Tk):
         TLabelframe1.configure(width=390)
 
         status_tab.Label1 = Label(TLabelframe1)
-        status_tab.Label1.place(relx=0.025, rely=0.15, height=19, width=150)
+        status_tab.Label1.place(relx=0.025, rely=0.175, height=30, width=300)
         status_tab.Label1.configure(text='''Picker Queue (IDs):''')
+        status_tab.Label1.configure(font=labelTFont)
+
 
         status_tab.Label2 = Label(TLabelframe1)
-        status_tab.Label2.place(relx=0.025, rely=0.3, height=19, width=150)
+        status_tab.Label2.place(relx=0.025, rely=0.35, height=19, width=300)
         status_tab.Label2.configure(text='''Targeted Pickers (IDs):''')
+        status_tab.Label2.configure(font=labelTFont)
+
 
         status_tab.Label3 = Label(TLabelframe1)
-        status_tab.Label3.place(relx=0.025, rely=0.45, height=19, width=150)
+        status_tab.Label3.place(relx=0.025, rely=0.525, height=19, width=300)
         status_tab.Label3.configure(text='''Total Kiwifruit collected:''')
+        status_tab.Label3.configure(font=labelTFont)
+
 
         status_tab.Label4 = Label(TLabelframe1)
-        status_tab.Label4.place(relx=0.025, rely=0.6, height=19, width=150)
+        status_tab.Label4.place(relx=0.025, rely=0.7, height=19, width=300)
         status_tab.Label4.configure(text='''Number of collections:''')
+        status_tab.Label4.configure(font=labelTFont)
+
 
         status_tab.TLabel1 = ttk.Label(TLabelframe1)
-        status_tab.TLabel1.place(relx=0.4, rely=0.15, height=17, width=150)
+        status_tab.TLabel1.place(relx=0.6, rely=0.175, height=25, width=250)
         status_tab.TLabel1.configure(background=self._bgcolor)
         status_tab.TLabel1.configure(foreground="#0066FF")
         status_tab.TLabel1.configure(relief=FLAT)
+        status_tab.TLabel1.configure(font=labelBFont)
+
 
         status_tab.TLabel2 = ttk.Label(TLabelframe1)
-        status_tab.TLabel2.place(relx=0.4, rely=0.3, height=17, width=150)
+        status_tab.TLabel2.place(relx=0.6, rely=0.35, height=25, width=250)
         status_tab.TLabel2.configure(background=self._bgcolor)
         status_tab.TLabel2.configure(foreground="#0066FF")
         status_tab.TLabel2.configure(relief=FLAT)
+        status_tab.TLabel2.configure(font=labelBFont)
+
 
         status_tab.TLabel3 = ttk.Label(TLabelframe1)
-        status_tab.TLabel3.place(relx=0.4, rely=0.45, height=17, width=150)
+        status_tab.TLabel3.place(relx=0.6, rely=0.525, height=25, width=250)
         status_tab.TLabel3.configure(background=self._bgcolor)
         status_tab.TLabel3.configure(foreground="#0066FF")
         status_tab.TLabel3.configure(relief=FLAT)
+        status_tab.TLabel3.configure(font=labelBFont)
+
 
         status_tab.TLabel4 = ttk.Label(TLabelframe1)
-        status_tab.TLabel4.place(relx=0.4, rely=0.6, height=17, width=150)
+        status_tab.TLabel4.place(relx=0.6, rely=0.7, height=25, width=250)
         status_tab.TLabel4.configure(background=self._bgcolor)
         status_tab.TLabel4.configure(foreground="#006600")
         status_tab.TLabel4.configure(relief=FLAT)
+        status_tab.TLabel4.configure(font=labelBFont)
+
 
         status_label_list = [status_tab.TLabel1,status_tab.TLabel2,status_tab.TLabel3,status_tab.TLabel4]
 
@@ -1849,7 +1869,7 @@ class GUI_overlay(Tkinter.Tk):
             for file in os.listdir(directory):
                 if (file.endswith("laser.ls")) and (count == 0):
                     read = True
-                    time.sleep(3)
+                    time.sleep(5)
                     count+=1
                     f = open(file)
                     lines = f.read()
@@ -1868,6 +1888,7 @@ class GUI_overlay(Tkinter.Tk):
                         self.canvas1.get_tk_widget().pack(side=Tkinter.TOP, fill=Tkinter.BOTH, expand=1)
                 elif (file.endswith("laser.ls")) and (count == 1):
                     count+=1
+                    time.sleep(1)
                     f = open(file)
                     lines = f.read()
                     lines = lines.translate(None, '\',[]')
