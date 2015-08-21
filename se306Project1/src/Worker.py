@@ -162,7 +162,9 @@ class Worker(Human):
     def define_orchard_row_gaps(self):
 
         #Set the path to the config.properties file
-        path_to_config = os.path.dirname(os.path.abspath(os.pardir)) + "/config.properties"
+        path_to_config = os.path.abspath(os.path.abspath(os.pardir)) + "/config.properties"
+
+        print(path_to_config)
 
         #Store each property in a dictionary
         with open(path_to_config, "r") as f:
