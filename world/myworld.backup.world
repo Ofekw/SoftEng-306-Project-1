@@ -1,7 +1,10 @@
 include "objects/picker.inc"
 include "objects/visitor.inc"
 include "objects/carrier.inc"
+include "objects/tree.inc"
+include "objects/visitor.inc"
 include "objects/animal.inc"
+include "objects/worker.inc"
 
 define floorplan model
 (
@@ -54,3 +57,5 @@ carrier( pose [ 0 -28 0.000 90 ] name "r3")
 visitor( pose [ 10 -28 0.000 90 ] name "r4")
 
 animal( pose [ 20 -28 0.000 90 ] name "r5")
+
+worker( pose [ 40 -20 0 0] name "w1")

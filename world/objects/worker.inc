@@ -11,7 +11,7 @@ define mylaser ranger
   
 )
 
-define visitor position 
+define worker position 
 (
   color "gray50"
   drive "diff"		 	# Differential steering model.
@@ -87,7 +87,7 @@ define visitor position
 	point[2] [0.6 1]
 	point[3] [0.6 0]
 	z [0.4 0.8]
-	color "red"
+	color "ivory"
   )
 
   # neck
@@ -112,5 +112,29 @@ define visitor position
 	point[3] [0.6 0.23]
 	z [0.85 1]
 	color "pink"
+  )
+
+  # hat part1
+  block
+  (
+	points 4
+	point[0] [0 0.23]
+	point[1] [0 0.76]
+	point[2] [0.6 0.76]
+	point[3] [0.6 0.23]
+	z [1 1.15]
+	color "ivory"
+  )
+
+  # hat part2
+  block
+  (
+	points 4
+	point[0] [0.6 0.23]
+	point[1] [0.6 0.76]
+	point[2] [0.9 0.76]
+	point[3] [0.9 0.23]
+	z [1 1.05]
+	color "ivory"
   )
 )
