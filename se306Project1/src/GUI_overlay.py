@@ -1778,6 +1778,7 @@ class GUI_overlay(Tkinter.Tk):
             for file in os.listdir(directory):
                 if (file.endswith("laser.ls")) and (count == 0):
                     read = True
+                    time.sleep(5)
                     count+=1
                     f = open(file)
                     lines = f.read()

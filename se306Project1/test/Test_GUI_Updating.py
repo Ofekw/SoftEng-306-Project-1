@@ -10,7 +10,7 @@ import Tkinter
 import multiprocessing
 import os
 
-class Test_GUI_overlay_read_data(unittest.TestCase,TestModule):
+class Test_GUI_Updating(unittest.TestCase,TestModule):
 
     def createFile(self,file_path,topic_name,entity_type,current_action,px,py,theta,capacity):
 
