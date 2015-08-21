@@ -105,5 +105,35 @@ class Test_GUI_overlay_read_data(unittest.TestCase,TestModule):
 
         os.remove(file_path)
 
+    def test_gui_worker_read(self):
+
+        print self.print_function_name(inspect.stack()[0][3])
+
+        gui = GUI_overlay()
+        gui.directory = "./se306Project1/src/"
+        file_path = './se306Project1/src/TESTwor.sta'
+        dir = os.path.abspath(file_path)
+        output_file = open(dir, "w")
+        output_file.write("human_500\n")
+        output_file.write("Visitor\n")
+        output_file.write("Doing random visitor stuff\n")
+        output_file.write("0.25\n")
+        output_file.write("0.55\n")
+        output_file.write("3.1415\n")
+        output_file.write("12/20\n")
+        output_file.close()
+
+        gui.update()
+
+        self.assertEquals(gui.human_label_list[0].cget("text"), "human_500\n")
+        self.assertEquals(gui.human_label_list[1].cget("text"), "Visitor\n")
+        self.assertEquals(gui.human_label_list[2].cget("text"), "Doing random visitor stuff\n")
+        self.assertEquals(gui.human_label_list[3].cget("text"), "0.25\n")
+        self.assertEquals(gui.human_label_list[4].cget("text"), "0.55\n")
+        self.assertEquals(gui.human_label_list[5].cget("text"), "3.1415\n")
+        self.assertEquals(gui.human_label_list[6].cget("text"), "12/20\n")
+
+        os.remove(file_path)
+
 if __name__ == '__main__':
     unittest.main()
