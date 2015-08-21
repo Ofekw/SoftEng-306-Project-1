@@ -72,7 +72,7 @@ class Worker(Human):
             5: self.go_to_empty_orchard_row,
             6: self.patrol_orchard,
             7: self.avoid_robot
-        }
+         }
 
     """
     @function
@@ -162,7 +162,7 @@ class Worker(Human):
     def define_orchard_row_gaps(self):
 
         #Set the path to the config.properties file
-        path_to_config = os.path.abspath(os.path.abspath(os.pardir)) + "/config.properties"
+        path_to_config = os.path.dirname(os.path.abspath(os.pardir)) + "/config.properties"
 
         #Store each property in a dictionary
         with open(path_to_config, "r") as f:
