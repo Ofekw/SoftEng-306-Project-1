@@ -164,8 +164,6 @@ class Worker(Human):
         #Set the path to the config.properties file
         path_to_config = os.path.abspath(os.path.abspath(os.pardir)) + "/config.properties"
 
-        print(path_to_config)
-
         #Store each property in a dictionary
         with open(path_to_config, "r") as f:
             for line in f:
