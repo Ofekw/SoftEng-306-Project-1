@@ -30,8 +30,8 @@ class Animal(Entity):
                         GOING_TO_VISITOR = "Going to visitor")
 
 
-    def __init__(self, r_id, x_off, y_off, theta_offset):
-        Entity.__init__(self, r_id, x_off, y_off, theta_offset)
+    def __init__(self, r_name, r_id, x_off, y_off, theta_offset):
+        Entity.__init__(self, r_name, r_id, x_off, y_off, theta_offset)
 
         self.dict_of_visitors = {}
 

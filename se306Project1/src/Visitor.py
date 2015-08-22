@@ -32,8 +32,8 @@ class Visitor(Human):
                         MOVING_RANDOM = "Move to rand direction")
 
 
-    def __init__(self, r_id, x_off, y_off, theta_offset):
-        Human.__init__(self, r_id, x_off, y_off, theta_offset)
+    def __init__(self, r_name, r_id, x_off, y_off, theta_offset):
+        Human.__init__(self, r_name, r_id, x_off, y_off, theta_offset)
 
         #Initialise the publisher
         self.pub_to_dog = rospy.Publisher("visitor_dog_topic", String, queue_size=10)

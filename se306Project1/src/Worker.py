@@ -36,8 +36,8 @@ class Worker(Human):
                         AVOIDING_ROBOT="Detected robot, leaving row",
                        WAITING_FOR_EMPTY_ROW="Waiting for row to become empty")
 
-    def __init__(self, r_id, x_off, y_off, theta_offset):
-        Human.__init__(self, r_id, x_off, y_off, theta_offset)
+    def __init__(self, r_name, r_id, x_off, y_off, theta_offset):
+        Human.__init__(self, r_name, r_id, x_off, y_off, theta_offset)
 
 
         #Initialise worker state to empty string
@@ -162,7 +162,7 @@ class Worker(Human):
     def define_orchard_row_gaps(self):
 
         #Set the path to the config.properties file
-        path_to_config = os.path.abspath(os.path.abspath(os.pardir)) + "/config.properties"
+        path_to_config = os.path.abspath(os.path.abspath(os.getcwd())) + "/config.properties"
 
         print(path_to_config)
 

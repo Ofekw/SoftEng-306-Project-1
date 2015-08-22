@@ -19,9 +19,9 @@ It inherits from the Entity class.
 """
 class Human(Entity):
 
-    def __init__(self,r_id,x_off,y_off, theta_offset):
+    def __init__(self,r_name,r_id,x_off,y_off, theta_offset):
         #Insert human specific attirbutes here
-        Entity.__init__(self,r_id,x_off,y_off, theta_offset)
+        Entity.__init__(self,r_name,r_id,x_off,y_off, theta_offset)
 
     def human_specific_function(self):
         pass

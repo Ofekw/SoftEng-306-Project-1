@@ -14,7 +14,6 @@ def main(argv):
     debugging = False
     webservice = False
 
-
     config = {}
     with open("config.properties", "r") as f:
         for line in f:
@@ -34,13 +33,13 @@ def main(argv):
             debugging = True
         elif opt == "-w":
             webservice = True
-	
-    if testing == True:
+
+    if testing:
         list = generateEntity.main(['-t'], config)
         generateWorldFile.main(config)
         return list
     else:
-        if debugging == True:
+        if debugging:
             list = generateEntity.main(["-d"])
         else:
             list = generateEntity.main([""], config)
@@ -53,7 +52,7 @@ def main(argv):
         #execute GUI script
         processes.append(subprocess.Popen(['python', 'GUI_overlay.py'], cwd=r'./se306Project1/src'))
         atexit.register(kill_GUI)
-        if webservice == True:
+        if webservice:
             processes.append(subprocess.Popen(['python', 'Webservice.py'], cwd=r'./se306Project1/src'))
         while True:
             pass
