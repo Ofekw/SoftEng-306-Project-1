@@ -28,7 +28,6 @@ def main(argv, config):
 
     #List of the temporary robot files created
     file_name = []
-    x_value = -40
     #Types of robots that the script reads the config file for
     robot_type = ["Picker", "Carrier", "Visitor", "Worker", "Animal"]
     #Loads the fields in the config file
@@ -48,15 +47,19 @@ def main(argv, config):
         if number > 5:
             number = 5
         robot = ""
+        if type == "Carrier":
+            x_value = -50
+        else:
+            x_value = 45 - robot_type.index(type)*4
         for i in range(0, number):
             if type != "Picker":
                 if type == "Carrier":
-                    constructor_name = "Robot" + type
-                    y = -35+(5*i)
-                else:
                     x_value += 10
+                    constructor_name = "Robot" + type
+                    y = -35-(5*i)
+                else:
                     constructor_name = type
-                    y = -35
+                    y = -35-(5*i)
                 robot += type.lower() + "( pose [ " + str(x_value)  +  " " + str(y) + " 0.000 90 ] name \"r" + str(total_robots) + "\")" + "\n"
                 constructor = "    robot = " + constructor_name + "(\"" + type + str(i) + "\", " + str(total_robots) + ", " + str(x_value) + ", " + str(y) +", math.pi/2)"
                 name = type + str(i) + ".py" #Name of the robot files
@@ -75,6 +78,7 @@ def main(argv, config):
             temp.close()
             #Gives the temporary robot file run permission
             os.chmod(directory+name,stat.S_IRWXU)
+
             total_robots += 1
         robot = robot + "\n"
         #Writes the robot models to the world file
