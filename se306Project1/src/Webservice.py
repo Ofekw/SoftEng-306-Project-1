@@ -6,6 +6,7 @@ from Entity status files
 import os
 import ftplib
 import time
+import datetime
 
 class Webservice():
 
@@ -47,10 +48,11 @@ class Webservice():
                     JSON_string+="\"5\":\"" + lines[5].strip() +"\","
                     JSON_string+="\"6\":\"""\"},"
 
-
+        time = str(unix_time(datetime.datetime.now()))
+        sliceTime = time[len(time)-9: len(time)-4]
         JSON_string = JSON_string[:-1]
         JSON_string+="]}"
-        JSON_string = "{\"sEcho\": 1,\"iTotalRecords\": " + str(count)+","+"\"iTotalDisplayRecords\": 50,\"" + JSON_string
+        JSON_string = "{\"lastModified\": "+sliceTime+","+"\"sEcho\": 1,\"iTotalRecords\": " + str(count)+","+"\"iTotalDisplayRecords\": 50,\"" + JSON_string
         return JSON_string
 
     def send_JSON_via_FTP(self,JSON_strings):
@@ -69,6 +71,11 @@ class Webservice():
     def updater(self):
         JSON_strings = self.create_JSON_strings()
         self.send_JSON_via_FTP(JSON_strings)
+
+def unix_time(dt):
+    epoch = datetime.datetime.utcfromtimestamp(0)
+    delta = dt - epoch
+    return delta.total_seconds() *1000
 
 
 if __name__ == '__main__':

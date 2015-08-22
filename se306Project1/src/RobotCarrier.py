@@ -44,8 +44,8 @@ class RobotCarrier(Robot):
         self.queue_sub = rospy.Subscriber("carrier_allocation_response", String, self.queue_callback)
 
         self.next_robot_id = None
-        self.carrier_robots = ["0,0,0","0,0,0","0,0,0","0,0,0","0,0,0","0,0,0"]
-        self.picker_robots = ["0,0,0","0,0,0","0,0,0","0,0,0","0,0,0","0,0,0"]
+        self.carrier_robots = ["0,0,0","0,0,0","0,0,0","0,0,0","0,0,0","0,0,0","0,0,0","0,0,0","0,0,0","0,0,0"]
+        self.picker_robots = ["0,0,0","0,0,0","0,0,0","0,0,0","0,0,0","0,0,0","0,0,0","0,0,0","0,0,0","0,0,0"]
 
         self.max_load = capacity
 

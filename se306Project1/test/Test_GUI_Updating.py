@@ -30,12 +30,10 @@ class Test_GUI_Updating(unittest.TestCase,TestModule):
 
     def test_gui_picker_read(self):
 
-        print self.print_function_name(inspect.stack()[0][3])
+        directory = "./se306Project1/src/"
+        gui = GUI_overlay(directory)
 
-        gui = GUI_overlay()
-        gui.directory = "./se306Project1/src/"
-
-        file_path = './se306Project1/src/TESTpic.sta'
+        file_path = './se306Project1/src/0pic.sta'
         topic_name = "robot_100\n"
         entity_name = "Picker\n"
         current_action = "Picking fruit\n"
@@ -64,10 +62,10 @@ class Test_GUI_Updating(unittest.TestCase,TestModule):
 
         print self.print_function_name(inspect.stack()[0][3])
 
-        gui = GUI_overlay()
-        gui.directory = "./se306Project1/src/"
+        directory = "./se306Project1/src/"
+        gui = GUI_overlay(directory)
 
-        file_path = './se306Project1/src/TESTcar.sta'
+        file_path = './se306Project1/src/0car.sta'
         topic_name = "robot_100\n"
         entity_name = "Picker\n"
         current_action = "Picking fruit\n"
@@ -92,12 +90,10 @@ class Test_GUI_Updating(unittest.TestCase,TestModule):
 
     def test_gui_visitor_read(self):
 
-        print self.print_function_name(inspect.stack()[0][3])
+        directory = "./se306Project1/src/"
+        gui = GUI_overlay(directory)
 
-        gui = GUI_overlay()
-        gui.directory = "./se306Project1/src/"
-
-        file_path = './se306Project1/src/TESTvis.sta'
+        file_path = './se306Project1/src/0vis.sta'
         topic_name = "robot_100\n"
         entity_name = "Picker\n"
         current_action = "Picking fruit\n"
@@ -123,12 +119,10 @@ class Test_GUI_Updating(unittest.TestCase,TestModule):
 
     def test_gui_worker_read(self):
 
-        print self.print_function_name(inspect.stack()[0][3])
+        directory = "./se306Project1/src/"
+        gui = GUI_overlay(directory)
 
-        gui = GUI_overlay()
-        gui.directory = "./se306Project1/src/"
-
-        file_path = './se306Project1/src/TESTvis.sta'
+        file_path = './se306Project1/src/0wor.sta'
         topic_name = "robot_100\n"
         entity_name = "Picker\n"
         current_action = "Picking fruit\n"
@@ -153,12 +147,10 @@ class Test_GUI_Updating(unittest.TestCase,TestModule):
 
     def test_gui_animal_read(self):
 
-        print self.print_function_name(inspect.stack()[0][3])
+        directory = "./se306Project1/src/"
+        gui = GUI_overlay(directory)
 
-        gui = GUI_overlay()
-        gui.directory = "./se306Project1/src/"
-
-        file_path = './se306Project1/src/TESTani.sta'
+        file_path = './se306Project1/src/0ani.sta'
         topic_name = "robot_100\n"
         entity_name = "Picker\n"
         current_action = "Picking fruit\n"
@@ -183,4 +175,6 @@ class Test_GUI_Updating(unittest.TestCase,TestModule):
 
 
 if __name__ == '__main__':
-    unittest.main()
+    # unittest.main()
+    import rostest
+    rostest.rosrun('se306Project1', 'test_bare_bones', Test_GUI_Updating)
