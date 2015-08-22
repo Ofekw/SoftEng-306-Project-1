@@ -8,6 +8,9 @@ import generateWorldFile
 
 config = {}
 def main(argv):
+    print "\n-----------------------------------------------------"
+    print "                Floppy Disk Testing Unit"
+    print "-----------------------------------------------------\n"
     with open("config.properties", "r") as f:
         for line in f:
             property = line.split('=')
@@ -37,14 +40,16 @@ def main(argv):
     run_tests(processes, test_files)
 
 def test_build():
+    print "Build Script Testing:\n"
     p = subprocess.Popen(['python', 'TestGenerateFiles.py'], shell=False, stdout=log, stderr=log)
     p.wait()
     if p.returncode == 0:
-        print("SUCCESS build tests all passed")
+        print("\tTesting Completed\n")
 
 def start_services(processes):
     generateWorldFile.main(config)
-    processes.append(subprocess.Popen(['roscore'], shell=False))
+    FNULL = open(devnull, 'w')
+    processes.append(subprocess.Popen(['roscore'], shell=False, stdout=FNULL, stderr=FNULL))
 
 def setup(processes):
     FNULL = open(devnull, 'w')
@@ -56,10 +61,12 @@ def cleanup(processes):
     processes=[]
 
 def run_tests(processes, test_files):
+    print "Entity and GUI Testing:\n"
     time.sleep(10)
     spinner = spinning_cursor()
+    test_files.sort()
     for file in test_files:
-        print("TESTING: " + file +'\n')
+        print("\tTESTING: " + file +'\n')
         s = subprocess.call(["chmod","+x",'se306Project1/test/'+file])
         p = subprocess.Popen(['rosrun', 'se306Project1', file], shell=False, stdout=log, stderr=log)
         for i in range(0,50):
@@ -69,9 +76,12 @@ def run_tests(processes, test_files):
             sys.stdout.write('\b')
         p.wait()
         if p.returncode == 0:
+            print "\t\t Testing Completed:\n"
             cleanup(processes)
             setup(processes)
             time.sleep(5)
+
+
 
     cleanup(processes)
 

@@ -24,7 +24,7 @@ class Test_Robot_turn(unittest.TestCase,TestModule):
     #since we can't reset the stage, we have to work with the same robot.
     robot0 = RobotPicker(0,-20,-28, math.pi/2)
 
-    def test_turn_0right(self):
+    def test_turn_1right(self):
 
         self.print_function_name(inspect.stack()[0][3])
 
@@ -34,7 +34,7 @@ class Test_Robot_turn(unittest.TestCase,TestModule):
 
         self.assertEqual(self.robot0.get_current_direction(), "east")
 
-    def test_turn_1left(self):
+    def test_turn_2left(self):
 
         self.print_function_name(inspect.stack()[0][3])
 
