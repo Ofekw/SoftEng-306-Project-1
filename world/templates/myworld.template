@@ -6,6 +6,7 @@ include "objects/carrier.inc"
 include "objects/animal.inc"
 include "objects/rock.inc"
 include "objects/weed.inc"
+include "objects/dropoff.inc"
 
 define floorplan model
 (
