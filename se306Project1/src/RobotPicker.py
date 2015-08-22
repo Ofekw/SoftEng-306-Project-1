@@ -120,7 +120,6 @@ class RobotPicker(Robot):
     """
     def waitForCollection(self):
         self.state = self.PickerState.WAITINGFORCOLLECTION
-        self._stopCurrentAction_ = True
         self.disableLaser = True
         action = self._actions_[7],[]
         if action != self._actionsStack_[-1]:
@@ -278,7 +277,9 @@ class RobotPicker(Robot):
                     self.state = self.PickerState.PICKING
                     self.treeDetected = True
                     self.noMoreTrees=0
-                    self.addKiwi(time.clock())
+                    #only pick if going up and down
+                    if self.get_current_direction() != Entity.Direction.EAST and self.get_current_direction() != Entity.Direction.WEST:
+                        self.addKiwi(time.clock())
                 elif rangeCount == 20:
                     pass
 
