@@ -44,9 +44,11 @@ def main(argv, config):
     for type in robot_type:
         #Loads the corresponding robot template
         string = open('world/templates/' + type + '.template').read()
-        number = config.get(type.lower() + '.number')
+        number = int(config.get(type.lower() + '.number'))
+        if number > 5:
+            number = 5
         robot = ""
-        for i in range(0, int(number)):
+        for i in range(0, number):
             if type != "Picker":
                 if type == "Carrier":
                     constructor_name = "Robot" + type
