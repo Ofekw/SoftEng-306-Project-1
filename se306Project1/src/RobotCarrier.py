@@ -31,7 +31,7 @@ class RobotCarrier(Robot):
     CarrierState = enum(WAITINGFORPICKER="Waiting for picker",
                               GOINGTOPICKER="Going to picker", GOTODROPOFF="Going to dropoff")
 
-    def __init__(self,r_id,x_off,y_off,theta_off):
+    def __init__(self,r_id,x_off,y_off,theta_off, capacity):
 
         Robot.__init__(self,r_id,x_off,y_off,theta_off)
 
@@ -47,8 +47,7 @@ class RobotCarrier(Robot):
         self.carrier_robots = ["0,0,0","0,0,0","0,0,0","0,0,0","0,0,0","0,0,0"]
         self.picker_robots = ["0,0,0","0,0,0","0,0,0","0,0,0","0,0,0","0,0,0"]
 
-        # self.max_load = 100
-        # self.current_load = 0
+        self.max_load = capacity
 
         self.is_going_home = False
 

@@ -21,7 +21,6 @@ class Robot(Entity):
 
     def __init__(self, r_id, x_off, y_off, theta_off):
 
-        self.max_load = 50
         self.current_load = 0
         Entity.__init__(self,r_id,x_off,y_off, theta_off)
 

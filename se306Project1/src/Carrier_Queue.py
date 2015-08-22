@@ -9,7 +9,7 @@ import os
 
 class Carrier_Queue:
 
-    def __init__(self):
+    def __init__(self, capacity):
         rospy.init_node("Carrier_Queue")
 
         # picker_queue is a FIFO queue contains the  ids of full pickers
@@ -19,8 +19,8 @@ class Carrier_Queue:
         self.targeted_pickers = []
 
         self.lock = threading.RLock()
-        self.picker_robots = ["0,0,0","0,0,0","0,0,0","0,0,0","0,0,0","0,0,0"]
-        self.max_load = 50
+        self.picker_robots = ["0,0,0","0,0,0","0,0,0","0,0,0","0,0,0","0,0,0","0,0,0","0,0,0","0,0,0","0,0,0",]
+        self.max_load = capacity
         self.total_kiwis_collected = 0
         self.total_collections = 0
 

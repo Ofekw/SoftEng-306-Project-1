@@ -53,7 +53,9 @@ def main(argv, config):
             constructor_name = "Robot" + type
             if type == "Visitor" or type == "Animal":
                 constructor_name = constructor_name.replace("Robot", "")
-            constructor = "    robot = " + constructor_name + "(" + str(total_robots) + ", " + str(x_value) + ", -28, math.pi/2)"
+                constructor = "    robot = " + constructor_name + "(" + str(total_robots) + ", " + str(x_value) + ", -28, math.pi/2)"
+            else:
+                constructor = "    robot = " + constructor_name + "(" + str(total_robots) + ", " + str(x_value) + ", -28, math.pi/2," + config.get("capacity.number") + ")"
             if debugging == True:
                 constructor = constructor + "\n" + debug_text1 + "\n" + debug_text2
             name = type + str(i) + ".py" #Name of the robot files
@@ -71,13 +73,23 @@ def main(argv, config):
         myworld.write(robot)
     myworld.close()
 
+    #This is the carrier queue creation
+    string = open('world/templates/Queue.template').read()
+    temp = open(os.path.join(directory, "Queue_0.py"),'w')
+    #Replaces "@@@" string in the template with the constructor
+    temp.write(string.replace("@@@", "    carrier_queue = Carrier_Queue(" + config.get("capacity.number") + ")"))
+    temp.close()
+    #Gives the temporary robot file run permission
+    os.chmod(directory+"Queue_0.py",stat.S_IRWXU)
+    file_name.append("Queue_0.py")
+
     if testing == False:
         for name in file_name:
             #Runs all the temporary robot files created
             command = ["rosrun", "se306Project1", name]
             processes.append(subprocess.Popen(command, shell=False))
 
-    processes.append(subprocess.Popen(["rosrun", "se306Project1", "Run_Carrier_Queue.py"], shell=False))
+    #processes.append(subprocess.Popen(["rosrun", "se306Project1", "Queue_0.py"], shell=False))
     return file_name
 
 def exit_process(file_name):
