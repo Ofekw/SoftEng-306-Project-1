@@ -19,13 +19,13 @@ from TestModule import TestModule
 import inspect
 
 
-class Test_Robot_goto(unittest.TestCase,TestModule):
+class Test_Robot_goto_xy(unittest.TestCase,TestModule):
 
     #Not in 'setUp' because it will be called every time, and that will mean the node will restart its in instantiation
     #since we can't reset the stage, we have to work with the same robot.
     robot0 = RobotPicker(0,-20,-28, math.pi/2)
 
-    def test_goto_move_right(self):
+    def test_goto_xy_move_right(self):
 
         self.print_function_name(inspect.stack()[0][3])
 
@@ -39,7 +39,7 @@ class Test_Robot_goto(unittest.TestCase,TestModule):
         self.assertTrue(self.compare_values_with_threshold(self.robot0.px,end_x),"End X = Expected End X")
         self.assertTrue(self.compare_values_with_threshold(self.robot0.py,end_y),"End Y = Expected End Y")
 
-    def test_goto_move_left(self):
+    def test_goto_xy_move_left(self):
 
         self.print_function_name(inspect.stack()[0][3])
 
