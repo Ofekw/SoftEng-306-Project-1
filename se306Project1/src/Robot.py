@@ -23,6 +23,12 @@ class Robot(Entity):
 
         self.max_load = 100;
         self.current_load = 0;
+        self.firstLaserReading = []
+        self.treesLeft = True
+        self.disableSideLaser = False
+
+
+
         Entity.__init__(self,r_id,x_off,y_off, theta_off)
 
     def robot_specific_function(self):
@@ -31,3 +37,12 @@ class Robot(Entity):
     def start_picking(self):
        #incomplete
         pass
+
+    def read(self, msg, container):
+        for i in range(70, 110):
+            container.append(msg[i])
+
+    def enum(**enums):
+        return type('Enum', (), enums)
+
+    RobotState = enum(PATH="Path finding")

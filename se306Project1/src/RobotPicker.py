@@ -27,8 +27,8 @@ class RobotPicker(Robot):
         return type('Enum', (), enums)
 
     PickerState = enum(PICKING="Picking Fruit",
-                              FINDING="Finding Orchard", WAITINGFORCOLLECTION="Waiting for collection",
-                       PATH="Path finding")
+                              FINDING="Finding Orchard", WAITINGFORCOLLECTION="Waiting for collection"
+                       )
 
     def __init__(self,r_id,x_off,y_off,theta_off):
         Robot.__init__(self,r_id,x_off,y_off,theta_off)
@@ -36,12 +36,7 @@ class RobotPicker(Robot):
 
         # self.max_load = 100
         # self.current_load = 0
-        self.firstLaserReading = []
         self.timeLastAdded = time.clock()
-
-
-        self.treesLeft = True
-        self.disableSideLaser = False
 
         self.kiwi_sub = rospy.Subscriber("carrier_kiwiTransfer", String, self.kiwi_callback)
         self.kiwi_pub = rospy.Publisher("picker_kiwiTransfer",String, queue_size=10)
@@ -131,10 +126,6 @@ class RobotPicker(Robot):
         pass
 
     def StageLaser_callback(self, msg):
-        barCount = 0
-        found = False
-
-
         #Write laser data for ranger
         fn = os.path.join(os.path.dirname(__file__), str(self.robot_id)+"laser.ls")
         output_file = open(fn, "w")
@@ -145,7 +136,7 @@ class RobotPicker(Robot):
 
         if not self.disableLaser:
             for i in range(70, 110):
-                if (msg.ranges[i]< 4.0 and self.state != self.PickerState.PATH) or (msg.ranges[i] < 3 and self.state == self.PickerState.PATH):
+                if (msg.ranges[i]< 4.0 and self.state != Robot.RobotState.PATH) or (msg.ranges[i] < 3 and self.state == Robot.RobotState.PATH):
                     #check if dynamic entity
                     self._stopCurrentAction_ = True
                     if self.firstLaserReading == []:
@@ -172,7 +163,7 @@ class RobotPicker(Robot):
                                 self.firstLaserReading = []
                                 return
                         #static actions
-                        if self.state != self.PickerState.PATH:
+                        if self.state != Robot.RobotState.PATH:
                             #count number of lasers that have hit to check if wall
                             laserCount = 0
                             for i in self.firstLaserReading:
@@ -196,7 +187,7 @@ class RobotPicker(Robot):
                                 return
                             else:
                                 #else object is an obstacle
-                                self.state = self.PickerState.PATH
+                                self.state = Robot.RobotState.PATH
                                 print("calculating route")
                                 moveHorizontal = None
                                 moveVertical = None
@@ -223,14 +214,15 @@ class RobotPicker(Robot):
                                 self._actionsStack_.append(moveHorizontal)
                                 self.firstLaserReading = []
                                 return
-                        if self.state == self.PickerState.PATH:
+                        if self.state == Robot.RobotState.PATH:
                             action = self._actions_[2], [Entity.Direction.RIGHT]
                             self._actionsStack_.append(action)
                             self.firstLaserReading = []
                             self.state = self.PickerState.FINDING
                             return
 
-            if not self.disableSideLaser and self.state != self.PickerState.PATH:
+            #Tree detection
+            if not self.disableSideLaser and self.state != Robot.RobotState.PATH:
                 rangeCount = 0
                 for i in range(160,180):
                     if msg.ranges[i]<5.0:
@@ -251,18 +243,21 @@ class RobotPicker(Robot):
                     #stop the robot moving forward
                     self._stopCurrentAction_ = True
                     #check other pickers to see if in row.
-                    for i in range(len(self.picker_robots)):
-                        data = self.picker_robots[i].split(",")
-                        #check if
-                        if self.px-0.5 <= float(data[0]) +i*10 <= self.px+0.5 and self.py-1 <= float(data[1]) <= self.py+1:
-                            continue
-                        elif self.px-10 < float(data[0]) +i*10 < self.px+2 and self.py < float(data[1]) and float(data[0]) != 0:
-                            self.noMoreTrees = 0
-                            self.state = self.PickerState.FINDING
-                            self.disableSideLaser = True
-                            goToAction = self._actions_[5], [self.px+10, self.py]
-                            self._actionsStack_.append(goToAction)
-                            return
+                    if self.get_current_direction() == Entity.Direction.WEST:
+                        for i in range(len(self.picker_robots)):
+                            data = self.picker_robots[i].split(",")
+                            #check if
+                            if self.px-0.5 <= float(data[0]) +i*10 <= self.px+0.5 and self.py-1 <= float(data[1]) <= self.py+1:
+                                continue
+                            elif self.px-10 < float(data[0]) +i*10 < self.px+2 and self.py < float(data[1]) and float(data[0]) != 0:
+                                print(self.px)
+                                print(data[0])
+                                self.noMoreTrees = 0
+                                self.state = self.PickerState.FINDING
+                                self.disableSideLaser = True
+                                goToAction = self._actions_[5], [self.px+10, self.py]
+                                self._actionsStack_.append(goToAction)
+                                return
 
                     self.noMoreTrees = 0
                     self.disableSideLaser = True
@@ -282,10 +277,6 @@ class RobotPicker(Robot):
                         self.addKiwi(time.clock())
                 elif rangeCount == 20:
                     pass
-
-    def read(self, msg, container):
-        for i in range(70, 110):
-            container.append(msg[i])
 
     """
     @function
