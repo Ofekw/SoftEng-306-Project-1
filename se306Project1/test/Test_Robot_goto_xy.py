@@ -25,7 +25,7 @@ class Test_Robot_goto_xy(unittest.TestCase,TestModule):
     #since we can't reset the stage, we have to work with the same robot.
     robot0 = RobotPicker(0,-20,-28, math.pi/2)
 
-    def test_goto_xy_move_right(self):
+    def test_goto_xy_1move_right(self):
 
         self.print_function_name(inspect.stack()[0][3])
 
@@ -39,12 +39,40 @@ class Test_Robot_goto_xy(unittest.TestCase,TestModule):
         self.assertTrue(self.compare_values_with_threshold(self.robot0.px,end_x),"End X = Expected End X")
         self.assertTrue(self.compare_values_with_threshold(self.robot0.py,end_y),"End Y = Expected End Y")
 
-    def test_goto_xy_move_left(self):
+    def test_goto_xy_2move_left(self):
 
         self.print_function_name(inspect.stack()[0][3])
 
         end_x = -30
         end_y = -28
+
+        moveAction = self.robot0.goto_xy, [end_x,end_y]
+
+        self.run_robot(self.robot0,moveAction,15)
+
+        self.assertTrue(self.compare_values_with_threshold(self.robot0.px,end_x),"End X = Expected End X")
+        self.assertTrue(self.compare_values_with_threshold(self.robot0.py,end_y),"End Y = Expected End Y")
+
+    def test_goto_xy_3move_up(self):
+
+        self.print_function_name(inspect.stack()[0][3])
+
+        end_x = -30
+        end_y = -20
+
+        moveAction = self.robot0.goto_xy, [end_x,end_y]
+
+        self.run_robot(self.robot0,moveAction,15)
+
+        self.assertTrue(self.compare_values_with_threshold(self.robot0.px,end_x),"End X = Expected End X")
+        self.assertTrue(self.compare_values_with_threshold(self.robot0.py,end_y),"End Y = Expected End Y")
+
+    def test_goto_xy_4move_down(self):
+
+        self.print_function_name(inspect.stack()[0][3])
+
+        end_x = -30
+        end_y = -30
 
         moveAction = self.robot0.goto_xy, [end_x,end_y]
 
