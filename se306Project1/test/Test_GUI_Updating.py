@@ -32,10 +32,10 @@ class Test_GUI_Updating(unittest.TestCase,TestModule):
 
         print self.print_function_name(inspect.stack()[0][3])
 
-        gui = GUI_overlay()
-        gui.directory = "./se306Project1/src/"
+        directory = "./se306Project1/src/"
+        gui = GUI_overlay(directory)
 
-        file_path = './se306Project1/src/TESTpic.sta'
+        file_path = './se306Project1/src/0pic.sta'
         topic_name = "robot_100\n"
         entity_name = "Picker\n"
         current_action = "Picking fruit\n"
@@ -64,10 +64,10 @@ class Test_GUI_Updating(unittest.TestCase,TestModule):
 
         print self.print_function_name(inspect.stack()[0][3])
 
-        gui = GUI_overlay()
-        gui.directory = "./se306Project1/src/"
+        directory = "./se306Project1/src/"
+        gui = GUI_overlay(directory)
 
-        file_path = './se306Project1/src/TESTcar.sta'
+        file_path = './se306Project1/src/0car.sta'
         topic_name = "robot_100\n"
         entity_name = "Picker\n"
         current_action = "Picking fruit\n"
@@ -94,10 +94,10 @@ class Test_GUI_Updating(unittest.TestCase,TestModule):
 
         print self.print_function_name(inspect.stack()[0][3])
 
-        gui = GUI_overlay()
-        gui.directory = "./se306Project1/src/"
+        directory = "./se306Project1/src/"
+        gui = GUI_overlay(directory)
 
-        file_path = './se306Project1/src/TESTvis.sta'
+        file_path = './se306Project1/src/0vis.sta'
         topic_name = "robot_100\n"
         entity_name = "Picker\n"
         current_action = "Picking fruit\n"
@@ -125,10 +125,10 @@ class Test_GUI_Updating(unittest.TestCase,TestModule):
 
         print self.print_function_name(inspect.stack()[0][3])
 
-        gui = GUI_overlay()
-        gui.directory = "./se306Project1/src/"
+        directory = "./se306Project1/src/"
+        gui = GUI_overlay(directory)
 
-        file_path = './se306Project1/src/TESTvis.sta'
+        file_path = './se306Project1/src/0wor.sta'
         topic_name = "robot_100\n"
         entity_name = "Picker\n"
         current_action = "Picking fruit\n"
@@ -155,10 +155,11 @@ class Test_GUI_Updating(unittest.TestCase,TestModule):
 
         print self.print_function_name(inspect.stack()[0][3])
 
-        gui = GUI_overlay()
-        gui.directory = "./se306Project1/src/"
+        directory = "./se306Project1/src/"
+        gui = GUI_overlay(directory)
 
-        file_path = './se306Project1/src/TESTani.sta'
+
+        file_path = './se306Project1/src/0ani.sta'
         topic_name = "robot_100\n"
         entity_name = "Picker\n"
         current_action = "Picking fruit\n"
