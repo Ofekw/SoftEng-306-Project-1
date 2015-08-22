@@ -23,15 +23,6 @@ class Test_Robot_Setup(unittest.TestCase,TestModule):
         self.assertEqual(self.animal.dict_of_visitors, {}, "Setting dict_of_visitors")
         self.assertEqual(self.animal.animal_state, "", "Setting animal_state")
 
-    def test_animal_random_movement(self):
-
-        self.print_function_name(inspect.stack()[0][3])
-
-
-
-
-        pass
-
 
 if __name__ == '__main__':
     unittest.main()

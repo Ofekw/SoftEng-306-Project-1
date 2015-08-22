@@ -60,6 +60,7 @@ def run_tests(processes, test_files):
     spinner = spinning_cursor()
     for file in test_files:
         print("TESTING: " + file +'\n')
+        s = subprocess.call(["chmod","+x",'se306Project1/test/'+file])
         p = subprocess.Popen(['rosrun', 'se306Project1', file], shell=False, stdout=log, stderr=log)
         for i in range(0,50):
             sys.stdout.write(spinner.next())
