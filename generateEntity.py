@@ -29,7 +29,7 @@ def main(argv, config):
     #List of the temporary robot files created
     file_name = []
     #Types of robots that the script reads the config file for
-    robot_type = ["Picker", "Carrier", "Visitor", "Worker", "Animal"]
+    robot_type = ["Picker", "Carrier", "Worker", "Animal", "Visitor"]
     #Loads the fields in the config file
 
     #Creates or overwrites the myworld.world file
