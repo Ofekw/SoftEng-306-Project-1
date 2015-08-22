@@ -8,9 +8,15 @@ import generateWorldFile
 
 config = {}
 def main(argv):
-    print "\n-----------------------------------------------------"
-    print "                Floppy Disk Testing Unit"
-    print "-----------------------------------------------------\n"
+
+    print_header()
+    
+    global verbose_mode
+    verbose_mode = False
+    if len(argv) > 0:
+        if argv[0] == "-v":
+            verbose_mode = True
+
     with open("config.properties", "r") as f:
         for line in f:
             property = line.split('=')
@@ -46,7 +52,7 @@ def test_build():
     p = subprocess.Popen(['python', 'TestGenerateFiles.py'], shell=False, stdout=log, stderr=error_log)
     p.wait()
     if p.returncode == 0:
-        print("\tTesting Completed\n")
+        print("\t"+green_string("SUCCESS\n"))
 
 def start_services(processes):
     generateWorldFile.main(config)
@@ -82,7 +88,10 @@ def run_tests(processes, test_files):
             setup(processes)
             time.sleep(5)
 
-        print_test_summary_short()
+        if verbose_mode:
+            print_test_summary_verbose()
+        else:
+            print_test_summary_short()
 
     cleanup(processes)
 
@@ -92,7 +101,7 @@ def print_test_summary_verbose():
     line_list.reverse()
     for i in range(len(line_list)):
         if "SUMMARY" in line_list[i]:
-            print "\t\t"+line_list[i-1]
+            print "\t\t"+red_string(line_list[i-1])
             print "\t\t"+line_list[i-2]
             print "\t\t"+line_list[i-3]
             print "\t\t"+line_list[i-4]
@@ -110,6 +119,12 @@ def print_test_summary_short():
             passed_count = test_count - error_count - failure_count
             print "\t\t"+ outcome + " (" +str(passed_count)+"/"+str(test_count) + ")\n"
             break
+
+def print_header():
+    print "\n-----------------------------------------------------"
+    print "                Floppy Disk Testing Unit"
+    print "-----------------------------------------------------\n"
+
 
 def red_string(string):
     return "\033[31m"+string+"\033[0m"
