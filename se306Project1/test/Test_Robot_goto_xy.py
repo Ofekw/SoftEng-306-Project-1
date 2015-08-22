@@ -36,8 +36,8 @@ class Test_Robot_goto_xy(unittest.TestCase,TestModule):
 
         self.run_robot(self.robot0,moveAction,15)
 
-        self.assertTrue(self.compare_values_with_threshold(self.robot0.px,end_x),"End X = Expected End X")
-        self.assertTrue(self.compare_values_with_threshold(self.robot0.py,end_y),"End Y = Expected End Y")
+        self.assertTrue(self.compare_values_with_threshold(self.robot0.px,end_x))
+        self.assertTrue(self.compare_values_with_threshold(self.robot0.py,end_y))
 
     def test_goto_xy_2move_left(self):
 
@@ -50,8 +50,8 @@ class Test_Robot_goto_xy(unittest.TestCase,TestModule):
 
         self.run_robot(self.robot0,moveAction,15)
 
-        self.assertTrue(self.compare_values_with_threshold(self.robot0.px,end_x),"End X = Expected End X")
-        self.assertTrue(self.compare_values_with_threshold(self.robot0.py,end_y),"End Y = Expected End Y")
+        self.assertTrue(self.compare_values_with_threshold(self.robot0.px,end_x))
+        self.assertTrue(self.compare_values_with_threshold(self.robot0.py,end_y))
 
     def test_goto_xy_3move_up(self):
 
@@ -64,8 +64,8 @@ class Test_Robot_goto_xy(unittest.TestCase,TestModule):
 
         self.run_robot(self.robot0,moveAction,15)
 
-        self.assertTrue(self.compare_values_with_threshold(self.robot0.px,end_x),"End X = Expected End X")
-        self.assertTrue(self.compare_values_with_threshold(self.robot0.py,end_y),"End Y = Expected End Y")
+        self.assertTrue(self.compare_values_with_threshold(self.robot0.px,end_x))
+        self.assertTrue(self.compare_values_with_threshold(self.robot0.py,end_y))
 
     def test_goto_xy_4move_down(self):
 
@@ -78,8 +78,64 @@ class Test_Robot_goto_xy(unittest.TestCase,TestModule):
 
         self.run_robot(self.robot0,moveAction,15)
 
-        self.assertTrue(self.compare_values_with_threshold(self.robot0.px,end_x),"End X = Expected End X")
-        self.assertTrue(self.compare_values_with_threshold(self.robot0.py,end_y),"End Y = Expected End Y")
+        self.assertTrue(self.compare_values_with_threshold(self.robot0.px,end_x))
+        self.assertTrue(self.compare_values_with_threshold(self.robot0.py,end_y))
+
+    def test_goto_xy_5move_up_right(self):
+
+        self.print_function_name(inspect.stack()[0][3])
+
+        end_x = -25
+        end_y = -25
+
+        moveAction = self.robot0.goto_xy, [end_x,end_y]
+
+        self.run_robot(self.robot0,moveAction,15)
+
+        self.assertTrue(self.compare_values_with_threshold(self.robot0.px,end_x))
+        self.assertTrue(self.compare_values_with_threshold(self.robot0.py,end_y))
+
+    def test_goto_xy_6move_down_left(self):
+
+        self.print_function_name(inspect.stack()[0][3])
+
+        end_x = -30
+        end_y = -30
+
+        moveAction = self.robot0.goto_xy, [end_x,end_y]
+
+        self.run_robot(self.robot0,moveAction,15)
+
+        self.assertTrue(self.compare_values_with_threshold(self.robot0.px,end_x))
+        self.assertTrue(self.compare_values_with_threshold(self.robot0.py,end_y))
+
+    def test_goto_xy_7move_up_left(self):
+
+        self.print_function_name(inspect.stack()[0][3])
+
+        end_x = -35
+        end_y = -25
+
+        moveAction = self.robot0.goto_xy, [end_x,end_y]
+
+        self.run_robot(self.robot0,moveAction,15)
+
+        self.assertTrue(self.compare_values_with_threshold(self.robot0.px,end_x))
+        self.assertTrue(self.compare_values_with_threshold(self.robot0.py,end_y))
+
+    def test_goto_xy_8move_down_right(self):
+
+        self.print_function_name(inspect.stack()[0][3])
+
+        end_x = -30
+        end_y = -30
+
+        moveAction = self.robot0.goto_xy, [end_x,end_y]
+
+        self.run_robot(self.robot0,moveAction,15)
+
+        self.assertTrue(self.compare_values_with_threshold(self.robot0.px,end_x))
+        self.assertTrue(self.compare_values_with_threshold(self.robot0.py,end_y))
 
 if __name__ == '__main__':
     unittest.main()
