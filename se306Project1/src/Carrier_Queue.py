@@ -93,6 +93,7 @@ class Carrier_Queue:
         self.picker_robots[picker_index] = message.data.split(',')[1] + "," + message.data.split(',')[2] + "," + message.data.split(',')[4]  # Should add element 3 here which is theta
 
         if int(self.picker_robots[picker_index].split(',')[2]) == self.max_load:
+            self.post_to_file()
             self.lock.acquire()
             try:
                 if picker_index not in self.picker_queue:
