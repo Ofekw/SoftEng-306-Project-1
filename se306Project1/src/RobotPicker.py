@@ -298,4 +298,7 @@ class RobotPicker(Robot):
 
         time.sleep(10)
         self.disableLaser = False
+        # Reset the robots state
+        self.state = self.PickerState.FINDING
+        self.firstLaserReading = []
         return 0
