@@ -12,39 +12,39 @@ import math
 from TestModule import TestModule
 import inspect
 
-class Test_Robot_Setup(unittest.TestCase,TestModule):
+class Test_Robot_Picker_Setup(unittest.TestCase,TestModule):
 
     robot0 = RobotPicker(0,-20,-28, math.pi/2)
 
     def test_robot_picker_setup(self):
 
-        self.print_function_name(inspect.stack()[0][3])
-
         #Entity Variables
-        self.assertEqual(self.robot0.linearX, 2, "Setting linearX")
-        self.assertEqual(self.robot0.angularZ, 0, "Setting angularZ")
-        self.assertEqual(self.robot0.init_theta, math.pi/2, "Setting init_theta")
-        self.assertEqual(self.robot0.init_x, -20, "Setting init_x")
-        self.assertEqual(self.robot0.init_y, -28, "Setting init_y")
-        self.assertEqual(self.robot0.px, -20, "Setting px")
-        self.assertEqual(self.robot0.py, -28, "Setting py")
-        self.assertEqual(self.robot0.robot_id, 0, "Setting robot_id")
-        self.assertEqual(self.robot0.robot_node_name, "RobotNode0", "Setting robot_node_name")
-        self.assertEqual(self.robot0.robot_node_identifier, "robot_0", "Setting robot_node_identifier")
-        self.assertEqual(self.robot0.goalx, -20, "Setting goalx")
-        self.assertEqual(self.robot0.goaly, -28, "Setting goaly")
-        self.assertEqual(self.robot0.state, self.robot0.State.STOPPED, "Setting state")
-        self.assertEqual(self.robot0._actionsStack_, [], "Setting _actionsStack_")
-        self.assertEqual(self.robot0._stopCurrentAction_, False, "Setting _stopCurrentAction_")
-        self.assertEqual(self.robot0._actionRunning_, False, "Setting _actionRunning_")
-        self.assertEqual(self.robot0.disableLaser, False, "Setting disableLaser")
-        self.assertEqual(self.robot0.noMoreTrees, 0, "Setting noMoreTrees")
-        self.assertEqual(self.robot0.treeDetected, False, "Setting treeDetected")
-        self.assertEqual(self.robot0.atOrchard, False, "Setting atOrchard")
+        self.assertEqual(self.robot0.linearX, 2)
+        self.assertEqual(self.robot0.angularZ, 0)
+        self.assertEqual(self.robot0.init_theta, math.pi/2)
+        self.assertEqual(self.robot0.init_x, -20)
+        self.assertEqual(self.robot0.init_y, -28)
+        self.assertEqual(self.robot0.px, -20)
+        self.assertEqual(self.robot0.py, -28)
+        self.assertEqual(self.robot0.robot_id, 0)
+        self.assertEqual(self.robot0.robot_node_name,"RobotNode0")
+        self.assertEqual(self.robot0.robot_node_identifier,"robot_0")
+        self.assertEqual(self.robot0.goalx, -20)
+        self.assertEqual(self.robot0.goaly, -28)
+        self.assertEqual(self.robot0.state, "Stopped")
+        self.assertEqual(self.robot0._actionsStack_, [])
+        self.assertEqual(self.robot0._stopCurrentAction_, False)
+        self.assertEqual(self.robot0._actionRunning_, False)
+        self.assertEqual(self.robot0.disableLaser, False)
+        self.assertEqual(self.robot0.noMoreTrees, 0)
+        self.assertEqual(self.robot0.treeDetected, False)
+        self.assertEqual(self.robot0.atOrchard, False)
         #Robot Picker Variables
-        self.assertEqual(self.robot0.max_load, 100, "Setting max_load")
-        self.assertEqual(self.robot0.current_load, 0, "Setting current_load")
-        self.assertEqual(self.robot0.firstLaserReading, [], "Setting firstLaserReading")
+        self.assertEqual(self.robot0.max_load, 50)
+        self.assertEqual(self.robot0.current_load, 0)
+        self.assertEqual(self.robot0.firstLaserReading, [])
 
 if __name__ == '__main__':
-    unittest.main()
+    # unittest.main()
+    import rostest
+    rostest.rosrun('se306Project1', 'test_bare_bones', Test_Robot_Picker_Setup)
