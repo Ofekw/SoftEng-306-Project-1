@@ -90,7 +90,7 @@ def main(argv, config):
             #Runs all the temporary robot files created
             command = ["rosrun", "se306Project1", name]
             processes.append(subprocess.Popen(command, shell=False))
-            processes.append(subprocess.Popen(["rosrun", "se306Project1", "Run_Carrier_Queue.py"], shell=False))
+        processes.append(subprocess.Popen(["rosrun", "se306Project1", "Run_Carrier_Queue.py"], shell=False))
     return file_name
 
 def spawnPickers(number, total_robots, file_name, config):
