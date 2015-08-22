@@ -15,13 +15,11 @@ import logging
 from TestModule import TestModule
 import inspect
 
-class Test_Robot_Setup(unittest.TestCase,TestModule):
+class Test_Robot_Carrier_Setup(unittest.TestCase,TestModule):
 
     robot1 = RobotCarrier(1,-10,-28, math.pi/2)
 
     def test_robot_carrier_setup(self):
-
-        self.print_function_name(inspect.stack()[0][3])
 
         #Entity Variables
         self.assertEqual(self.robot1.linearX, 2)
@@ -56,4 +54,6 @@ class Test_Robot_Setup(unittest.TestCase,TestModule):
 
 
 if __name__ == '__main__':
-    unittest.main()
+    # unittest.main()
+    import rostest
+    rostest.rosrun('se306Project1', 'test_bare_bones', Test_Robot_Carrier_Setup)

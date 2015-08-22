@@ -27,8 +27,6 @@ class Test_Robot_goto_xy(unittest.TestCase,TestModule):
 
     def test_goto_xy_1move_right(self):
 
-        self.print_function_name(inspect.stack()[0][3])
-
         end_x = -15
         end_y = -28
 
@@ -40,8 +38,6 @@ class Test_Robot_goto_xy(unittest.TestCase,TestModule):
         self.assertTrue(self.compare_values_with_threshold(self.robot0.py,end_y))
 
     def test_goto_xy_2move_left(self):
-
-        self.print_function_name(inspect.stack()[0][3])
 
         end_x = -30
         end_y = -28
@@ -55,8 +51,6 @@ class Test_Robot_goto_xy(unittest.TestCase,TestModule):
 
     def test_goto_xy_3move_up(self):
 
-        self.print_function_name(inspect.stack()[0][3])
-
         end_x = -30
         end_y = -20
 
@@ -69,8 +63,6 @@ class Test_Robot_goto_xy(unittest.TestCase,TestModule):
 
     def test_goto_xy_4move_down(self):
 
-        self.print_function_name(inspect.stack()[0][3])
-
         end_x = -30
         end_y = -30
 
@@ -82,6 +74,6 @@ class Test_Robot_goto_xy(unittest.TestCase,TestModule):
         self.assertTrue(self.compare_values_with_threshold(self.robot0.py,end_y))
 
 if __name__ == '__main__':
-    unittest.main()
-    # import rostest
-    # rostest.rosrun("se306Project1", "test_robot_goto", TestRobotGoTo)
+    # unittest.main()
+    import rostest
+    rostest.rosrun('se306Project1', 'test_bare_bones', Test_Robot_goto_xy)

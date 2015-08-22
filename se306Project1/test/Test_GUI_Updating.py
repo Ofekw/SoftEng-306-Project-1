@@ -30,8 +30,6 @@ class Test_GUI_Updating(unittest.TestCase,TestModule):
 
     def test_gui_picker_read(self):
 
-        print self.print_function_name(inspect.stack()[0][3])
-
         directory = "./se306Project1/src/"
         gui = GUI_overlay(directory)
 
@@ -92,8 +90,6 @@ class Test_GUI_Updating(unittest.TestCase,TestModule):
 
     def test_gui_visitor_read(self):
 
-        print self.print_function_name(inspect.stack()[0][3])
-
         directory = "./se306Project1/src/"
         gui = GUI_overlay(directory)
 
@@ -123,8 +119,6 @@ class Test_GUI_Updating(unittest.TestCase,TestModule):
 
     def test_gui_worker_read(self):
 
-        print self.print_function_name(inspect.stack()[0][3])
-
         directory = "./se306Project1/src/"
         gui = GUI_overlay(directory)
 
@@ -153,11 +147,8 @@ class Test_GUI_Updating(unittest.TestCase,TestModule):
 
     def test_gui_animal_read(self):
 
-        print self.print_function_name(inspect.stack()[0][3])
-
         directory = "./se306Project1/src/"
         gui = GUI_overlay(directory)
-
 
         file_path = './se306Project1/src/0ani.sta'
         topic_name = "robot_100\n"
@@ -184,4 +175,6 @@ class Test_GUI_Updating(unittest.TestCase,TestModule):
 
 
 if __name__ == '__main__':
-    unittest.main()
+    # unittest.main()
+    import rostest
+    rostest.rosrun('se306Project1', 'test_bare_bones', Test_GUI_Updating)

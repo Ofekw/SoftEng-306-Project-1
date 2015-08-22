@@ -30,7 +30,6 @@ class TestModule():
                 break
 
         if(time.time() >= max_time):
-            print "Time Limit Exceeded"
             return False
 
         return True

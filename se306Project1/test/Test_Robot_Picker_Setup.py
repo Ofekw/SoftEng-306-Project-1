@@ -12,13 +12,11 @@ import math
 from TestModule import TestModule
 import inspect
 
-class Test_Robot_Setup(unittest.TestCase,TestModule):
+class Test_Robot_Picker_Setup(unittest.TestCase,TestModule):
 
     robot0 = RobotPicker(0,-20,-28, math.pi/2)
 
     def test_robot_picker_setup(self):
-
-        self.print_function_name(inspect.stack()[0][3])
 
         #Entity Variables
         self.assertEqual(self.robot0.linearX, 2)
@@ -47,4 +45,6 @@ class Test_Robot_Setup(unittest.TestCase,TestModule):
         self.assertEqual(self.robot0.firstLaserReading, [])
 
 if __name__ == '__main__':
-    unittest.main()
+    # unittest.main()
+    import rostest
+    rostest.rosrun('se306Project1', 'test_bare_bones', Test_Robot_Picker_Setup)

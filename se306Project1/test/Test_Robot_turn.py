@@ -26,8 +26,6 @@ class Test_Robot_turn(unittest.TestCase,TestModule):
 
     def test_turn_1right(self):
 
-        self.print_function_name(inspect.stack()[0][3])
-
         moveAction = self.robot0.turn,["right"]
 
         self.run_robot(self.robot0,moveAction,5)
@@ -36,14 +34,13 @@ class Test_Robot_turn(unittest.TestCase,TestModule):
 
     def test_turn_2left(self):
 
-        self.print_function_name(inspect.stack()[0][3])
-
         moveAction = self.robot0.turn,["left"]
 
         self.run_robot(self.robot0,moveAction,5)
 
         self.assertEqual(self.robot0.get_current_direction(), "north")
 
-
 if __name__ == '__main__':
-    unittest.main()
+    # unittest.main()
+    import rostest
+    rostest.rosrun('se306Project1', 'test_bare_bones', Test_Robot_turn)
