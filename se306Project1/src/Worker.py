@@ -59,8 +59,8 @@ class Worker(Human):
         self.empty_row_target = [0, 0]
 
         #Create subscribers to the positions for both picker and carrier
-        self.sub_to_picker_positions = rospy.Subscriber("pickerPosition", String, self.Robot_Locations_Callback)
-        self.sub_to_carrier_positions = rospy.Subscriber("carrierPosition", String, self.Robot_Locations_Callback)
+        self.sub_to_picker_positions = rospy.Subscriber("picker_position", String, self.Robot_Locations_Callback)
+        self.sub_to_carrier_positions = rospy.Subscriber("carrier_position", String, self.Robot_Locations_Callback)
 
         #Define the actions to be used for the action stack
         self._actions_ = {
@@ -214,7 +214,7 @@ class Worker(Human):
         #Initialise a boolean variable that will change based on whether a empty orchard gap exists or not
         found_row = False
 
-        for g in self.orchard_row_gaps:
+        for g in reversed(self.orchard_row_gaps):
             #For each gap in the orchard_row_gaps, initially set unpopulated boolean variable to True
             unpopulated = True
             #Then iterate through each robot coordinate stores in the robot_locations dictionary
@@ -319,7 +319,7 @@ class Worker(Human):
             r_py = r_coord[1]
 
             #Check if the x coordinate is within the current orchard row
-            if self.empty_row_target[0] <= r_px <= self.empty_row_target[1]:
+            if self.empty_row_target[0] <= r_px <= self.empty_row_target[1] and self.state != self.WorkerState.AVOIDING_ROBOT:
                 #Check if the robot has actually entered the orchard row as well
                 if -10 <= r_py <= 39:
 
