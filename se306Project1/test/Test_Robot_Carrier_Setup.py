@@ -17,7 +17,7 @@ import inspect
 
 class Test_Robot_Carrier_Setup(unittest.TestCase,TestModule):
 
-    robot1 = RobotCarrier(1,-10,-28, math.pi/2)
+    robot1 = RobotCarrier("Node",1,-10,-28, math.pi/2,50)
 
     def test_robot_carrier_setup(self):
 
@@ -30,7 +30,7 @@ class Test_Robot_Carrier_Setup(unittest.TestCase,TestModule):
         self.assertEqual(self.robot1.px, -10)
         self.assertEqual(self.robot1.py, -28)
         self.assertEqual(self.robot1.robot_id, 1)
-        self.assertEqual(self.robot1.robot_node_name, "RobotNode1")
+        self.assertEqual(self.robot1.robot_node_name, "Node")
         self.assertEqual(self.robot1.robot_node_identifier, "robot_1")
         self.assertEqual(self.robot1.goalx, -10)
         self.assertEqual(self.robot1.goaly, -28)
@@ -44,8 +44,8 @@ class Test_Robot_Carrier_Setup(unittest.TestCase,TestModule):
         self.assertEqual(self.robot1.atOrchard, False)
         #Robot Carrier Variables
         self.assertEqual(self.robot1.next_robot_id, None)
-        self.assertEqual(self.robot1.carrier_robots, ["0,0,0","0,0,0","0,0,0","0,0,0","0,0,0","0,0,0"])
-        self.assertEqual(self.robot1.picker_robots, ["0,0,0","0,0,0","0,0,0","0,0,0","0,0,0","0,0,0"])
+        self.assertEqual(self.robot1.carrier_robots, ["0,0,0","0,0,0","0,0,0","0,0,0","0,0,0","0,0,0","0,0,0","0,0,0","0,0,0","0,0,0"])
+        self.assertEqual(self.robot1.picker_robots, ["0,0,0","0,0,0","0,0,0","0,0,0","0,0,0","0,0,0","0,0,0","0,0,0","0,0,0","0,0,0"])
         self.assertEqual(self.robot1.max_load, 50)
         self.assertEqual(self.robot1.current_load, 0)
         self.assertEqual(self.robot1.is_going_home, False)
