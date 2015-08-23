@@ -17,6 +17,7 @@ import os
 import string
 import time
 import tkFont
+import glob
 
 
 """
@@ -1865,11 +1866,10 @@ class GUI_overlay(Tkinter.Tk):
         directory = "./"
         count = 0
         read = False
-        while read == False:
+        laser_file_count = len(glob.glob1(directory,"*.ls"))
+        while laser_file_count > count:
             for file in os.listdir(directory):
                 if (file.endswith("laser.ls")) and (count == 0):
-                    read = True
-                    time.sleep(5)
                     count+=1
                     f = open(file)
                     lines = f.read()
@@ -1888,7 +1888,6 @@ class GUI_overlay(Tkinter.Tk):
                         self.canvas1.get_tk_widget().pack(side=Tkinter.TOP, fill=Tkinter.BOTH, expand=1)
                 elif (file.endswith("laser.ls")) and (count == 1):
                     count+=1
-                    time.sleep(1)
                     f = open(file)
                     lines = f.read()
                     lines = lines.translate(None, '\',[]')
@@ -1987,6 +1986,7 @@ class GUI_overlay(Tkinter.Tk):
                         except RuntimeError:
                             pass
                 elif (file.endswith("laser.ls")) and (count == 2):
+                    read = True
                     try:
                         self.LaserFrame3.configure(text="Robot Picker "+str(file[0]))
                     except RuntimeError:

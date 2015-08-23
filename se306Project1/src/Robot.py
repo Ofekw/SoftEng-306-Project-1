@@ -19,10 +19,10 @@ It inherits from the Entity class.
 """
 class Robot(Entity):
 
-    def __init__(self, r_id, x_off, y_off, theta_off):
+    def __init__(self, r_name, r_id, x_off, y_off, theta_off):
 
         self.current_load = 0
-        Entity.__init__(self,r_id,x_off,y_off, theta_off)
+        Entity.__init__(self, r_name, r_id,x_off,y_off, theta_off)
 
     def robot_specific_function(self):
         pass

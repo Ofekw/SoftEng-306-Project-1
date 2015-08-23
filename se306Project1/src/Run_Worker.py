@@ -20,7 +20,7 @@ Main function that creates robot and sets a path
 """
 
 def main():
-    robot = Worker(2, 10, -20, 0)
+    robot = Worker("Worker0",2, 10, -20, 0)
     rospy.sleep(5)
 
     while not rospy.is_shutdown():
