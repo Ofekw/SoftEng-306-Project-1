@@ -59,8 +59,8 @@ class Worker(Human):
         self.empty_row_target = [0, 0]
 
         #Create subscribers to the positions for both picker and carrier
-        self.sub_to_picker_positions = rospy.Subscriber("pickerPosition", String, self.Robot_Locations_Callback)
-        self.sub_to_carrier_positions = rospy.Subscriber("carrierPosition", String, self.Robot_Locations_Callback)
+        self.sub_to_picker_positions = rospy.Subscriber("picker_position", String, self.Robot_Locations_Callback)
+        self.sub_to_carrier_positions = rospy.Subscriber("carrier_position", String, self.Robot_Locations_Callback)
 
         #Define the actions to be used for the action stack
         self._actions_ = {
