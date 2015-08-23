@@ -47,7 +47,7 @@ def main():
                     robot._actionsStack_.pop()
                     robot.disableSideLaser = False
             except ActionInterruptException.ActionInterruptException as e:
-                print(e)
+                pass
 
 
 if __name__ == '__main__':

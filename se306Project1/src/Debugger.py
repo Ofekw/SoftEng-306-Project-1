@@ -8,6 +8,7 @@ class Debugger:
     def __init__(self, robot):
         self.robot = robot
         self.user_input = [""]
+        self.inputThread = threading.Thread(target=self.getInput, args=())
 
     def getInput(self):
         while self.user_input[0] != "q":
@@ -27,9 +28,8 @@ class Debugger:
                 print(self.robot.current_load)
             elif self.user_input[0] == "state":
                 print(self.robot.state)
-        self._thread.exit()
+        self.inputThread._thread.exit()
 
     def start(self):
-        inputThread = threading.Thread(target=self.getInput, args=())
-        inputThread.daemon = True
-        inputThread.start()
+        self.inputThread.daemon = True
+        self.inputThread.start()

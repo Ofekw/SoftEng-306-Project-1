@@ -16,7 +16,7 @@ define carrier position
   color "gray50"
   drive "diff"		 	# Differential steering model.
 
-  obstacle_return 1           	# Can hit things.
+  obstacle_return 0           	# Can hit things.
   ranger_return 1             	# reflects sonar beams
   fiducial_return 1           	# Seen as "1" fiducial finders
 
