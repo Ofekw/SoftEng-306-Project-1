@@ -10,6 +10,8 @@ import math
 import numpy.testing
 from RobotCarrier import RobotCarrier
 from Debugger import Debugger
+from Robot import Robot
+import ActionInterruptException
 
 """
 @MAIN
@@ -45,9 +47,17 @@ def main():
             result = action[0](*action[1])
             robot._actionRunning_=False
             #if action completes succesfully pop it
-            if result == 0 or result == 1:
+            robot._stopCurrentAction_ = False
+            if result == 0:
                 robot._actionsStack_.pop()
-                robot.arrivedAtPoint()
+                robot.disableSideLaser = False
+                if (action[0] == robot._actions_[0]):
+                    robot.state = robot.previousState
+                if (action[0] == robot._actions_[1] or action[0] == robot._actions_[5] and robot.state != Robot.RobotState.PATH):
+                    robot.disableLaser = False
+                    robot.arrivedAtPoint()
+            if result == 2:
+                pass
 
 
 if __name__ == '__main__':

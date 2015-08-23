@@ -247,9 +247,6 @@ class Entity:
             #Find the distance gained by calculating sqrt(xDiff^2 + yDiff^2)
             dist_gained = math.sqrt(xDiff * xDiff + yDiff * yDiff)
 
-            #print("Moving Forward: " + str(distToGo) + "m to go")
-            #print("Current x pos = " + str(self.px) +"," +str(self.py))
-
 
         if self._stopCurrentAction_ == True:
                 #stop movement and throw exception
@@ -257,7 +254,6 @@ class Entity:
                 self.RobotNode_stage_pub.publish(self.RobotNode_cmdvel)
                 self._stopCurrentAction_ = False
                 raise ActionInterruptException.ActionInterruptException("Wall hit")
-                #print "Move Forward: Stopped due to potential collision"
                 return 2
         else:
             #Stop robot by setting forward velocity to 0 and then publish change
@@ -312,7 +308,6 @@ class Entity:
 
             rospy.sleep(0.0001)
 
-            #print("Turning " + direction + " current theta is " + str(self.theta) +", target theta is " + str(thetaTarg))
         #Turn complete, reenable laser
         self.disableLaser = False
         if self._stopCurrentAction_ == True:
@@ -375,8 +370,6 @@ class Entity:
 
             rospy.sleep(0.0001)
 
-           # print("Rotating - current theta is " + str(self.theta) +", target theta is " + str(thetaTarg))
-
         if self._stopCurrentAction_ == True:
             self._stopCurrentAction_ = False
             #raise ActionInterruptException.ActionInterruptException("Wall hit")
@@ -399,9 +392,6 @@ class Entity:
     """
     def face_direction(self, direction_to_face):
         current_direction = self.get_current_direction()
-
-        #print("Currently facing:" + current_direction)
-        #print("Turning to face: "+ direction_to_face)
 
         if (current_direction== direction_to_face):
             return
@@ -442,7 +432,6 @@ class Entity:
                 self.turn(Direction.RIGHT)
             self.correct_theta()
         else:
-            #print("Error: Face Direction")
             return
 
         return 0
@@ -533,10 +522,8 @@ class Entity:
                     return 0
 
         except ActionInterruptException.ActionInterruptException as e:
-            #print(e.message)
-            return 1
+            self._stopCurrentAction_ = True
         finally:
-
             if self._stopCurrentAction_:
                 return 2
             else:
@@ -629,9 +616,9 @@ class Entity:
                     return 0
 
         except ActionInterruptException.ActionInterruptException as e:
-            return 1
+            print("Exception thrown")
+            self._stopCurrentAction_ = True
         finally:
-
             if self._stopCurrentAction_:
                 return 2
             else:

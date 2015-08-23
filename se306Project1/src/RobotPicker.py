@@ -88,7 +88,6 @@ class RobotPicker(Robot):
     """
     def kiwi_callback(self, message):
         if (message.data.split(",")[0] != str(self.robot_id) and self.current_load >= self.max_load and message.data.split(",")[1] == str(self.robot_id)):
-            print("transfer load")
             self.current_load = 0
             self.kiwi_pub.publish(str(self.robot_id))
 
@@ -164,14 +163,12 @@ class RobotPicker(Robot):
                                     laserCount += 1
                             #if wall return home and restart picking loop
                             if laserCount == 40:
-                                print("Returning home to restart")
                                 action = self._actions_[1], [self.init_x, self.init_y]
                                 goToAction = self._actions_[5], [self.init_x, -13]
                                 turnAction = self._actions_[2], [Entity.Direction.RIGHT]
                                 #check if action already exists in stack, otherwise laser will spam rotates
                                 if action != self._actionsStack_[-1]:
                                     #stop moving foward and add turn action
-                                    print("Going home")
                                     self._actionsStack_.append(turnAction)
                                     self._actionsStack_.append(goToAction)
                                     self._actionsStack_.append(action)
@@ -181,7 +178,6 @@ class RobotPicker(Robot):
                             else:
                                 #else object is an obstacle
                                 self.state = Robot.RobotState.PATH
-                                print("calculating route")
                                 moveHorizontal = None
                                 moveVertical = None
                                 turn = None
@@ -243,8 +239,6 @@ class RobotPicker(Robot):
                             if self.px-0.5 <= float(data[0]) +i*10 <= self.px+0.5 and self.py-1 <= float(data[1]) <= self.py+1:
                                 continue
                             elif self.px-10 < float(data[0]) +i*10 < self.px+2 and self.py < float(data[1]) and float(data[0]) != 0:
-                                print(self.px)
-                                print(data[0])
                                 self.noMoreTrees = 0
                                 self.state = self.PickerState.FINDING
                                 self.disableSideLaser = True
