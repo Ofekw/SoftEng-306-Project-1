@@ -22,7 +22,7 @@ class Test_Robot_turn(unittest.TestCase,TestModule):
 
     #Not in 'setUp' because it will be called every time, and that will mean the node will restart its in instantiation
     #since we can't reset the stage, we have to work with the same robot.
-    robot0 = RobotPicker(0,-20,-28, math.pi/2)
+    robot0 = RobotPicker("Node",0,-20,-28, math.pi/2,50)
 
     def test_turn_1right(self):
 

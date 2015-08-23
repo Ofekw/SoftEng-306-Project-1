@@ -14,7 +14,7 @@ import inspect
 
 class Test_Robot_Picker_Setup(unittest.TestCase,TestModule):
 
-    robot0 = RobotPicker(0,-20,-28, math.pi/2)
+    robot0 = RobotPicker("Node",0,-20,-28, math.pi/2,50)
 
     def test_robot_picker_setup(self):
 
@@ -27,7 +27,7 @@ class Test_Robot_Picker_Setup(unittest.TestCase,TestModule):
         self.assertEqual(self.robot0.px, -20)
         self.assertEqual(self.robot0.py, -28)
         self.assertEqual(self.robot0.robot_id, 0)
-        self.assertEqual(self.robot0.robot_node_name,"RobotNode0")
+        self.assertEqual(self.robot0.robot_node_name,"Node")
         self.assertEqual(self.robot0.robot_node_identifier,"robot_0")
         self.assertEqual(self.robot0.goalx, -20)
         self.assertEqual(self.robot0.goaly, -28)
