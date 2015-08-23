@@ -30,26 +30,22 @@ class RobotPicker(Robot):
                               FINDING="Finding Orchard", WAITINGFORCOLLECTION="Waiting for collection"
                        )
 
-    def __init__(self,r_id,x_off,y_off,theta_off):
-        Robot.__init__(self,r_id,x_off,y_off,theta_off)
-        self.picker_pub = rospy.Publisher("pickerPosition",String, queue_size=10)
+    def __init__(self,r_name,r_id,x_off,y_off,theta_off,capacity):
+        Robot.__init__(self,r_name,r_id,x_off,y_off,theta_off)
 
-        # self.max_load = 100
-        # self.current_load = 0
+        self.max_load = capacity
+
         self.timeLastAdded = time.clock()
+        self.disableSideLaser = False
 
-        self.kiwi_sub = rospy.Subscriber("carrier_kiwiTransfer", String, self.kiwi_callback)
-        self.kiwi_pub = rospy.Publisher("picker_kiwiTransfer",String, queue_size=10)
+        self.picker_pub = rospy.Publisher("picker_position",String, queue_size=10)
+        self.kiwi_sub = rospy.Subscriber("carrier_kiwi_transfer", String, self.kiwi_callback)
+        self.kiwi_pub = rospy.Publisher("picker_kiwi_transfer",String, queue_size=10)
 
-        self.picker_sub = rospy.Subscriber("pickerPosition", String, self.pickerCallback)
+        self.picker_sub = rospy.Subscriber("picker_position", String, self.picker_callback)
         self.picker_robots = ["0,0,0","0,0,0","0,0,0","0,0,0","0,0,0","0,0,0"]
 
-
-
-    def robot_specific_function(self):
-        pass
-
-    def pickerCallback(self, message):
+    def picker_callback(self, message):
         picker_index = int(message.data.split(',')[0])
         self.picker_robots[picker_index] = message.data.split(',')[1] + "," + message.data.split(',')[2] + "," + message.data.split(',')[4]  # Should add element 3 here which is theta
 
@@ -103,7 +99,7 @@ class RobotPicker(Robot):
     """
     def addKiwi(self, clockTime):
         if(self.current_load >= self.max_load):
-            self.waitForCollection()
+            self.wait_for_collection()
         elif(clockTime >= (self.timeLastAdded + 0.005)):
             self.current_load = self.current_load + 1
             self.timeLastAdded = clockTime
@@ -113,7 +109,7 @@ class RobotPicker(Robot):
 
     Wait for a carrier to pickup
     """
-    def waitForCollection(self):
+    def wait_for_collection(self):
         self.state = self.PickerState.WAITINGFORCOLLECTION
         self.disableLaser = True
         action = self._actions_[7],[]
@@ -121,9 +117,6 @@ class RobotPicker(Robot):
             #stop moving foward and add turn action
             self._stopCurrentAction_ = True
             self._actionsStack_.append(action)
-
-    def gotoClosestRobot(self):
-        pass
 
     def StageLaser_callback(self, msg):
         #Write laser data for ranger

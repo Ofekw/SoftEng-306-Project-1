@@ -20,44 +20,38 @@ class Test_Robot_face_direction(unittest.TestCase,TestModule):
 
     def test_face_south(self):
 
-        self.print_function_name(inspect.stack()[0][3])
-
         moveAction = self.robot0.face_direction,["south"]
 
-        self.assertTrue(self.run_robot(self.robot0,moveAction,10), "Time Limit Exceeded")
+        self.run_robot(self.robot0,moveAction,10)
 
         self.assertEqual(self.robot0.get_current_direction(), "south","Turning to face south")
 
     def test_face_east(self):
 
-        self.print_function_name(inspect.stack()[0][3])
-
         moveAction = self.robot0.face_direction,["east"]
 
-        self.assertTrue(self.run_robot(self.robot0,moveAction,10), "Time Limit Exceeded")
+        self.run_robot(self.robot0,moveAction,10)
 
-        self.assertEqual(self.robot0.get_current_direction(), "east","Turning to face south")
+        self.assertEqual(self.robot0.get_current_direction(), "eastzzz","Turning to face south")
 
     def test_face_north(self):
 
-        self.print_function_name(inspect.stack()[0][3])
-
         moveAction = self.robot0.face_direction,["north"]
 
-        self.assertTrue(self.run_robot(self.robot0,moveAction,10), "Time Limit Exceeded")
+        self.run_robot(self.robot0,moveAction,10)
 
         self.assertEqual(self.robot0.get_current_direction(), "north","Turning to face south")
 
     def test_face_west(self):
 
-        self.print_function_name(inspect.stack()[0][3])
-
         moveAction = self.robot0.face_direction,["west"]
 
-        self.assertTrue(self.run_robot(self.robot0,moveAction,10), "Time Limit Exceeded")
+        self.run_robot(self.robot0,moveAction,10)
 
         self.assertEqual(self.robot0.get_current_direction(), "west","Turning to face south")
 
 
 if __name__ == '__main__':
-    unittest.main()
+    # unittest.main()
+    import rostest
+    rostest.rosrun('se306Project1', 'test_bare_bones', Test_Robot_face_direction)

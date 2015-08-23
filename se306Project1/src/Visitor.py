@@ -18,6 +18,9 @@ import os
 
 Visitor class. Inherits from the abstract Human class. The behaviour of this entity will consist
 of random movement around the orchard.
+
+It also publishes to a topic named "visitor_dog_topic". It sends a String that holds coordinate information
+about the Visitor, which the Animal entity subscribes to.
 """
 
 class Visitor(Human):
@@ -25,33 +28,36 @@ class Visitor(Human):
     def enum(**enums):
         return type('Enum', (), enums)
 
-    random_location = {}
-
-    random_nav = {}
-
     VisitorState = enum(NAVIGATING_RANDOM="Nav to rand location",
                         MOVING_RANDOM = "Move to rand direction")
 
 
-    def __init__(self, r_id, x_off, y_off, theta_offset):
-        Human.__init__(self, r_id, x_off, y_off, theta_offset)
+    def __init__(self, r_name, r_id, x_off, y_off, theta_offset):
+        Human.__init__(self, r_name, r_id, x_off, y_off, theta_offset)
 
+        #Initialise the publisher
         self.pub_to_dog = rospy.Publisher("visitor_dog_topic", String, queue_size=10)
 
+        #Set the state to initially empty
         self.visitor_state = ""
 
-
+        #Set the actions to be used by the Visitor class
         self._actions_ = {
             0: self.move_forward,
             1: self.goto_yx,
             2: self.turn,
             3: self.stop,
             4: self.random_nav,
-            5: self.go_to_rand_location
+            5: self.go_to_rand_location,
+            6: self.face_direction
         }
 
-        self.linearX = 3
+    """
+    @function
 
+    Call back function to update position values. Also will write current state information to a wor.sta file which
+    is to be used by the GUI
+    """
     def StageOdom_callback(self, msg):
         #Update the px and py values
         self.update_position(msg.pose.pose.position.x, msg.pose.pose.position.y)
@@ -75,12 +81,26 @@ class Visitor(Human):
         output_file.close()
 
 
+    """
+    @function
+
+    Call back function for the laser messages. When this entity detects a object in front of it,
+    it will stop current action, then turn right and move forward.
+    """
     def StageLaser_callback(self, msg):
+        #Check for a degree range between 60 and 120 degrees
         for i in range(60, 120):
+            #If object within 4m and not already turning then perform collision avoidance
             if (msg.ranges[i] < 4 and self.disableLaser == False):
+
+                #Stop current action
                 self._stopCurrentAction_ = True
+
+                #Create actions to turn right and move forward
                 move1 = self._actions_[0], [3]
                 turn2 = self._actions_[2], ["right"]
+
+                #Append actions to stack
                 self._actionsStack_.append(move1)
                 self._actionsStack_.append(turn2)
 
@@ -93,7 +113,6 @@ class Visitor(Human):
     a random distance between 5 and 10m, at a random velocity between 2 and 4 m/s
     """
     def random_nav(self):
-        global random_nav
         #Create an array of the cardinal directions
         cardinal_directions = ["north", "south", "west", "east"]
 
@@ -107,18 +126,23 @@ class Visitor(Human):
         #random_nav[1] = str(rand_dist)
         self.visitor_state = self.VisitorState.MOVING_RANDOM
 
+        # face_rand_direction = self._actions_[6], [rand_direction]
+        # move_forward = self._actions_[0], [rand_dist]
+        #
+        # self._actionsStack_.append(move_forward)
+        # self._actionsStack_.append(face_rand_direction)
+
         self.face_direction(rand_direction)
         self.move_forward(rand_dist)
 
     """
-    @function
+    @function.
     This function involves randomly selecting a coordinate between -40 to 40 x, and -40 to 40 y, then having the entity
     attempt to navigate towards the coordinate. The navigation works by using a goto function to move vertically towards
     an area with no trees or robots (y = -15), then another goto function to move horizontally so the px value lines up to the random
     x value, then finally moving vertically towards the y coordinate.
     """
     def go_to_rand_location(self):
-        global random_location
 
         #Generate random coordinates
         random_x = random.randint(-40, 40)
@@ -147,10 +171,17 @@ class Visitor(Human):
         if (self.py > -15):
             self._actionsStack_.append(move_to_empty_area)
 
+    """
+    @function
 
+    Function to be called by the main while loop in the Run_Visitor scripts. It will set the initial action
+    to either random_nav or go_to_rand_location.
+    """
     def visitor_specific_function(self):
+        #Generate a random integer to be used between 0 and 10
         random_action_int = random.randint(0, 10)
 
+        #50% chance of being either random_nav or go_to_rand_location as first action
         if (random_action_int < 6):
             action_init = self.random_nav, []
             self._actionsStack_.append(action_init)
@@ -165,12 +196,18 @@ class Visitor(Human):
             action = self._actionsStack_[-1]
 
             try:
+                self._actionRunning_ = True
                 #run aciton with paremeter
                 result = action[0](*action[1])
 
                 del self._actionsStack_[self._actionsStack_.index(action)]
-
                 self._actionRunning_ = False
+
+            #Catch the exception that will be raised when the stopCurrentAction is set to True, then delete last action
+            #from stack
             except ActionInterruptException.ActionInterruptException as e:
-                ()
+                #Remove the last currently ran action from the stack
+                del self._actionsStack_[self._actionsStack_.index(action)]
+                self._actionRunning_ = False
+
 

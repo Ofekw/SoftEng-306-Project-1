@@ -28,9 +28,8 @@ def main(argv, config):
 
     #List of the temporary robot files created
     file_name = []
-    x_value = -40
     #Types of robots that the script reads the config file for
-    robot_type = ["Picker", "Carrier", "Visitor", "Animal"]
+    robot_type = ["Picker", "Carrier", "Visitor", "Worker", "Animal"]
     #Loads the fields in the config file
 
     #Creates or overwrites the myworld.world file
@@ -44,39 +43,100 @@ def main(argv, config):
     for type in robot_type:
         #Loads the corresponding robot template
         string = open('world/templates/' + type + '.template').read()
-        number = config.get(type.lower() + '.number')
+        number = int(config.get(type.lower() + '.number'))
+        if number > 5:
+            number = 5
         robot = ""
-        for i in range(0, int(number)):
-            #Appends to the myworld file the robot model of each robot
-            robot = robot + type.lower() + "( pose [ " + str(x_value)  +  " -28 0.000 90 ] name \"r" + str(total_robots) + "\")" + "\n"
-            #The constructor of that robot type with the robot_id and the x y positions
-            constructor_name = "Robot" + type
-            if type == "Visitor" or type == "Animal":
-                constructor_name = constructor_name.replace("Robot", "")
-            constructor = "    robot = " + constructor_name + "(" + str(total_robots) + ", " + str(x_value) + ", -28, math.pi/2)"
-            if debugging == True:
-                constructor = constructor + "\n" + debug_text1 + "\n" + debug_text2
-            name = type + str(i) + ".py" #Name of the robot files
+        if type == "Carrier":
+            x_value = -50
+        else:
+            x_value = 45 - robot_type.index(type)*4
+        for i in range(0, number):
+            if type != "Picker":
+                if type == "Carrier":
+                    x_value += 10
+                    constructor_name = "Robot" + type
+                    y = -35-(5*i)
+                else:
+                    constructor_name = type
+                    y = -35-(5*i)
+
+                robot += type.lower() + "( pose [ " + str(x_value)  +  " " + str(y) + " 0.000 90 ] name \"r" + str(total_robots) + "\")" + "\n"
+                if type != "Carrier":
+                    constructor = "    robot = " + constructor_name + "(\"" + type + str(i) + "\", " + str(total_robots) + ", " + str(x_value) + ", " + str(y) +", math.pi/2)"
+                else:
+                    constructor = "    robot = " + constructor_name + "(\"" + type + str(i) + "\", " + str(total_robots) + ", " + str(x_value) + ", " + str(y) +", math.pi/2," + config.get("capacity.number") + ")"
+                name = type + str(i) + ".py" #Name of the robot files
+
+            else:
+                output = spawnPickers(i, total_robots, file_name, config)
+                robot += output[0]
+                constructor = output[1]
+                name = output[2]
+
             file_name.append(name)
             temp = open(os.path.join(directory, name),'w')
+            if debugging:
+                constructor = constructor + "\n" + debug_text1 + "\n" + debug_text2
             #Replaces "@@@" string in the template with the constructor
             temp.write(string.replace("@@@", constructor))
             temp.close()
             #Gives the temporary robot file run permission
             os.chmod(directory+name,stat.S_IRWXU)
+
             total_robots += 1
-            x_value += 10
         robot = robot + "\n"
         #Writes the robot models to the world file
         myworld.write(robot)
     myworld.close()
 
-    if testing == False:
+    #This is the carrier queue creation
+    string = open('world/templates/Queue.template').read()
+    temp = open(os.path.join(directory, "Queue_0.py"),'w')
+    #Replaces "@@@" string in the template with the constructor
+    temp.write(string.replace("@@@", "    carrier_queue = Carrier_Queue(" + config.get("capacity.number") + ")"))
+    temp.close()
+    #Gives the temporary robot file run permission
+    os.chmod(directory+"Queue_0.py",stat.S_IRWXU)
+    file_name.append("Queue_0.py")
+
+
+    if not(testing):
         for name in file_name:
             #Runs all the temporary robot files created
             command = ["rosrun", "se306Project1", name]
             processes.append(subprocess.Popen(command, shell=False))
+
+    #processes.append(subprocess.Popen(["rosrun", "se306Project1", "Queue_0.py"], shell=False))
     return file_name
+
+def spawnPickers(number, total_robots, file_name, config):
+    picker = ""
+    #Creates the robot model of each robot to be appended to the world file
+    picker ="picker( pose [ " + str(getPickerPosition(config, number))  +  " -28 0.000 90 ] name \"r" + str(total_robots) + "\")" + "\n"
+    #The constructor of that robot type with the robot_id and the x y positions
+    constructor = "    robot = " + "Robot" + "Picker" + "(\"" + "Picker" + str(number) + "\", " + str(total_robots) + ", " + str(getPickerPosition(config, number)) + ", -28, math.pi/2," + config.get("capacity.number") + ")"
+    name = "Picker" + str(number) + ".py" #Name of the robot files
+    return [picker, constructor, name]
+
+
+def getPickerPosition(config, robot_number):
+    WORLD_WIDTH = 80
+    rows = int(config.get('orchard.number'))
+    #max number of orchards is 10
+    if rows > 10:
+        rows = 10
+    elif rows < 1:
+        rows = 1
+
+    #Set the width between the rows
+    width_between_rows = WORLD_WIDTH/(rows)
+    if robot_number == 0:
+        return (-WORLD_WIDTH/2 + width_between_rows/2) - 4
+    else:
+        return -WORLD_WIDTH/2 + width_between_rows*robot_number
+
+
 
 def exit_process(file_name):
     #This function is called when the process is killed. The function will delete all the temporary robot files and the myworld.world file

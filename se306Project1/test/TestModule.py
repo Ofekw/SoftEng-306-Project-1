@@ -30,14 +30,13 @@ class TestModule():
                 break
 
         if(time.time() >= max_time):
-            print "Time Limit Exceeded"
             return False
 
         return True
 
 
     def compare_values_with_threshold(self, value1, value2):
-        threshold = 0.5
+        threshold = 0.8
         absolute_difference = abs(value1-value2)
         if absolute_difference < threshold:
             return True
