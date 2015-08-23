@@ -60,9 +60,14 @@ def main(argv, config):
                 else:
                     constructor_name = type
                     y = -35-(5*i)
+
                 robot += type.lower() + "( pose [ " + str(x_value)  +  " " + str(y) + " 0.000 90 ] name \"r" + str(total_robots) + "\")" + "\n"
-                constructor = "    robot = " + constructor_name + "(\"" + type + str(i) + "\", " + str(total_robots) + ", " + str(x_value) + ", " + str(y) +", math.pi/2)"
+                if type != "Carrier":
+                    constructor = "    robot = " + constructor_name + "(\"" + type + str(i) + "\", " + str(total_robots) + ", " + str(x_value) + ", " + str(y) +", math.pi/2)"
+                else:
+                    constructor = "    robot = " + constructor_name + "(\"" + type + str(i) + "\", " + str(total_robots) + ", " + str(x_value) + ", " + str(y) +", math.pi/2," + config.get("capacity.number") + ")"
                 name = type + str(i) + ".py" #Name of the robot files
+
             else:
                 output = spawnPickers(i, total_robots, file_name, config)
                 robot += output[0]
@@ -85,12 +90,24 @@ def main(argv, config):
         myworld.write(robot)
     myworld.close()
 
+    #This is the carrier queue creation
+    string = open('world/templates/Queue.template').read()
+    temp = open(os.path.join(directory, "Queue_0.py"),'w')
+    #Replaces "@@@" string in the template with the constructor
+    temp.write(string.replace("@@@", "    carrier_queue = Carrier_Queue(" + config.get("capacity.number") + ")"))
+    temp.close()
+    #Gives the temporary robot file run permission
+    os.chmod(directory+"Queue_0.py",stat.S_IRWXU)
+    file_name.append("Queue_0.py")
+
+
     if not(testing):
         for name in file_name:
             #Runs all the temporary robot files created
             command = ["rosrun", "se306Project1", name]
             processes.append(subprocess.Popen(command, shell=False))
-        processes.append(subprocess.Popen(["rosrun", "se306Project1", "Run_Carrier_Queue.py"], shell=False))
+
+    #processes.append(subprocess.Popen(["rosrun", "se306Project1", "Queue_0.py"], shell=False))
     return file_name
 
 def spawnPickers(number, total_robots, file_name, config):
@@ -98,7 +115,7 @@ def spawnPickers(number, total_robots, file_name, config):
     #Creates the robot model of each robot to be appended to the world file
     picker ="picker( pose [ " + str(getPickerPosition(config, number))  +  " -28 0.000 90 ] name \"r" + str(total_robots) + "\")" + "\n"
     #The constructor of that robot type with the robot_id and the x y positions
-    constructor = "    robot = " + "Robot" + "Picker" + "(\"" + "Picker" + str(number) + "\", " + str(total_robots) + ", " + str(getPickerPosition(config, number)) + ", -28, math.pi/2)"
+    constructor = "    robot = " + "Robot" + "Picker" + "(\"" + "Picker" + str(number) + "\", " + str(total_robots) + ", " + str(getPickerPosition(config, number)) + ", -28, math.pi/2," + config.get("capacity.number") + ")"
     name = "Picker" + str(number) + ".py" #Name of the robot files
     return [picker, constructor, name]
 
