@@ -28,8 +28,8 @@ class Visitor(Human):
     def enum(**enums):
         return type('Enum', (), enums)
 
-    VisitorState = enum(NAVIGATING_RANDOM="Nav to rand location",
-                        MOVING_RANDOM = "Move to rand direction")
+    VisitorState = enum(NAVIGATING_RANDOM="Navigating to random location",
+                        MOVING_RANDOM = "Moving in random direction")
 
 
     def __init__(self, r_name, r_id, x_off, y_off, theta_offset):
@@ -122,15 +122,7 @@ class Visitor(Human):
         #Random select a distance to move forward
         rand_dist = random.randint(15, 30)
 
-        #random_nav[0] = rand_direction
-        #random_nav[1] = str(rand_dist)
         self.visitor_state = self.VisitorState.MOVING_RANDOM
-
-        # face_rand_direction = self._actions_[6], [rand_direction]
-        # move_forward = self._actions_[0], [rand_dist]
-        #
-        # self._actionsStack_.append(move_forward)
-        # self._actionsStack_.append(face_rand_direction)
 
         self.face_direction(rand_direction)
         self.move_forward(rand_dist)
@@ -148,10 +140,7 @@ class Visitor(Human):
         random_x = random.randint(-40, 40)
         random_y = random.randint(-40, 40)
 
-        random_location = {random_x, random_y}
         self.visitor_state = self.VisitorState.NAVIGATING_RANDOM
-
-        print("Attempting to go to " + str(random_x) + ", " + str(random_y))
 
         #Create action that will move vertically to empty area
         move_to_empty_area = self._actions_[1], [self.px, -15]

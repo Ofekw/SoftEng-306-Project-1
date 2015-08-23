@@ -12,6 +12,7 @@ import numpy.testing
 from Human import Human
 import ActionInterruptException
 import os
+import threading
 import time
 
 """
@@ -58,9 +59,17 @@ class Worker(Human):
         #This is the current orchard row gap that the worker will be travelling to, or is currently patrolling
         self.empty_row_target = [0, 0]
 
+        #Keep track of the last row the worker patrolled
+        self.last_patrolled_row = [0, 0]
+
+        #Track the position of the robot which caused the worker to leave an orchard row
+        self.detected_robot_position = [0, 0]
+
         #Create subscribers to the positions for both picker and carrier
         self.sub_to_picker_positions = rospy.Subscriber("picker_position", String, self.Robot_Locations_Callback)
         self.sub_to_carrier_positions = rospy.Subscriber("carrier_position", String, self.Robot_Locations_Callback)
+
+        self.lock = threading.Lock()
 
         #Define the actions to be used for the action stack
         self._actions_ = {
@@ -116,6 +125,9 @@ class Worker(Human):
                 #Stop current action
                 self._stopCurrentAction_ = True
 
+                #Clear action stack
+                del self._actionsStack_[:]
+
                 #Create actions to turn right and move forward
                 move1 = self._actions_[0], [3]
 
@@ -124,7 +136,21 @@ class Worker(Human):
                 else:
                     turn2 = self._actions_[3], ["left"]
 
+                #After collision avoidance, append appropriate next action depending on current
+                #state and position
+                if self.last_patrolled_row[0] <= self.px <= self.last_patrolled_row[1]:
+                    if self.worker_state == self.WorkerState.AVOIDING_ROBOT:
+                        #Set next action to be avoiding robot
+                        next_action = self._actions_[7], []
+                    else:
+                        #Set next action to be patrolling orchard
+                        next_action = self._actions_[6], []
+                else:
+                    #Set next action to finding an empty orchard row
+                    next_action = self._actions_[5], []
+
                 #Append actions to stack
+                self._actionsStack_.append(next_action)
                 self._actionsStack_.append(move1)
                 self._actionsStack_.append(turn2)
 
@@ -224,7 +250,7 @@ class Worker(Human):
             #Then iterate through each robot coordinate stores in the robot_locations dictionary
             for r_coord in self.robot_locations.itervalues():
                 #Check if x coordinate of robot is within orchard row gap
-                if [0] <= r_coord[0] <= g[1]:
+                if g[0] <= r_coord[0] <= g[1]:
                     #If true then set unpopulated to false
                     unpopulated = False
 
@@ -269,6 +295,9 @@ class Worker(Human):
     appends two actions to the stack, that will move the worker up and down the row.
     """
     def patrol_orchard(self):
+        #Set the last patrolled row
+        self.last_patrolled_row = self.empty_row_target
+
         #Set state to PATROLLING_ORCHARD
         self.worker_state = self.WorkerState.PATROLLING_ORCHARD
 
@@ -276,7 +305,11 @@ class Worker(Human):
         go_north = self._actions_[1], [self.px, 40]
         go_south = self._actions_[1], [self.px, -10]
 
+        #Append patrol orchard function again so it will repeat
+        patrol_orchard = self._actions_[6], []
+
         #Append actions to stack
+        self._actionsStack_.append(patrol_orchard)
         self._actionsStack_.append(go_south)
         self._actionsStack_.append(go_north)
 
@@ -292,14 +325,20 @@ class Worker(Human):
         #Set state to AVOIDING_ROBOT
         self.worker_state = Worker.WorkerState.AVOIDING_ROBOT
 
+        #Reset the empty row target
+        self.empty_row_target = [0, 0]
+
+        #empty action stack
+        del self._actionsStack_[:]
+
         if robot_py > self.py:
             #Create action to leave the row by going  then head east
             leave_row = self._actions_[1], [self.px, -20]
             go_east = self._actions_[1], [30, -20]
         else:
             #Create action to leave the row by going north then head east
-            leave_row = self._actions_[1], [self.px, 48]
-            go_east = self._actions_[1], [30, 48]
+            leave_row = self._actions_[1], [self.px, 45]
+            go_east = self._actions_[1], [30, 45]
 
         #Append actions
         self._actionsStack_.append(go_east)
@@ -338,6 +377,9 @@ class Worker(Human):
                         avoid_action = self._actions_[7], [r_py]
                         self._actionsStack_.append(avoid_action)
 
+                        #Set the detected robot position to the robot in the current row
+                        self.detected_robot_position = r_coord
+
                         return
 
     """
@@ -362,18 +404,17 @@ class Worker(Human):
                 break
 
             try:
-                #run aciton with paremeter
+                #Make sure to set stopCurrentAction to False
+                self._stopCurrentAction_ = False
+
+                #If valid action then run it
                 result = action[0](*action[1])
 
                 #Remove the last currently ran action from the stack
-                del self._actionsStack_[self._actionsStack_.index(action)]
-                self._actionRunning_ = False
+                if (action in self._actionsStack_):
+                    del self._actionsStack_[self._actionsStack_.index(action)]
 
-                #If there are no actions on the stack and the Worker is currently patrolling an orhcard row,
-                #then add the patrol orchard row action to the stack
-                if len(self._actionsStack_) == 0 and self.worker_state == self.WorkerState.PATROLLING_ORCHARD:
-                    patrol_action = self._actions_[6], []
-                    self._actionsStack_.append(patrol_action)
+                self._actionRunning_ = False
 
             #Catch the exception that will be raised when the stopCurrentAction is set to True, then delete last action
             #from stack

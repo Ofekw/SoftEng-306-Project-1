@@ -26,8 +26,8 @@ class Animal(Entity):
     def enum(**enums):
         return type('Enum', (), enums)
 
-    AnimalState = enum(NAVIGATING_RANDOM = "Nav to rand location",
-                        GOING_TO_VISITOR = "Going to visitor")
+    AnimalState = enum(NAVIGATING_RANDOM = "Navigating to random location",
+                        GOING_TO_VISITOR = "Attempting to follow Visitor")
 
 
     def __init__(self, r_name, r_id, x_off, y_off, theta_offset):
