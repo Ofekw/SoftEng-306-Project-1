@@ -13,7 +13,7 @@ import inspect
 
 class Test_Robot_Setup(unittest.TestCase,TestModule):
 
-    animal = Animal(2,-10,-28, math.pi/2)
+    animal = Animal("Node",2,-10,-28, math.pi/2)
 
     def test_robot_carrier_setup(self):
 

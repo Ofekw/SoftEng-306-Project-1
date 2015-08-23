@@ -16,7 +16,7 @@ import inspect
 
 class Test_Robot_face_direction(unittest.TestCase,TestModule):
 
-    robot0 = RobotPicker(0,-20,-28, math.pi/2)
+    robot0 = RobotPicker("Node",0,-20,-28, math.pi/2,50)
 
     def test_face_south(self):
 
@@ -32,7 +32,7 @@ class Test_Robot_face_direction(unittest.TestCase,TestModule):
 
         self.run_robot(self.robot0,moveAction,10)
 
-        self.assertEqual(self.robot0.get_current_direction(), "eastzzz","Turning to face south")
+        self.assertEqual(self.robot0.get_current_direction(), "east","Turning to face south")
 
     def test_face_north(self):
 
