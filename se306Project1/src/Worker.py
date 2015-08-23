@@ -59,8 +59,8 @@ class Worker(Human):
         self.empty_row_target = [0, 0]
 
         #Create subscribers to the positions for both picker and carrier
-        self.sub_to_picker_positions = rospy.Subscriber("pickerPosition", String, self.Robot_Locations_Callback)
-        self.sub_to_carrier_positions = rospy.Subscriber("carrierPosition", String, self.Robot_Locations_Callback)
+        self.sub_to_picker_positions = rospy.Subscriber("picker_position", String, self.Robot_Locations_Callback)
+        self.sub_to_carrier_positions = rospy.Subscriber("carrier_position", String, self.Robot_Locations_Callback)
 
         #Define the actions to be used for the action stack
         self._actions_ = {
@@ -118,7 +118,11 @@ class Worker(Human):
 
                 #Create actions to turn right and move forward
                 move1 = self._actions_[0], [3]
-                turn2 = self._actions_[3], ["right"]
+
+                if i < 90:
+                    turn2 = self._actions_[3], ["right"]
+                else:
+                    turn2 = self._actions_[3], ["left"]
 
                 #Append actions to stack
                 self._actionsStack_.append(move1)
@@ -163,8 +167,6 @@ class Worker(Human):
 
         #Set the path to the config.properties file
         path_to_config = os.path.abspath(os.path.abspath(os.getcwd())) + "/config.properties"
-
-        print(path_to_config)
 
         #Store each property in a dictionary
         with open(path_to_config, "r") as f:
@@ -216,7 +218,7 @@ class Worker(Human):
         #Initialise a boolean variable that will change based on whether a empty orchard gap exists or not
         found_row = False
 
-        for g in self.orchard_row_gaps:
+        for g in reversed(self.orchard_row_gaps):
             #For each gap in the orchard_row_gaps, initially set unpopulated boolean variable to True
             unpopulated = True
             #Then iterate through each robot coordinate stores in the robot_locations dictionary
@@ -231,7 +233,7 @@ class Worker(Human):
                 #Set empty orchard row x coordinates to the founded gap
                 empty_orchard_row_x = g
                 #Set empty orhcard row target
-                self.empty_row_target = g
+                self.empty_row_target = empty_orchard_row_x
                 #Set found_row to True
                 found_row = True
                 break
@@ -244,7 +246,9 @@ class Worker(Human):
 
         #Set the x coordinate that the worker will traverse to, to be a random value inbetween the left and right x
         #coordinate of the founded orchard gap
-        x_target = random.randint(empty_orchard_row_x[0] + 3, empty_orchard_row_x[1] - 3)
+        #x_target = random.randint(empty_orchard_row_x[0] + 3, empty_orchard_row_x[1] - 3)
+
+        x_target = empty_orchard_row_x[0] + (empty_orchard_row_x[1] - empty_orchard_row_x[0])/2
 
         #Create actions to traverse to orchard row, as well as the action to patrol the row up and down
         goto_x_action = self._actions_[1], [x_target, self.py]
@@ -269,7 +273,7 @@ class Worker(Human):
         self.worker_state = self.WorkerState.PATROLLING_ORCHARD
 
         #Create actions to move north then south
-        go_north = self._actions_[1], [self.px, 48]
+        go_north = self._actions_[1], [self.px, 40]
         go_south = self._actions_[1], [self.px, -10]
 
         #Append actions to stack
@@ -288,7 +292,7 @@ class Worker(Human):
         #Set state to AVOIDING_ROBOT
         self.worker_state = Worker.WorkerState.AVOIDING_ROBOT
 
-        if robot_py < self.py:
+        if robot_py > self.py:
             #Create action to leave the row by going  then head east
             leave_row = self._actions_[1], [self.px, -20]
             go_east = self._actions_[1], [30, -20]
@@ -320,19 +324,21 @@ class Worker(Human):
             r_px = r_coord[0]
             r_py = r_coord[1]
 
-            #Check if the x coordinate is within the current orchard row
-            if self.empty_row_target[0] <= r_px <= self.empty_row_target[1]:
-                #Check if the robot has actually entered the orchard row as well
-                if -10 <= r_py <= 39:
+            #If not already trying to avoid robot
+            if self.worker_state != self.WorkerState.AVOIDING_ROBOT:
+                #Check if the x coordinate is within the current orchard row
+                if self.empty_row_target[0] <= r_px <= self.empty_row_target[1]:
+                    #Check if the robot has actually entered the orchard row as well
+                    if -10 <= r_py <= 39:
 
-                    #Stop current action
-                    self._stopCurrentAction_ = True
+                        #Stop current action
+                        self._stopCurrentAction_ = True
 
-                    #Set and append avoid action
-                    avoid_action = self._actions_[7], [r_py]
-                    self._actionsStack_.append(avoid_action)
+                        #Set and append avoid action
+                        avoid_action = self._actions_[7], [r_py]
+                        self._actionsStack_.append(avoid_action)
 
-                    return
+                        return
 
     """
     @function
@@ -356,14 +362,11 @@ class Worker(Human):
                 break
 
             try:
-                self._actionRunning_ = True
-
                 #run aciton with paremeter
                 result = action[0](*action[1])
 
                 #Remove the last currently ran action from the stack
                 del self._actionsStack_[self._actionsStack_.index(action)]
-
                 self._actionRunning_ = False
 
                 #If there are no actions on the stack and the Worker is currently patrolling an orhcard row,
@@ -372,9 +375,10 @@ class Worker(Human):
                     patrol_action = self._actions_[6], []
                     self._actionsStack_.append(patrol_action)
 
-            #Catch the exception that will be raised when the stopCurrentAction is set to True, though do not
-            #perform any actions
+            #Catch the exception that will be raised when the stopCurrentAction is set to True, then delete last action
+            #from stack
             except ActionInterruptException.ActionInterruptException as e:
-                print(str(e))
-
+                #Remove the last currently ran action from the stack
+                del self._actionsStack_[self._actionsStack_.index(action)]
+                self._actionRunning_ = False
 
