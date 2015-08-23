@@ -164,8 +164,6 @@ class Worker(Human):
         #Set the path to the config.properties file
         path_to_config = os.path.abspath(os.path.abspath(os.getcwd())) + "/config.properties"
 
-        print(path_to_config)
-
         #Store each property in a dictionary
         with open(path_to_config, "r") as f:
             for line in f:
@@ -356,14 +354,11 @@ class Worker(Human):
                 break
 
             try:
-                self._actionRunning_ = True
-
                 #run aciton with paremeter
                 result = action[0](*action[1])
 
                 #Remove the last currently ran action from the stack
                 del self._actionsStack_[self._actionsStack_.index(action)]
-
                 self._actionRunning_ = False
 
                 #If there are no actions on the stack and the Worker is currently patrolling an orhcard row,
@@ -372,9 +367,10 @@ class Worker(Human):
                     patrol_action = self._actions_[6], []
                     self._actionsStack_.append(patrol_action)
 
-            #Catch the exception that will be raised when the stopCurrentAction is set to True, though do not
-            #perform any actions
+            #Catch the exception that will be raised when the stopCurrentAction is set to True, then delete last action
+            #from stack
             except ActionInterruptException.ActionInterruptException as e:
-                print(str(e))
-
+                #Remove the last currently ran action from the stack
+                del self._actionsStack_[self._actionsStack_.index(action)]
+                self._actionRunning_ = False
 
