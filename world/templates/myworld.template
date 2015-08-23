@@ -1,10 +1,12 @@
 include "objects/picker.inc"
 include "objects/tree.inc"
 include "objects/visitor.inc"
+include "objects/worker.inc"
 include "objects/carrier.inc"
 include "objects/animal.inc"
 include "objects/rock.inc"
 include "objects/weed.inc"
+include "objects/dropoff.inc"
 
 define floorplan model
 (

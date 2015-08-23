@@ -9,7 +9,7 @@ import os
 
 class Carrier_Queue:
 
-    def __init__(self):
+    def __init__(self, capacity):
         rospy.init_node("Carrier_Queue")
 
         # picker_queue is a FIFO queue contains the  ids of full pickers
@@ -19,8 +19,8 @@ class Carrier_Queue:
         self.targeted_pickers = []
 
         self.lock = threading.RLock()
-        self.picker_robots = ["0,0,0","0,0,0","0,0,0","0,0,0","0,0,0","0,0,0"]
-        self.max_load = 50
+        self.picker_robots = ["0,0,0","0,0,0","0,0,0","0,0,0","0,0,0","0,0,0","0,0,0","0,0,0","0,0,0","0,0,0",]
+        self.max_load = capacity
         self.total_kiwis_collected = 0
         self.total_collections = 0
 
@@ -93,6 +93,7 @@ class Carrier_Queue:
         self.picker_robots[picker_index] = message.data.split(',')[1] + "," + message.data.split(',')[2] + "," + message.data.split(',')[4]  # Should add element 3 here which is theta
 
         if int(self.picker_robots[picker_index].split(',')[2]) == self.max_load:
+            self.post_to_file()
             self.lock.acquire()
             try:
                 if picker_index not in self.picker_queue:

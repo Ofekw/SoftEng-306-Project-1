@@ -21,10 +21,10 @@ $(document).ready(function(){
         checkIfServerIsOnline(); // we check when the json file was last updated to determine if the server is online
 
         if (online) {
-            serverStatus.html('ROS Server is: ONLINE')
+            serverStatus.html('ONLINE').css('color', 'green');
             table.ajax.url('/ros/state_file.json').load();
         }else{
-            serverStatus.html('ROS Server is: OFFLINE')
+            serverStatus.html('OFFLINE').css('color', 'red');
             table.ajax.url('/ros/offline.json').load();
         }
     }

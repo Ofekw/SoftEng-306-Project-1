@@ -30,11 +30,11 @@ class RobotPicker(Robot):
                               FINDING="Finding Orchard", WAITINGFORCOLLECTION="Waiting for collection",
                        PATH="Path finding")
 
-    def __init__(self,r_id,x_off,y_off,theta_off):
-        Robot.__init__(self,r_id,x_off,y_off,theta_off)
+    def __init__(self,r_name,r_id,x_off,y_off,theta_off,capacity):
+        Robot.__init__(self,r_name,r_id,x_off,y_off,theta_off)
 
-        # self.max_load = 100
-        # self.current_load = 0
+        self.max_load = capacity
+
         self.firstLaserReading = []
         self.timeLastAdded = time.clock()
 
