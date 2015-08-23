@@ -16,6 +16,8 @@ import matplotlib.pyplot as plt
 import os
 import string
 import time
+import tkFont
+import glob
 
 
 """
@@ -63,6 +65,7 @@ class GUI_overlay(Tkinter.Tk):
 
         nb = ttk.Notebook(self)
         nb.pack(fill='both', expand='yes')
+        status_tab = Frame(nb)
         robot_tab = Frame(nb)
         robot_tab2 = Frame(nb)
         human_tab = Frame(nb)
@@ -70,16 +73,22 @@ class GUI_overlay(Tkinter.Tk):
         self.laser_tab = Frame(nb)
 
         # create the tabs
+        nb.add(status_tab,text='Status Overview')
         nb.add(robot_tab, text='Robot Pickers')
         nb.add(robot_tab2, text='Robot Carriers')
         nb.add(human_tab, text='Humans')
         nb.add(animal_tab, text='Animals')
         nb.add(self.laser_tab, text='Laser-Rangers')
 
+
+        #BEGIN STATUS
+        self.status_label_list = self.setup_status(nb, status_tab)
+
+
         #BEGIN ROBOTS
 
-        self.robot_label_list = self.setup_pickers(nb,robot_tab)
 
+        self.robot_label_list = self.setup_pickers(nb,robot_tab)
         self.robot2_label_list = self.setup_carriers(nb,robot_tab2)
 
         # BEGIN HUMANS ________________________________________________________
@@ -89,7 +98,7 @@ class GUI_overlay(Tkinter.Tk):
         self.animal_label_list = self.setup_animals(nb,animal_tab)
 
         # BEGIN LASERS
-        if self.directory != "./":
+        if self.directory == "./":
             #only sets up lasers if NOT in testing mode. (in testing mode, a custom directory is passed in.
             self.setup_lasers()
 
@@ -1735,6 +1744,89 @@ class GUI_overlay(Tkinter.Tk):
                              animal_tab.TLabel25,animal_tab.TLabel26,animal_tab.TLabel27,animal_tab.TLabel28,animal_tab.TLabel29,animal_tab.TLabel30]
         return animal_label_list
 
+
+    def setup_status(self,nb,status_tab):
+
+        #Write default status values
+        fn = os.path.join(os.path.dirname(__file__), "carrier.que")
+        output_file = open(fn, "w")
+        output_file.write("[]\n")
+        output_file.write("[]\n")
+        output_file.write("0\n")
+        output_file.write("0\n")
+        output_file.close()
+
+        labelTFont = tkFont.Font(family="Helvetica",size=16,weight="bold")
+        labelBFont = tkFont.Font(family="Helvetica",size=14)
+
+        TLabelframe1 = ttk.Labelframe(status_tab)
+        TLabelframe1.place(relx=0.02, rely=0.1, relheight=0.4,relwidth=0.95)
+        TLabelframe1.configure(relief=RAISED)
+        TLabelframe1.configure(text='''Picker and Carrier Report''')
+        TLabelframe1.configure(relief=RAISED)
+        TLabelframe1.configure(width=390)
+
+        status_tab.Label1 = Label(TLabelframe1)
+        status_tab.Label1.place(relx=0.025, rely=0.175, height=30, width=300)
+        status_tab.Label1.configure(text='''Picker Queue (IDs):''')
+        status_tab.Label1.configure(font=labelTFont)
+
+
+        status_tab.Label2 = Label(TLabelframe1)
+        status_tab.Label2.place(relx=0.025, rely=0.35, height=19, width=300)
+        status_tab.Label2.configure(text='''Targeted Pickers (IDs):''')
+        status_tab.Label2.configure(font=labelTFont)
+
+
+        status_tab.Label3 = Label(TLabelframe1)
+        status_tab.Label3.place(relx=0.025, rely=0.525, height=19, width=300)
+        status_tab.Label3.configure(text='''Total Kiwifruit collected:''')
+        status_tab.Label3.configure(font=labelTFont)
+
+
+        status_tab.Label4 = Label(TLabelframe1)
+        status_tab.Label4.place(relx=0.025, rely=0.7, height=19, width=300)
+        status_tab.Label4.configure(text='''Number of collections:''')
+        status_tab.Label4.configure(font=labelTFont)
+
+
+        status_tab.TLabel1 = ttk.Label(TLabelframe1)
+        status_tab.TLabel1.place(relx=0.6, rely=0.175, height=25, width=250)
+        status_tab.TLabel1.configure(background=self._bgcolor)
+        status_tab.TLabel1.configure(foreground="#0066FF")
+        status_tab.TLabel1.configure(relief=FLAT)
+        status_tab.TLabel1.configure(font=labelBFont)
+
+
+        status_tab.TLabel2 = ttk.Label(TLabelframe1)
+        status_tab.TLabel2.place(relx=0.6, rely=0.35, height=25, width=250)
+        status_tab.TLabel2.configure(background=self._bgcolor)
+        status_tab.TLabel2.configure(foreground="#0066FF")
+        status_tab.TLabel2.configure(relief=FLAT)
+        status_tab.TLabel2.configure(font=labelBFont)
+
+
+        status_tab.TLabel3 = ttk.Label(TLabelframe1)
+        status_tab.TLabel3.place(relx=0.6, rely=0.525, height=25, width=250)
+        status_tab.TLabel3.configure(background=self._bgcolor)
+        status_tab.TLabel3.configure(foreground="#0066FF")
+        status_tab.TLabel3.configure(relief=FLAT)
+        status_tab.TLabel3.configure(font=labelBFont)
+
+
+        status_tab.TLabel4 = ttk.Label(TLabelframe1)
+        status_tab.TLabel4.place(relx=0.6, rely=0.7, height=25, width=250)
+        status_tab.TLabel4.configure(background=self._bgcolor)
+        status_tab.TLabel4.configure(foreground="#006600")
+        status_tab.TLabel4.configure(relief=FLAT)
+        status_tab.TLabel4.configure(font=labelBFont)
+
+
+        status_label_list = [status_tab.TLabel1,status_tab.TLabel2,status_tab.TLabel3,status_tab.TLabel4]
+
+        return status_label_list
+
+
     #Setup those laser rangers
     def setup_lasers(self):
 
@@ -1774,11 +1866,10 @@ class GUI_overlay(Tkinter.Tk):
         directory = "./"
         count = 0
         read = False
-        while read == False:
+        laser_file_count = len(glob.glob1(directory,"*.ls"))
+        while laser_file_count > count:
             for file in os.listdir(directory):
                 if (file.endswith("laser.ls")) and (count == 0):
-                    read = True
-                    time.sleep(5)
                     count+=1
                     f = open(file)
                     lines = f.read()
@@ -1895,6 +1986,7 @@ class GUI_overlay(Tkinter.Tk):
                         except RuntimeError:
                             pass
                 elif (file.endswith("laser.ls")) and (count == 2):
+                    read = True
                     try:
                         self.LaserFrame3.configure(text="Robot Picker "+str(file[0]))
                     except RuntimeError:
@@ -1941,6 +2033,13 @@ class GUI_overlay(Tkinter.Tk):
 
     """
     def update(self):
+        i=0
+        for file in os.listdir(self.directory):
+            if file.endswith(".que"):
+                with open(self.directory+file) as f:
+                    for line in f:
+                        self.status_label_list[i].configure(text=str(line))
+                        i+=1
         i = 0
         for file in os.listdir(self.directory):
             if file.endswith("pic.sta"):

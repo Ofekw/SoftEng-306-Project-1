@@ -36,8 +36,8 @@ class Worker(Human):
                         AVOIDING_ROBOT="Detected robot, leaving row",
                        WAITING_FOR_EMPTY_ROW="Waiting for row to become empty")
 
-    def __init__(self, r_id, x_off, y_off, theta_offset):
-        Human.__init__(self, r_id, x_off, y_off, theta_offset)
+    def __init__(self, r_name, r_id, x_off, y_off, theta_offset):
+        Human.__init__(self, r_name, r_id, x_off, y_off, theta_offset)
 
 
         #Initialise worker state to empty string
@@ -162,7 +162,7 @@ class Worker(Human):
     def define_orchard_row_gaps(self):
 
         #Set the path to the config.properties file
-        path_to_config = os.path.abspath(os.path.abspath(os.pardir)) + "/config.properties"
+        path_to_config = os.path.abspath(os.path.abspath(os.getcwd())) + "/config.properties"
 
         #Store each property in a dictionary
         with open(path_to_config, "r") as f:
@@ -354,14 +354,11 @@ class Worker(Human):
                 break
 
             try:
-                self._actionRunning_ = True
-
                 #run aciton with paremeter
                 result = action[0](*action[1])
 
                 #Remove the last currently ran action from the stack
                 del self._actionsStack_[self._actionsStack_.index(action)]
-
                 self._actionRunning_ = False
 
                 #If there are no actions on the stack and the Worker is currently patrolling an orhcard row,
@@ -370,9 +367,10 @@ class Worker(Human):
                     patrol_action = self._actions_[6], []
                     self._actionsStack_.append(patrol_action)
 
-            #Catch the exception that will be raised when the stopCurrentAction is set to True, though do not
-            #perform any actions
+            #Catch the exception that will be raised when the stopCurrentAction is set to True, then delete last action
+            #from stack
             except ActionInterruptException.ActionInterruptException as e:
-                print(str(e))
-
+                #Remove the last currently ran action from the stack
+                del self._actionsStack_[self._actionsStack_.index(action)]
+                self._actionRunning_ = False
 

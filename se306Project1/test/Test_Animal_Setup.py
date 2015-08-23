@@ -17,21 +17,12 @@ class Test_Robot_Setup(unittest.TestCase,TestModule):
 
     def test_robot_carrier_setup(self):
 
-        self.print_function_name(inspect.stack()[0][3])
-
         self.assertEqual(self.animal.linearX, 3, "Setting linearX")
         self.assertEqual(self.animal.dict_of_visitors, {}, "Setting dict_of_visitors")
         self.assertEqual(self.animal.animal_state, "", "Setting animal_state")
 
-    def test_animal_random_movement(self):
-
-        self.print_function_name(inspect.stack()[0][3])
-
-
-
-
-        pass
-
 
 if __name__ == '__main__':
-    unittest.main()
+    # unittest.main()
+    import rostest
+    rostest.rosrun('se306Project1', 'test_bare_bones', Test_Robot_Setup)

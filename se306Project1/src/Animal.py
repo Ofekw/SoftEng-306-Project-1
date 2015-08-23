@@ -30,8 +30,8 @@ class Animal(Entity):
                         GOING_TO_VISITOR = "Going to visitor")
 
 
-    def __init__(self, r_id, x_off, y_off, theta_offset):
-        Entity.__init__(self, r_id, x_off, y_off, theta_offset)
+    def __init__(self, r_name, r_id, x_off, y_off, theta_offset):
+        Entity.__init__(self, r_name, r_id, x_off, y_off, theta_offset)
 
         self.dict_of_visitors = {}
 
@@ -208,14 +208,19 @@ class Animal(Entity):
             action = self._actionsStack_[-1]
 
             try:
+                self._actionRunning_ = True
                 #run aciton with paremeter
                 result = action[0](*action[1])
 
                 del self._actionsStack_[self._actionsStack_.index(action)]
-
                 self._actionRunning_ = False
+
+            #Catch the exception that will be raised when the stopCurrentAction is set to True, then delete last action
+            #from stack
             except ActionInterruptException.ActionInterruptException as e:
-                ()
+                #Remove the last currently ran action from the stack
+                del self._actionsStack_[self._actionsStack_.index(action)]
+                self._actionRunning_ = False
 
     def __str__(self):
         return "animal_"

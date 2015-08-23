@@ -82,5 +82,6 @@ class TestGenerateFiles(unittest.TestCase):
         generateEntity.exit_process(self.list)
 
 if __name__ == '__main__':
-    unittest.main()
-
+    # unittest.main()
+    import rostest
+    rostest.rosrun('se306Project1', 'test_bare_bones', TestGenerateFiles)

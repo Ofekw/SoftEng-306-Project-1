@@ -20,7 +20,7 @@ class Carrier_Queue:
 
         self.lock = threading.RLock()
         self.picker_robots = ["0,0,0","0,0,0","0,0,0","0,0,0","0,0,0","0,0,0"]
-        self.max_load = 20
+        self.max_load = 50
         self.total_kiwis_collected = 0
         self.total_collections = 0
 
@@ -110,7 +110,6 @@ class Carrier_Queue:
     def post_to_file(self):
         fn = os.path.join(os.path.dirname(__file__), "carrier.que")
         output_file = open(fn, "w")
-        output_file.write("Carrier Queue\n")
         output_file.write(str(list(self.picker_queue)) + "\n")
         output_file.write(str(self.targeted_pickers) + "\n")
         output_file.write(str(self.total_kiwis_collected) + "\n")

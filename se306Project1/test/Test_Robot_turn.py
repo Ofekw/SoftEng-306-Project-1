@@ -24,16 +24,23 @@ class Test_Robot_turn(unittest.TestCase,TestModule):
     #since we can't reset the stage, we have to work with the same robot.
     robot0 = RobotPicker(0,-20,-28, math.pi/2)
 
-    def test_turn_right(self):
-
-        self.print_function_name(inspect.stack()[0][3])
+    def test_turn_1right(self):
 
         moveAction = self.robot0.turn,["right"]
 
         self.run_robot(self.robot0,moveAction,5)
 
-        self.assertEqual(self.robot0.get_current_direction(), "east","North Turning Right = EAST")
+        self.assertEqual(self.robot0.get_current_direction(), "east")
 
+    def test_turn_2left(self):
+
+        moveAction = self.robot0.turn,["left"]
+
+        self.run_robot(self.robot0,moveAction,5)
+
+        self.assertEqual(self.robot0.get_current_direction(), "north")
 
 if __name__ == '__main__':
-    unittest.main()
+    # unittest.main()
+    import rostest
+    rostest.rosrun('se306Project1', 'test_bare_bones', Test_Robot_turn)

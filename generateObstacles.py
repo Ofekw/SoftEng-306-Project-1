@@ -11,6 +11,8 @@ def main(row_values, config):
         x_values.append(i-4.2)
         x_values.append(i+4.2)
     obstacle_coordinates = []
+    if number > 5:
+        number = 5
     for i in range(0, number):
         temp = obstacle.replace("obstacle", "rock")
 

@@ -32,8 +32,8 @@ class Visitor(Human):
                         MOVING_RANDOM = "Move to rand direction")
 
 
-    def __init__(self, r_id, x_off, y_off, theta_offset):
-        Human.__init__(self, r_id, x_off, y_off, theta_offset)
+    def __init__(self, r_name, r_id, x_off, y_off, theta_offset):
+        Human.__init__(self, r_name, r_id, x_off, y_off, theta_offset)
 
         #Initialise the publisher
         self.pub_to_dog = rospy.Publisher("visitor_dog_topic", String, queue_size=10)
@@ -48,7 +48,8 @@ class Visitor(Human):
             2: self.turn,
             3: self.stop,
             4: self.random_nav,
-            5: self.go_to_rand_location
+            5: self.go_to_rand_location,
+            6: self.face_direction
         }
 
     """
@@ -112,7 +113,6 @@ class Visitor(Human):
     a random distance between 5 and 10m, at a random velocity between 2 and 4 m/s
     """
     def random_nav(self):
-        global random_nav
         #Create an array of the cardinal directions
         cardinal_directions = ["north", "south", "west", "east"]
 
@@ -126,18 +126,23 @@ class Visitor(Human):
         #random_nav[1] = str(rand_dist)
         self.visitor_state = self.VisitorState.MOVING_RANDOM
 
+        # face_rand_direction = self._actions_[6], [rand_direction]
+        # move_forward = self._actions_[0], [rand_dist]
+        #
+        # self._actionsStack_.append(move_forward)
+        # self._actionsStack_.append(face_rand_direction)
+
         self.face_direction(rand_direction)
         self.move_forward(rand_dist)
 
     """
-    @function
+    @function.
     This function involves randomly selecting a coordinate between -40 to 40 x, and -40 to 40 y, then having the entity
     attempt to navigate towards the coordinate. The navigation works by using a goto function to move vertically towards
     an area with no trees or robots (y = -15), then another goto function to move horizontally so the px value lines up to the random
     x value, then finally moving vertically towards the y coordinate.
     """
     def go_to_rand_location(self):
-        global random_location
 
         #Generate random coordinates
         random_x = random.randint(-40, 40)
@@ -187,21 +192,22 @@ class Visitor(Human):
         #While there are actions on the stack and no action is currently running
         while (len(self._actionsStack_) > 0 and not self._actionRunning_):
 
-            self._actionRunning_ = True
-
             #get top action on stack
             action = self._actionsStack_[-1]
 
             try:
+                self._actionRunning_ = True
                 #run aciton with paremeter
                 result = action[0](*action[1])
 
                 del self._actionsStack_[self._actionsStack_.index(action)]
-
                 self._actionRunning_ = False
 
-            #Catch the exception that will be raised when the stopCurrentAction is set to True, though do not
-            #perform any actions
+            #Catch the exception that will be raised when the stopCurrentAction is set to True, then delete last action
+            #from stack
             except ActionInterruptException.ActionInterruptException as e:
-                ()
+                #Remove the last currently ran action from the stack
+                del self._actionsStack_[self._actionsStack_.index(action)]
+                self._actionRunning_ = False
+
 

@@ -33,7 +33,7 @@ class Entity:
     Angle = enum(DEGREES="degrees", RADIANS="radians")
     State = enum(STOPPED="Stopped", TURNING="Turning", CORRECTING="Aligning to cardinal direction",
                  DETECTING="Detecting entity type", FIN="Finished Picking")
-    def __init__(self,r_id,x_off,y_off, theta_off):
+    def __init__(self,r_name,r_id,x_off,y_off, theta_off):
 
 
 
@@ -52,8 +52,8 @@ class Entity:
         self.x_off = x_off
         self.y_off = y_off
         self.robot_id = r_id
-        self.robot_node_name = ("RobotNode" +str(self.robot_id))
-        self.robot_node_identifier = ("robot_"+ str(self.robot_id))
+        self.robot_node_name = r_name
+        self.robot_node_identifier = ("robot_"+ str(r_id))
         self.goalx = self.px
         self.goaly = self.py
         self.state = self.State.STOPPED
@@ -400,7 +400,7 @@ class Entity:
 
     """
     def face_direction(self, direction_to_face):
-        print("Running Function face_direction")
+        #print("Running Function face_direction")
         current_direction = self.get_current_direction()
 
         #print("Currently facing:" + current_direction)
@@ -445,7 +445,7 @@ class Entity:
                 self.turn(Direction.RIGHT)
             self.correct_theta()
         else:
-            print("Error: Face Direction")
+            #print("Error: Face Direction")
             return
 
         return 0
@@ -469,12 +469,12 @@ class Entity:
     A
     """
     def goto_yx(self, x_coord, y_coord):
-        print ("Going To : ("+str(x_coord)+","+str(y_coord)+")")
+        #print ("Going To : ("+str(x_coord)+","+str(y_coord)+")")
         #try run the goto command
         try:
 
             if (abs(x_coord-self.px)<=0.3 and abs(y_coord-self.py)<=0.2 ):
-                print("Already at coordinate!")
+                #print("Already at coordinate!")
                 return 0
 
             x_difference = x_coord - self.px
@@ -538,16 +538,16 @@ class Entity:
                     return 0
 
         except ActionInterruptException.ActionInterruptException as e:
-            print(e.message)
+            #print(e.message)
             return 1
         finally:
 
             if self._stopCurrentAction_:
-                print("Halted at destination:", self.px, self.py)
-                print("Go To: Stopped due to potential collision")
+                #print("Halted at destination:", self.px, self.py)
+                #print("Go To: Stopped due to potential collision")
                 return 2
             else:
-                print("Arrived at destination:", self.px, self.py)
+                #print("Arrived at destination:", self.px, self.py)
                 return 0
 
 
