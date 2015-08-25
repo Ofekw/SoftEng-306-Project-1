@@ -5,6 +5,7 @@ include "objects/tree.inc"
 include "objects/visitor.inc"
 include "objects/animal.inc"
 include "objects/worker.inc"
+include "objects/tractor.inc"
 
 define floorplan model
 (
@@ -59,3 +60,5 @@ visitor( pose [ 10 -28 0.000 90 ] name "r4")
 animal( pose [ 20 -28 0.000 90 ] name "r5")
 
 worker( pose [ 40 -20 0 0] name "w1")
+
+tractor( pose [ 45 -20 0 0] name "t1")
