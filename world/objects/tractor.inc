@@ -118,11 +118,11 @@ define tractor position
   block
   (
 	points 4
-	point[0] [0.27 0]
-	point[1] [0.27 1]
-	point[2] [0.37 1]
-	point[3] [0.37 0]
-	z [0.4 0.8]
+	point[0] [0.28 0.35]
+	point[1] [0.28 0.67]
+	point[2] [0.39 0.67]
+	point[3] [0.39 0.35]
+	z [0.2 0.6]
 	color "ivory"
   )
 
@@ -130,11 +130,11 @@ define tractor position
   block
   (
 	points 4
-	point[0] [0 0.33]
-	point[1] [0 0.66]
-	point[2] [0.6 0.66]
-	point[3] [0.6 0.33]
-	z [0.8 0.85]
+	point[0] [0.28 0.456]
+	point[1] [0.28 0.563]
+	point[2] [0.39 0.563]
+	point[3] [0.39 0.456]
+	z [0.6 0.65]
 	color "pink"
   )
 
@@ -142,11 +142,11 @@ define tractor position
   block
   (
 	points 4
-	point[0] [0 0.23]
-	point[1] [0 0.76]
-	point[2] [0.6 0.76]
-	point[3] [0.6 0.23]
-	z [0.85 1]
+	point[0] [0.28 0.4236]
+	point[1] [0.28 0.5964]
+	point[2] [0.39 0.5964]
+	point[3] [0.39 0.4236]
+	z [0.65 0.8]
 	color "pink"
   )
 
@@ -154,11 +154,11 @@ define tractor position
   block
   (
 	points 4
-	point[0] [0 0.23]
-	point[1] [0 0.76]
-	point[2] [0.6 0.76]
-	point[3] [0.6 0.23]
-	z [1 1.15]
+	point[0] [0.28 0.4236]
+	point[1] [0.28 0.5964]
+	point[2] [0.39 0.5964]
+	point[3] [0.39 0.4236]
+	z [0.8 0.9]
 	color "ivory"
   )
 
@@ -166,11 +166,11 @@ define tractor position
   block
   (
 	points 4
-	point[0] [0.6 0.23]
-	point[1] [0.6 0.76]
-	point[2] [0.9 0.76]
-	point[3] [0.9 0.23]
-	z [1 1.05]
+	point[0] [0.39 0.4236]
+	point[1] [0.39 0.5964]
+	point[2] [0.441 0.5964]
+	point[3] [0.441 0.4236]
+	z [0.8 0.85]
 	color "ivory"
   )
 )
