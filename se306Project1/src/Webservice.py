@@ -3,11 +3,10 @@ Webservice program that creates JSON Strings
 from Entity status files
 
 """
-
-__author__ = 'harry'
 import os
 import ftplib
 import time
+import datetime
 
 class Webservice():
 
@@ -36,7 +35,7 @@ class Webservice():
 
 
         for file in os.listdir(directory):
-            if file.endswith("vis.sta") or file.endswith("ani.sta"):
+            if file.endswith("vis.sta") or file.endswith("wor.sta") or file.endswith("ani.sta"):
                 count+=1
                 f=open(file)
                 lines=f.readlines()
@@ -49,22 +48,20 @@ class Webservice():
                     JSON_string+="\"5\":\"" + lines[5].strip() +"\","
                     JSON_string+="\"6\":\"""\"},"
 
-
+        time = str(unix_time(datetime.datetime.now()))
+        sliceTime = time[len(time)-9: len(time)-4]
         JSON_string = JSON_string[:-1]
         JSON_string+="]}"
-        JSON_string = "{\"sEcho\": 1,\"iTotalRecords\": " + str(count)+","+"\"iTotalDisplayRecords\": 50,\"" + JSON_string
+        JSON_string = "{\"lastModified\": "+sliceTime+","+"\"sEcho\": 1,\"iTotalRecords\": " + str(count)+","+"\"iTotalDisplayRecords\": 50,\"" + JSON_string
         return JSON_string
-
-
-    #TODO WORKERS!
 
     def send_JSON_via_FTP(self,JSON_strings):
         fn = os.path.join(os.path.dirname(__file__),"state_file.json")
         output_file = open(fn, "w")
         output_file.write(JSON_strings)
         output_file.close()
-        session = ftplib.FTP('thinkscruffy.com','ros@thinkscruffy.com','network')
-        session.cwd("/public_html/ros/")
+        session = ftplib.FTP('ofek.io','ros@ofek.io','network')
+        session.cwd("/")
         file = open("state_file.json", "rb")
         session.storbinary('STOR state_file.json', file)     # send the file
         file.close()                                    # close file and FTP
@@ -74,6 +71,11 @@ class Webservice():
     def updater(self):
         JSON_strings = self.create_JSON_strings()
         self.send_JSON_via_FTP(JSON_strings)
+
+def unix_time(dt):
+    epoch = datetime.datetime.utcfromtimestamp(0)
+    delta = dt - epoch
+    return delta.total_seconds() *1000
 
 
 if __name__ == '__main__':

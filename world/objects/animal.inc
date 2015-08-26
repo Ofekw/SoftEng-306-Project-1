@@ -16,7 +16,7 @@ define animal position
   color "gray50"
   drive "diff"		 	# Differential steering model.
 
-  obstacle_return 1           	# Can hit things.
+  obstacle_return 0           	# Can hit things.
   ranger_return 1             	# reflects sonar beams
   fiducial_return 1           	# Seen as "1" fiducial finders
 
@@ -37,7 +37,7 @@ define animal position
 	point[2] [0.65 1]
 	point[3] [0.65 0]
 	z [0.45 1]
-	color "black"
+	color "sienna"
   )
 
   # neck
@@ -49,7 +49,7 @@ define animal position
 	point[2] [0.7 0.75]
 	point[3] [0.7 0.25]
 	z [0.65 0.9]
-	color "brown"
+	color "saddle brown"
   )
 
   # head
@@ -61,7 +61,7 @@ define animal position
 	point[2] [1 1]
 	point[3] [1 0]
 	z [0.6 1]
-	color "brown"
+	color "saddle brown"
   )
 
   # leg 1
@@ -73,6 +73,7 @@ define animal position
 	point[0] [0.1 0.2]
 	point[0] [0.1 0]
 	z [0 0.45]
+	color "saddle brown"
   )
 
   # leg 2
@@ -84,6 +85,7 @@ define animal position
 	point[2] [0.1 1]
 	point[3] [0.1 0.8]
 	z [0 0.45]
+	color "saddle brown"
   )
 
   # leg 3
@@ -95,6 +97,7 @@ define animal position
 	point[2] [0.65 1]
 	point[3] [0.65 0.8]
 	z [0 0.45]
+	color "saddle brown"
   )
 
   # leg 4
@@ -106,6 +109,43 @@ define animal position
 	point[2] [0.65 0.2]
 	point[3] [0.65 0]
 	z [0 0.45]
+	color "saddle brown"
   )
 
+  # tail
+  block
+  (
+	points 4
+	point[0] [0 0.4]
+	point[1] [0 0.6]
+	point[2] [0.1 0.6]
+	point[3] [0.1 0.4]
+	z [1 1.3]
+	color "saddle brown"
+  )
+
+  # ear 1
+  block
+  (
+	points 4
+	point[0] [0.7 0]
+	point[1] [0.7 0.2]
+	point[2] [0.75 0.2]
+	point[3] [0.75 0]
+	z [1 1.1]
+	color "saddle brown"
+  )
+
+  # ear 2
+  block
+  (
+	points 4
+	point[0] [0.7 0.8]
+	point[1] [0.7 1]
+	point[2] [0.75 1]
+	point[3] [0.75 0.8]
+	z [1 1.1]
+	color "saddle brown"
+
+  )
 )

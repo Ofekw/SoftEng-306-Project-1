@@ -27,31 +27,25 @@ class RobotPicker(Robot):
         return type('Enum', (), enums)
 
     PickerState = enum(PICKING="Picking Fruit",
-                              FINDING="Finding Orchard", WAITINGFORCOLLECTION="Waiting for collection")
+                              FINDING="Finding Orchard", WAITINGFORCOLLECTION="Waiting for collection"
+                       )
 
-    def __init__(self,r_id,x_off,y_off,theta_off):
-        Robot.__init__(self,r_id,x_off,y_off,theta_off)
-        self.picker_pub = rospy.Publisher("pickerPosition",String, queue_size=10)
+    def __init__(self,r_name,r_id,x_off,y_off,theta_off,capacity):
+        Robot.__init__(self,r_name,r_id,x_off,y_off,theta_off)
 
-        # self.max_load = 100
-        # self.current_load = 0
-        self.firstLaserReading = []
+        self.max_load = capacity
+
         self.timeLastAdded = time.clock()
-
         self.disableSideLaser = False
 
-        self.kiwi_sub = rospy.Subscriber("carrier_kiwiTransfer", String, self.kiwi_callback)
-        self.kiwi_pub = rospy.Publisher("picker_kiwiTransfer",String, queue_size=10)
+        self.picker_pub = rospy.Publisher("picker_position",String, queue_size=10)
+        self.kiwi_sub = rospy.Subscriber("carrier_kiwi_transfer", String, self.kiwi_callback)
+        self.kiwi_pub = rospy.Publisher("picker_kiwi_transfer",String, queue_size=10)
 
-        self.picker_sub = rospy.Subscriber("pickerPosition", String, self.pickerCallback)
+        self.picker_sub = rospy.Subscriber("picker_position", String, self.picker_callback)
         self.picker_robots = ["0,0,0","0,0,0","0,0,0","0,0,0","0,0,0","0,0,0"]
 
-
-
-    def robot_specific_function(self):
-        pass
-
-    def pickerCallback(self, message):
+    def picker_callback(self, message):
         picker_index = int(message.data.split(',')[0])
         self.picker_robots[picker_index] = message.data.split(',')[1] + "," + message.data.split(',')[2] + "," + message.data.split(',')[4]  # Should add element 3 here which is theta
 
@@ -94,7 +88,6 @@ class RobotPicker(Robot):
     """
     def kiwi_callback(self, message):
         if (message.data.split(",")[0] != str(self.robot_id) and self.current_load >= self.max_load and message.data.split(",")[1] == str(self.robot_id)):
-            print("transfer load")
             self.current_load = 0
             self.kiwi_pub.publish(str(self.robot_id))
 
@@ -105,7 +98,7 @@ class RobotPicker(Robot):
     """
     def addKiwi(self, clockTime):
         if(self.current_load >= self.max_load):
-            self.waitForCollection()
+            self.wait_for_collection()
         elif(clockTime >= (self.timeLastAdded + 0.005)):
             self.current_load = self.current_load + 1
             self.timeLastAdded = clockTime
@@ -115,9 +108,8 @@ class RobotPicker(Robot):
 
     Wait for a carrier to pickup
     """
-    def waitForCollection(self):
+    def wait_for_collection(self):
         self.state = self.PickerState.WAITINGFORCOLLECTION
-        self._stopCurrentAction_ = True
         self.disableLaser = True
         action = self._actions_[7],[]
         if action != self._actionsStack_[-1]:
@@ -125,14 +117,7 @@ class RobotPicker(Robot):
             self._stopCurrentAction_ = True
             self._actionsStack_.append(action)
 
-    def gotoClosestRobot(self):
-        pass
-
     def StageLaser_callback(self, msg):
-        barCount = 0
-        found = False
-
-
         #Write laser data for ranger
         fn = os.path.join(os.path.dirname(__file__), str(self.robot_id)+"laser.ls")
         output_file = open(fn, "w")
@@ -143,7 +128,7 @@ class RobotPicker(Robot):
 
         if not self.disableLaser:
             for i in range(70, 110):
-                if msg.ranges[i]< 4.0:
+                if (msg.ranges[i]< 4.0 and self.state != Robot.RobotState.PATH) or (msg.ranges[i] < 3 and self.state == Robot.RobotState.PATH):
                     #check if dynamic entity
                     self._stopCurrentAction_ = True
                     if self.firstLaserReading == []:
@@ -162,31 +147,71 @@ class RobotPicker(Robot):
                             #check if laser reading's differ
                             if self.firstLaserReading[i] != msg.ranges[i+70]:
                                 #if they do, entity is dynamic, so wait 5's for it to leave.
+                                # self.disableLaser = True
+                                self.disableSideLaser = True
                                 wait = self._actions_[4], [5]
                                 self._actionsStack_.append(wait)
                                 #reset laserReading
                                 self.firstLaserReading = []
                                 return
-
-                        print("static")
-                        # action = self._actions_[2], [Entity.Direction.RIGHT]
-                        action = self._actions_[1], [self.init_x, self.init_y]
-                        goToAction = self._actions_[5], [self.init_x, -13.5]
-                        turnAction = self._actions_[2], [Entity.Direction.RIGHT]
-                        #check if action already exists in stack, otherwise laser will spam rotates
-                        if action != self._actionsStack_[-1]:
-                            #stop moving foward and add turn action
-                            self._stopCurrentAction_ = True
-                            self._actionsStack_.append(turnAction)
-                            self._actionsStack_.append(goToAction)
+                        #static actions
+                        if self.state != Robot.RobotState.PATH:
+                            #count number of lasers that have hit to check if wall
+                            laserCount = 0
+                            for i in self.firstLaserReading:
+                                if i < 5:
+                                    laserCount += 1
+                            #if wall return home and restart picking loop
+                            if laserCount == 40:
+                                action = self._actions_[1], [self.init_x, self.init_y]
+                                goToAction = self._actions_[5], [self.init_x, -13]
+                                turnAction = self._actions_[2], [Entity.Direction.RIGHT]
+                                #check if action already exists in stack, otherwise laser will spam rotates
+                                if action != self._actionsStack_[-1]:
+                                    #stop moving foward and add turn action
+                                    self._actionsStack_.append(turnAction)
+                                    self._actionsStack_.append(goToAction)
+                                    self._actionsStack_.append(action)
+                                    self.firstLaserReading = []
+                                    return
+                                return
+                            else:
+                                #else object is an obstacle
+                                self.state = Robot.RobotState.PATH
+                                moveHorizontal = None
+                                moveVertical = None
+                                turn = None
+                                #decide which way the second to last turn will be
+                                if self.treesLeft:
+                                    turn = self._actions_[2], [Entity.Direction.LEFT]
+                                else:
+                                    turn = self._actions_[2], [Entity.Direction.RIGHT]
+                                d = self.get_current_direction()
+                                #decide which side ways direction to move
+                                x = -3
+                                if (d == Entity.Direction.NORTH and self.treesLeft) or \
+                                        (d == Entity.Direction.SOUTH and not self.treesLeft):
+                                    x = 3
+                                moveHorizontal = self._actions_[5], [self.px + 3, self.py]
+                                #decide which vertical way to move
+                                if d == Entity.Direction.NORTH:
+                                    moveVertical = self._actions_[5], [self.px+x, self.py+10]
+                                else:
+                                    moveVertical = self._actions_[5], [self.px+x, self.py-10]
+                                self._actionsStack_.append(turn)
+                                self._actionsStack_.append(moveVertical)
+                                self._actionsStack_.append(moveHorizontal)
+                                self.firstLaserReading = []
+                                return
+                        if self.state == Robot.RobotState.PATH:
+                            action = self._actions_[2], [Entity.Direction.RIGHT]
                             self._actionsStack_.append(action)
                             self.firstLaserReading = []
+                            self.state = self.PickerState.FINDING
                             return
-                        return
 
-
-            #check that all lasers in 0-20 range are not hitting object
-            if not self.disableSideLaser:
+            #Tree detection
+            if not self.disableSideLaser and self.state != Robot.RobotState.PATH:
                 rangeCount = 0
                 for i in range(160,180):
                     if msg.ranges[i]<5.0:
@@ -207,21 +232,25 @@ class RobotPicker(Robot):
                     #stop the robot moving forward
                     self._stopCurrentAction_ = True
                     #check other pickers to see if in row.
-                    for i in range(len(self.picker_robots)):
-                        data = self.picker_robots[i].split(",")
-                        #check if
-                        if self.px-0.5 <= float(data[0]) +i*10 <= self.px+0.5 and self.py-1 <= float(data[1] <= self.py+1):
-                            continue
-                        elif self.px-10 < float(data[0]) +i*10 < self.px+2 and self.py < float(data[1]) and float(data[0]) != 0:
-                            self.noMoreTrees = 0
-                            self.state = self.PickerState.FINDING
-                            self.disableSideLaser = True
-                            goToAction = self._actions_[5], [self.px+10, self.py]
-                            self._actionsStack_.append(goToAction)
-                            return
+                    if self.get_current_direction() == Entity.Direction.WEST:
+                        for i in range(len(self.picker_robots)):
+                            data = self.picker_robots[i].split(",")
+                            #check if
+                            if self.px-0.5 <= float(data[0]) +i*10 <= self.px+0.5 and self.py-1 <= float(data[1]) <= self.py+1:
+                                continue
+                            elif self.px-10 < float(data[0]) +i*10 < self.px+2 and self.py < float(data[1]) and float(data[0]) != 0:
+                                self.noMoreTrees = 0
+                                self.state = self.PickerState.FINDING
+                                self.disableSideLaser = True
+                                goToAction = self._actions_[5], [self.px+10, self.py]
+                                self._actionsStack_.append(goToAction)
+                                return
 
+                    self.noMoreTrees = 0
+                    self.disableSideLaser = True
                     turnAction = self._actions_[2], [Entity.Direction.LEFT]
                     self._actionsStack_.append(turnAction)
+
                 elif rangeCount == 0:
                     self.noMoreTrees +=1
                     self.treeDetected = False
@@ -230,14 +259,11 @@ class RobotPicker(Robot):
                     self.state = self.PickerState.PICKING
                     self.treeDetected = True
                     self.noMoreTrees=0
-                    #print("Found Tree")
-                    self.addKiwi(time.clock())
+                    #only pick if going up and down
+                    if self.get_current_direction() != Entity.Direction.EAST and self.get_current_direction() != Entity.Direction.WEST:
+                        self.addKiwi(time.clock())
                 elif rangeCount == 20:
                     pass
-
-    def read(self, msg, container):
-        for i in range(70, 110):
-            container.append(msg[i])
 
     """
     @function
@@ -250,4 +276,7 @@ class RobotPicker(Robot):
 
         time.sleep(10)
         self.disableLaser = False
+        # Reset the robots state
+        self.state = self.PickerState.FINDING
+        self.firstLaserReading = []
         return 0

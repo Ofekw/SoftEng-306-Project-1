@@ -33,7 +33,7 @@ class Entity:
     Angle = enum(DEGREES="degrees", RADIANS="radians")
     State = enum(STOPPED="Stopped", TURNING="Turning", CORRECTING="Aligning to cardinal direction",
                  DETECTING="Detecting entity type", FIN="Finished Picking")
-    def __init__(self,r_id,x_off,y_off, theta_off):
+    def __init__(self,r_name,r_id,x_off,y_off, theta_off):
 
 
 
@@ -52,8 +52,8 @@ class Entity:
         self.x_off = x_off
         self.y_off = y_off
         self.robot_id = r_id
-        self.robot_node_name = ("RobotNode" +str(self.robot_id))
-        self.robot_node_identifier = ("robot_"+ str(self.robot_id))
+        self.robot_node_name = r_name
+        self.robot_node_identifier = ("robot_"+ str(r_id))
         self.goalx = self.px
         self.goaly = self.py
         self.state = self.State.STOPPED
@@ -218,7 +218,6 @@ class Entity:
         previousY = self.py
 
 
-        print("Moving Forward")
         #While the distance that the Entity has gained has not exceeded the given distance, continue to move the Entity forward
         while (dist_gained < dist and not self._stopCurrentAction_):
 
@@ -248,9 +247,6 @@ class Entity:
             #Find the distance gained by calculating sqrt(xDiff^2 + yDiff^2)
             dist_gained = math.sqrt(xDiff * xDiff + yDiff * yDiff)
 
-            #print("Moving Forward: " + str(distToGo) + "m to go")
-            #print("Current x pos = " + str(self.px) +"," +str(self.py))
-
 
         if self._stopCurrentAction_ == True:
                 #stop movement and throw exception
@@ -258,7 +254,6 @@ class Entity:
                 self.RobotNode_stage_pub.publish(self.RobotNode_cmdvel)
                 self._stopCurrentAction_ = False
                 raise ActionInterruptException.ActionInterruptException("Wall hit")
-                #print "Move Forward: Stopped due to potential collision"
                 return 2
         else:
             #Stop robot by setting forward velocity to 0 and then publish change
@@ -277,7 +272,6 @@ class Entity:
     Turn function which allows the Entity to turn 90 degrees ( a right angle) either left or right.
     """
     def turn(self, direction):
-        print("Turning "+ direction)
         pi = math.pi
 
         if (direction == Direction.LEFT):
@@ -314,7 +308,6 @@ class Entity:
 
             rospy.sleep(0.0001)
 
-            #print("Turning " + direction + " current theta is " + str(self.theta) +", target theta is " + str(thetaTarg))
         #Turn complete, reenable laser
         self.disableLaser = False
         if self._stopCurrentAction_ == True:
@@ -377,8 +370,6 @@ class Entity:
 
             rospy.sleep(0.0001)
 
-           # print("Rotating - current theta is " + str(self.theta) +", target theta is " + str(thetaTarg))
-
         if self._stopCurrentAction_ == True:
             self._stopCurrentAction_ = False
             #raise ActionInterruptException.ActionInterruptException("Wall hit")
@@ -400,11 +391,7 @@ class Entity:
 
     """
     def face_direction(self, direction_to_face):
-        print("Running Function face_direction")
         current_direction = self.get_current_direction()
-
-        #print("Currently facing:" + current_direction)
-        #print("Turning to face: "+ direction_to_face)
 
         if (current_direction== direction_to_face):
             return
@@ -445,7 +432,6 @@ class Entity:
                 self.turn(Direction.RIGHT)
             self.correct_theta()
         else:
-            print("Error: Face Direction")
             return
 
         return 0
@@ -469,12 +455,10 @@ class Entity:
     A
     """
     def goto_yx(self, x_coord, y_coord):
-        print ("Going To : ("+str(x_coord)+","+str(y_coord)+")")
         #try run the goto command
         try:
 
             if (abs(x_coord-self.px)<=0.3 and abs(y_coord-self.py)<=0.2 ):
-                print("Already at coordinate!")
                 return 0
 
             x_difference = x_coord - self.px
@@ -538,16 +522,11 @@ class Entity:
                     return 0
 
         except ActionInterruptException.ActionInterruptException as e:
-            print(e.message)
-            return 1
+            self._stopCurrentAction_ = True
         finally:
-
             if self._stopCurrentAction_:
-                print("Halted at destination:", self.px, self.py)
-                print("Go To: Stopped due to potential collision")
                 return 2
             else:
-                print("Arrived at destination:", self.px, self.py)
                 return 0
 
 
@@ -570,12 +549,10 @@ class Entity:
 
     """
     def goto_xy(self, x_coord, y_coord):
-        print ("Going To : ("+str(x_coord)+","+str(y_coord)+")")
         #try run the goto command
         try:
 
             if (abs(x_coord-self.px)<=0.3 and abs(y_coord-self.py)<=0.2 ):
-                print("Already at coordinate!")
                 return 0
 
             x_difference = x_coord - self.px
@@ -639,16 +616,12 @@ class Entity:
                     return 0
 
         except ActionInterruptException.ActionInterruptException as e:
-            print(e.message)
-            return 1
+            print("Exception thrown")
+            self._stopCurrentAction_ = True
         finally:
-
             if self._stopCurrentAction_:
-                print("Halted at destination:", self.px, self.py)
-                print ("Go To: Stopped due to potential collision")
                 return 2
             else:
-                print("Arrived at destination:", self.px, self.py)
                 return 0
 
     """
@@ -670,7 +643,6 @@ class Entity:
         elif (abs(self.theta- math.pi)<=0.1 or abs(self.theta+math.pi)<=0.1):
             current_direction = Direction.WEST
         else:
-            print("Current direction not one of the four cardinal directions")
             current_direction = self.correct_theta()
 
         return current_direction

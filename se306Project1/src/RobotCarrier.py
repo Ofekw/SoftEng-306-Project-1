@@ -12,8 +12,9 @@ import numpy.testing
 from Robot import Robot
 import os
 import ActionInterruptException
-import globals
 from collections import deque
+import threading
+import Entity
 
 
 """
@@ -31,25 +32,24 @@ class RobotCarrier(Robot):
     CarrierState = enum(WAITINGFORPICKER="Waiting for picker",
                               GOINGTOPICKER="Going to picker", GOTODROPOFF="Going to dropoff")
 
-    def __init__(self,r_id,x_off,y_off,theta_off):
+    def __init__(self,r_name,r_id,x_off,y_off,theta_off, capacity):
 
-        Robot.__init__(self,r_id,x_off,y_off,theta_off)
-        globals.init()
+        Robot.__init__(self,r_name,r_id,x_off,y_off,theta_off)
 
-        self.carrier_pub = rospy.Publisher("carrierPosition",String, queue_size=10)
-        self.carrier_sub = rospy.Subscriber("carrierPosition", String, self.carrierCallback)
-        self.picker_sub = rospy.Subscriber("pickerPosition", String, self.pickerCallback)
-        self.kiwi_sub = rospy.Subscriber("picker_kiwiTransfer", String, self.kiwi_callback)
-        self.kiwi_pub = rospy.Publisher("carrier_kiwiTransfer",String, queue_size=10)
+        self.carrier_pub = rospy.Publisher("carrier_position",String, queue_size=10)
+        self.carrier_sub = rospy.Subscriber("carrier_position", String, self.carrier_callback)
+        self.picker_sub = rospy.Subscriber("picker_position", String, self.picker_callback)
+        self.kiwi_sub = rospy.Subscriber("picker_kiwi_transfer", String, self.kiwi_callback)
+        self.kiwi_pub = rospy.Publisher("carrier_kiwi_transfer",String, queue_size=10)
+        self.queue_pub = rospy.Publisher("carrier_allocation_request", String, queue_size=10)
+        self.queue_sub = rospy.Subscriber("carrier_allocation_response", String, self.queue_callback)
 
+        self.next_robot_id = None
+        self.carrier_robots = ["0,0,0","0,0,0","0,0,0","0,0,0","0,0,0","0,0,0","0,0,0","0,0,0","0,0,0","0,0,0"]
+        self.picker_robots = ["0,0,0","0,0,0","0,0,0","0,0,0","0,0,0","0,0,0","0,0,0","0,0,0","0,0,0","0,0,0"]
 
-        self.next_robot_id = 0
-        self.carrier_robots = ["0,0,0","0,0,0","0,0,0","0,0,0","0,0,0","0,0,0"]
-        self.picker_robots = ["0,0,0","0,0,0","0,0,0","0,0,0","0,0,0","0,0,0"]
-
-        # self.max_load = 100
-        # self.current_load = 0
-
+        self.max_load = capacity
+        self.previousState = self.CarrierState.WAITINGFORPICKER
         self.is_going_home = False
 
         #these variables are used to help the laser callback, it will help in dealing with entities/debris on
@@ -101,10 +101,8 @@ class RobotCarrier(Robot):
 
     Sets the position of carrier robots received from messages on the topic
     """
-    def carrierCallback(self, message):
+    def carrier_callback(self, message):
         self.carrier_robots[int(message.data.split(',')[0])] = message.data.split(',')[1] + "," + message.data.split(',')[2] #+ "," + message.data.split(',')[4]  # Should add element 4 here which is theta
-        # print("Carrier array")
-        # print ', '.join(self.carrier_robots)
 
     """
     @function
@@ -112,34 +110,40 @@ class RobotCarrier(Robot):
 
     Sets the position of picker robots received from messages on the topic
     """
-    def pickerCallback(self, message):
+    def picker_callback(self, message):
         picker_index = int(message.data.split(',')[0])
         self.picker_robots[picker_index] = message.data.split(',')[1] + "," + message.data.split(',')[2] + "," + message.data.split(',')[4]  # Should add element 3 here which is theta
-
-        if int(self.picker_robots[picker_index].split(',')[2]) == self.max_load:
-            if picker_index not in globals.picker_queue:
-                print("Added picker " + str(picker_index) + " to queue")
-                globals.picker_queue.append(picker_index)
-                print(globals.picker_queue)
-
-
 
     """
     @function
     @parameter: message
 
-    Displays info sent from a picker robot when transferring kiwis
+    Callback from the picker for confirmation of transfer
+    Carrier publishes to the carrier_queue that it has completed
     """
     def kiwi_callback(self, message):
+        # if the id of the picker robot == the robot id it is supposed to go to
         if (int(message.data) == self.next_robot_id):
-            #message.data != str(self.robot_id) and
             self.current_load = self.max_load # possible add max load here
-            # globals.targeted_pickers.remove(int(message.data))
-            globals.targeted_pickers.remove(globals.picker_queue.popleft())
-            if len(globals.picker_queue) > 0:
-                self.get_next_in_queue()
-            print("going to dropoff zone")
+
+            # signal queue that transfer has completed
+            self.queue_pub.publish(str(self.robot_id) + ",arrived," + str(self.next_robot_id))
+            self.next_robot_id = None
             self.returnToOrigin()
+
+    """
+    @function
+    @parameter: message
+
+    Callback from carrier_queue to let the carrier know which robot to go to next
+    Then goes to that robot if it is not going home
+    """
+    def queue_callback(self, message):
+        #self.carrier_robots[int(message.data.split(',')[0])] = message.data.split(',')[1] + "," + message.data.split(',')[2] #+ "," + message.data.split(',')[4]  # Should add element 4 here which is theta
+        if(int(message.data.split(',')[0]) == self.robot_id):
+            self.next_robot_id = int(message.data.split(',')[1])
+            if not(self.is_going_home):
+                self.go_to_next_picker()
 
     """
     @function
@@ -149,7 +153,6 @@ class RobotCarrier(Robot):
     """
     def initiate_transfer(self):
         self.kiwi_pub.publish(str(self.robot_id) + "," + str(self.next_robot_id))
-        print("intitate transfer")
 
     """
     @function
@@ -160,57 +163,82 @@ class RobotCarrier(Robot):
     """
     def StageLaser_callback(self, msg):
         pass
-
-        # if msg.ranges[90] < 4.0:
-        #     self.halt_counter += 1
-        #     self._stopCurrentAction_ = True
-        #     self.FiveCounter = 0
-        # else:
-        #     #waits for 5 consecutive not found values, this is to tackle the weird laser scan issue
-        #     #that returns alternating incorrect values.
-        #     self.FiveCounter += 1
-        #     if self.FiveCounter == 5:
-        #         self.halt_counter = 0
-        #         self._stopCurrentAction_ = False
-        #         self.FiveCounter = 0
-
-        #Code for diverting path, which I don't think is needed atm, we can add it later if needed
-        # if self.halt_counter == 50:
-        #     if not self._divertingPath_:
-        #         print "ENCOUNTERED STATIC ELEMENT!!!!"
-        #         print "Diverting Path Now..."
-        #
-        #         move_action = self.move_forward, [10]
-        #         turn_action = self.turn, ["left"]
-        #         move_forward2 = self.move_forward, [5]
-        #         turn_action2 = self.turn, ["right"]
-        #
-        #         self._actionsStack_.append(move_action)
-        #         self._actionsStack_.append(turn_action)
-        #         self._actionsStack_.append(move_forward2)
-        #         self._actionsStack_.append(turn_action2)
-        #         self._stopCurrentAction_ = False
-        #     self._divertingPath_ = True
-        # elif self.halt_counter == 30:
-        #     print "Checking if Entity in front is a static element..."
-
-    """
-    @function
-
-    Sets the next robot in the picker queue
-    """
-    def get_next_in_queue(self):
-        for pickerid in globals.picker_queue:
-            if(pickerid not in globals.targeted_pickers):
-                self.next_robot_id = pickerid
-                globals.targeted_pickers.append(pickerid)
+        # if not self.disableLaser:
+        #     for i in range(70, 110):
+        #         if (msg.ranges[i]< 4.0 and self.state!= Robot.RobotState.PATH) or (msg.ranges[i] < 1 and self.state == Robot.RobotState.PATH):
+        #             #check if dynamic entity
+        #             self._stopCurrentAction_ = True
+        #             if self.firstLaserReading == []:
+        #                 self.disableLaser = True
+        #                 #read 0-110 lasers into array
+        #                 self.read(msg.ranges, self.firstLaserReading)
+        #                 #add stop and wait actions to stack
+        #                 stop = self._actions_[3], [2]
+        #                 wait = self._actions_[4], [2]
+        #                 self._actionsStack_.append(stop)
+        #                 self._actionsStack_.append(wait)
+        #                 return
+        #             #check for an initial laser reading
+        #             if self.firstLaserReading != []:
+        #                 for i in range(len(self.firstLaserReading)):
+        #                     #check if laser reading's differ
+        #                     if self.firstLaserReading[i] != msg.ranges[i+70]:
+        #                         #if they do, entity is dynamic, so wait 5's for it to leave.
+        #                         # self.disableLaser = True
+        #                         self.disableSideLaser = True
+        #                         wait = self._actions_[4], [5]
+        #                         self._actionsStack_.append(wait)
+        #                         #reset laserReading
+        #                         self.firstLaserReading = []
+        #                         return
+        #                 #static actions
+        #                 if self.state != Robot.RobotState.PATH:
+        #                     self.previousState = self.state
+        #                     #object is an obstacle
+        #                     self.state = Robot.RobotState.PATH
+        #                     self.treesLeft = False
+        #                     for i in range(110, 180):
+        #                         if msg.ranges[i] < 5:
+        #                             self.treesLeft = True
+        #                             break
+        #                     print("calculating route")
+        #                     moveHorizontal = None
+        #                     moveVertical = None
+        #                     shortWait = None
+        #                     moveBack = None
+        #                     #decide which way the second to last turn will be
+        #                     shortWait = self._actions_[0], [0]
+        #                     # if self.treesLeft:
+        #                     #     turn = self._actions_[2], [Entity.Direction.LEFT]
+        #                     # else:
+        #                     #     turn = self._actions_[2], [Entity.Direction.RIGHT]
+        #                     d = self.get_current_direction()
+        #                     #decide which side ways direction to move
+        #                     x = -3
+        #                     if (d == Entity.Direction.NORTH and self.treesLeft) or \
+        #                             (d == Entity.Direction.SOUTH and not self.treesLeft):
+        #                         x = 3
+        #                     moveHorizontal = self._actions_[5], [self.px + x, self.py]
+        #                     #decide which vertical way to move
+        #                     if d == Entity.Direction.NORTH:
+        #                         moveVertical = self._actions_[5], [self.px+x, self.py+8]
+        #                         moveBack = self._actions_[5], [self.px, self.py+8]
+        #                     else:
+        #                         moveVertical = self._actions_[5], [self.px+x, self.py-8]
+        #                         moveBack = self._actions_[5], [self.px, self.py-8]
+        #                     self._actionsStack_.append(shortWait)
+        #                     self._actionsStack_.append(moveBack)
+        #                     self._actionsStack_.append(moveVertical)
+        #                     self._actionsStack_.append(moveHorizontal)
+        #                     self.firstLaserReading = []
+        #                     return
 
     """
     @function
     @parameter: message
 
     Default action for picker
-    Used to wait until a picker is ready for collection
+    Constantly publishes itself to carrier_pub and asks the carrier_queue if there is something to do
     """
     def waitForPicker(self):
         self.state = self.CarrierState.WAITINGFORPICKER
@@ -220,19 +248,20 @@ class RobotCarrier(Robot):
             raise ActionInterruptException.ActionInterruptException("waitFor Stopped")
         else:
             if not(self.is_going_home):
-                if len(globals.picker_queue) > 0:
-                    self.get_next_in_queue()
-                    self.go_to_next_picker()
+                if(self.next_robot_id == None):
+                    self.queue_pub.publish(str(self.robot_id) + ",waiting,"  + str(self.next_robot_id))
+                    rospy.sleep(0.5) # without the sleep it publishes many times making the system slow down
+
 
     """
     @function
     @parameter: message
 
-    Go to the full picker
+    Go to the next picker as denoted by next_robot_id
     """
     def go_to_next_picker(self):
         self.state = self.CarrierState.GOINGTOPICKER
-        action = self._actions_[5], [float(self.picker_robots[self.next_robot_id].split(',')[0]), float(self.picker_robots[self.next_robot_id].split(',')[1])-5.0]
+        action = self._actions_[5], [float(self.picker_robots[self.next_robot_id].split(',')[0]), float(self.picker_robots[self.next_robot_id].split(',')[1])-5.5]
         if action != self._actionsStack_[-1]:
             self._actionsStack_.append(action)
 
@@ -240,7 +269,9 @@ class RobotCarrier(Robot):
     @function
     @parameter: message
 
-    Robot has arrived at point, then decides whether to wait or go to drop off
+    Robot has arrived at point, then decides if it has arrived at the picker or at home
+    If at home, it finishes and waitForPicker is called again
+    If at picker, it initiates transfer
     """
     def arrivedAtPoint(self):
         xabsolute = abs(self.goalx - self.px)
@@ -251,12 +282,12 @@ class RobotCarrier(Robot):
         else:
             self.is_going_home = True
 
-        if (self.is_going_home):
+        if (self.is_going_home):    # may be redundent check?
             xgoal = float(self.picker_robots[self.next_robot_id].split(',')[0])
             ygoal = float(self.picker_robots[self.next_robot_id].split(',')[1])
             xabsolute = abs(xgoal - self.px)
             yabsolute = abs(ygoal - self.py)
-            if (xabsolute < 2 and yabsolute < 6):
+            if (xabsolute < 2 and yabsolute < 7):
                 if (int(self.picker_robots[self.next_robot_id].split(',')[2]) == self.max_load):
                     self.initiate_transfer()
 
@@ -272,3 +303,6 @@ class RobotCarrier(Robot):
         self.is_going_home = True;
         self._stopCurrentAction_ = False
         self._actionsStack_.append(action)
+
+    def printLists(self):
+        pass

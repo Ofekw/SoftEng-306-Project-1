@@ -40,6 +40,12 @@ def main(config):
     myworld = open('world/myworld.world','a')
 
     myworld.write("".join(all_tree_string))
+
+    #Append dropoff zone
+    dropoff = '\ndropoff( pose [ -0.0 -42.0 0.0 0.0 ] name "dropoff")'
+
+    myworld.write("".join(dropoff))
+
     myworld.close()
     generateObstacles.main(row_values, config)
 

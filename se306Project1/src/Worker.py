@@ -12,6 +12,7 @@ import numpy.testing
 from Human import Human
 import ActionInterruptException
 import os
+import threading
 import time
 
 """
@@ -36,8 +37,8 @@ class Worker(Human):
                         AVOIDING_ROBOT="Detected robot, leaving row",
                        WAITING_FOR_EMPTY_ROW="Waiting for row to become empty")
 
-    def __init__(self, r_id, x_off, y_off, theta_offset):
-        Human.__init__(self, r_id, x_off, y_off, theta_offset)
+    def __init__(self, r_name, r_id, x_off, y_off, theta_offset):
+        Human.__init__(self, r_name, r_id, x_off, y_off, theta_offset)
 
 
         #Initialise worker state to empty string
@@ -58,9 +59,17 @@ class Worker(Human):
         #This is the current orchard row gap that the worker will be travelling to, or is currently patrolling
         self.empty_row_target = [0, 0]
 
+        #Keep track of the last row the worker patrolled
+        self.last_patrolled_row = [0, 0]
+
+        #Track the position of the robot which caused the worker to leave an orchard row
+        self.detected_robot_position = [0, 0]
+
         #Create subscribers to the positions for both picker and carrier
-        self.sub_to_picker_positions = rospy.Subscriber("pickerPosition", String, self.Robot_Locations_Callback)
-        self.sub_to_carrier_positions = rospy.Subscriber("carrierPosition", String, self.Robot_Locations_Callback)
+        self.sub_to_picker_positions = rospy.Subscriber("picker_position", String, self.Robot_Locations_Callback)
+        self.sub_to_carrier_positions = rospy.Subscriber("carrier_position", String, self.Robot_Locations_Callback)
+
+        self.lock = threading.Lock()
 
         #Define the actions to be used for the action stack
         self._actions_ = {
@@ -72,13 +81,13 @@ class Worker(Human):
             5: self.go_to_empty_orchard_row,
             6: self.patrol_orchard,
             7: self.avoid_robot
-        }
+         }
 
     """
     @function
 
     Call back function to update position values. Also will write current state information to a wor.sta file which
-    is to be used by the gui
+    is to be used by the GUI
     """
     def StageOdom_callback(self, msg):
         #Update the px and py values
@@ -116,11 +125,32 @@ class Worker(Human):
                 #Stop current action
                 self._stopCurrentAction_ = True
 
+                #Clear action stack
+                del self._actionsStack_[:]
+
                 #Create actions to turn right and move forward
                 move1 = self._actions_[0], [3]
-                turn2 = self._actions_[2], ["right"]
+
+                if i < 90:
+                    turn2 = self._actions_[3], ["right"]
+                else:
+                    turn2 = self._actions_[3], ["left"]
+
+                #After collision avoidance, append appropriate next action depending on current
+                #state and position
+                if self.last_patrolled_row[0] <= self.px <= self.last_patrolled_row[1]:
+                    if self.worker_state == self.WorkerState.AVOIDING_ROBOT:
+                        #Set next action to be avoiding robot
+                        next_action = self._actions_[7], []
+                    else:
+                        #Set next action to be patrolling orchard
+                        next_action = self._actions_[6], []
+                else:
+                    #Set next action to finding an empty orchard row
+                    next_action = self._actions_[5], []
 
                 #Append actions to stack
+                self._actionsStack_.append(next_action)
                 self._actionsStack_.append(move1)
                 self._actionsStack_.append(turn2)
 
@@ -162,7 +192,7 @@ class Worker(Human):
     def define_orchard_row_gaps(self):
 
         #Set the path to the config.properties file
-        path_to_config = os.path.abspath(os.path.abspath(os.pardir)) + "/config.properties"
+        path_to_config = os.path.abspath(os.path.abspath(os.getcwd())) + "/config.properties"
 
         #Store each property in a dictionary
         with open(path_to_config, "r") as f:
@@ -214,13 +244,13 @@ class Worker(Human):
         #Initialise a boolean variable that will change based on whether a empty orchard gap exists or not
         found_row = False
 
-        for g in self.orchard_row_gaps:
+        for g in reversed(self.orchard_row_gaps):
             #For each gap in the orchard_row_gaps, initially set unpopulated boolean variable to True
             unpopulated = True
             #Then iterate through each robot coordinate stores in the robot_locations dictionary
             for r_coord in self.robot_locations.itervalues():
                 #Check if x coordinate of robot is within orchard row gap
-                if [0] <= r_coord[0] <= g[1]:
+                if g[0] <= r_coord[0] <= g[1]:
                     #If true then set unpopulated to false
                     unpopulated = False
 
@@ -229,7 +259,7 @@ class Worker(Human):
                 #Set empty orchard row x coordinates to the founded gap
                 empty_orchard_row_x = g
                 #Set empty orhcard row target
-                self.empty_row_target = g
+                self.empty_row_target = empty_orchard_row_x
                 #Set found_row to True
                 found_row = True
                 break
@@ -242,7 +272,9 @@ class Worker(Human):
 
         #Set the x coordinate that the worker will traverse to, to be a random value inbetween the left and right x
         #coordinate of the founded orchard gap
-        x_target = random.randint(empty_orchard_row_x[0] + 3, empty_orchard_row_x[1] - 3)
+        #x_target = random.randint(empty_orchard_row_x[0] + 3, empty_orchard_row_x[1] - 3)
+
+        x_target = empty_orchard_row_x[0] + (empty_orchard_row_x[1] - empty_orchard_row_x[0])/2
 
         #Create actions to traverse to orchard row, as well as the action to patrol the row up and down
         goto_x_action = self._actions_[1], [x_target, self.py]
@@ -263,6 +295,9 @@ class Worker(Human):
     appends two actions to the stack, that will move the worker up and down the row.
     """
     def patrol_orchard(self):
+        #Set the last patrolled row
+        self.last_patrolled_row = self.empty_row_target
+
         #Set state to PATROLLING_ORCHARD
         self.worker_state = self.WorkerState.PATROLLING_ORCHARD
 
@@ -270,7 +305,11 @@ class Worker(Human):
         go_north = self._actions_[1], [self.px, 40]
         go_south = self._actions_[1], [self.px, -10]
 
+        #Append patrol orchard function again so it will repeat
+        patrol_orchard = self._actions_[6], []
+
         #Append actions to stack
+        self._actionsStack_.append(patrol_orchard)
         self._actionsStack_.append(go_south)
         self._actionsStack_.append(go_north)
 
@@ -279,21 +318,31 @@ class Worker(Human):
 
     """
     @function
-    This function is called when a robot enters the row that the worker is currently in
+    This function is called when a robot enters the row that the worker is currently in. It will create
+    and append actions in order to move the worker out of the row.
     """
-    def avoid_robot(self):
+    def avoid_robot(self, robot_py):
         #Set state to AVOIDING_ROBOT
         self.worker_state = Worker.WorkerState.AVOIDING_ROBOT
 
-        #Create action to leave the row by going south
-        go_south = self._actions_[1], [self.px, -20]
+        #Reset the empty row target
+        self.empty_row_target = [0, 0]
 
-        #Create action that will move the worker to the bottom right corner
-        go_east = self._actions_[1], [30, -20]
+        #empty action stack
+        del self._actionsStack_[:]
+
+        if robot_py > self.py:
+            #Create action to leave the row by going  then head east
+            leave_row = self._actions_[1], [self.px, -20]
+            go_east = self._actions_[1], [30, -20]
+        else:
+            #Create action to leave the row by going north then head east
+            leave_row = self._actions_[1], [self.px, 45]
+            go_east = self._actions_[1], [30, 45]
 
         #Append actions
         self._actionsStack_.append(go_east)
-        self._actionsStack_.append(go_south)
+        self._actionsStack_.append(leave_row)
 
         #Set stopCurrentAction to false
         self._stopCurrentAction_ = False
@@ -314,19 +363,24 @@ class Worker(Human):
             r_px = r_coord[0]
             r_py = r_coord[1]
 
-            #Check if the x coordinate is within the current orchard row
-            if self.empty_row_target[0] <= r_px <= self.empty_row_target[1]:
-                #Check if the robot has actually entered the orchard row as well
-                if -10 <= r_py <= 48:
+            #If not already trying to avoid robot
+            if self.worker_state != self.WorkerState.AVOIDING_ROBOT:
+                #Check if the x coordinate is within the current orchard row
+                if self.empty_row_target[0] <= r_px <= self.empty_row_target[1]:
+                    #Check if the robot has actually entered the orchard row as well
+                    if -10 <= r_py <= 39:
 
-                    #Stop current action
-                    self._stopCurrentAction_ = True
+                        #Stop current action
+                        self._stopCurrentAction_ = True
 
-                    #Set and append avoid action
-                    avoid_action = self._actions_[7], []
-                    self._actionsStack_.append(avoid_action)
+                        #Set and append avoid action
+                        avoid_action = self._actions_[7], [r_py]
+                        self._actionsStack_.append(avoid_action)
 
-                    return
+                        #Set the detected robot position to the robot in the current row
+                        self.detected_robot_position = r_coord
+
+                        return
 
     """
     @function
@@ -350,25 +404,22 @@ class Worker(Human):
                 break
 
             try:
-                self._actionRunning_ = True
+                #Make sure to set stopCurrentAction to False
+                self._stopCurrentAction_ = False
 
-                #run aciton with paremeter
+                #If valid action then run it
                 result = action[0](*action[1])
 
                 #Remove the last currently ran action from the stack
-                del self._actionsStack_[self._actionsStack_.index(action)]
+                if (action in self._actionsStack_):
+                    del self._actionsStack_[self._actionsStack_.index(action)]
 
                 self._actionRunning_ = False
 
-                #If there are no actions on the stack and the Worker is currently patrolling an orhcard row,
-                #then add the patrol orchard row action to the stack
-                if len(self._actionsStack_) == 0 and self.worker_state == self.WorkerState.PATROLLING_ORCHARD:
-                    patrol_action = self._actions_[6], []
-                    self._actionsStack_.append(patrol_action)
-
-            #Catch the exception that will be raised when the stopCurrentAction is set to True, though do not
-            #perform any actions
+            #Catch the exception that will be raised when the stopCurrentAction is set to True, then delete last action
+            #from stack
             except ActionInterruptException.ActionInterruptException as e:
-                print(str(e))
-
+                #Remove the last currently ran action from the stack
+                del self._actionsStack_[self._actionsStack_.index(action)]
+                self._actionRunning_ = False
 
