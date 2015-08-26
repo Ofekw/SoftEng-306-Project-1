@@ -30,13 +30,12 @@ class Robot(Entity):
 
         Entity.__init__(self, r_name, r_id,x_off,y_off, theta_off)
 
-    def robot_specific_function(self):
-        pass
+    """
+    @function
+    @parameter: Msg msg, Container container
 
-    def start_picking(self):
-       #incomplete
-        pass
-
+    Method to read laser data into local array
+    """
     def read(self, msg, container):
         for i in range(70, 110):
             container.append(msg[i])

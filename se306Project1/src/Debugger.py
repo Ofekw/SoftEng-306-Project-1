@@ -10,6 +10,11 @@ class Debugger:
         self.user_input = [""]
         self.inputThread = threading.Thread(target=self.getInput, args=())
 
+    """
+    @function
+
+    Method run in debug thread that allows for input to be passed and specific commands passed to the entity.
+    """
     def getInput(self):
         while self.user_input[0] != "q":
             self.user_input[0] = raw_input()

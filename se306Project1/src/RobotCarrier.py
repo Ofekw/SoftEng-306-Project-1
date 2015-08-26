@@ -162,76 +162,72 @@ class RobotCarrier(Robot):
     Determines what to do when encountering static and dynamic elements.
     """
     def StageLaser_callback(self, msg):
-        pass
-        # if not self.disableLaser:
-        #     for i in range(70, 110):
-        #         if (msg.ranges[i]< 4.0 and self.state!= Robot.RobotState.PATH) or (msg.ranges[i] < 1 and self.state == Robot.RobotState.PATH):
-        #             #check if dynamic entity
-        #             self._stopCurrentAction_ = True
-        #             if self.firstLaserReading == []:
-        #                 self.disableLaser = True
-        #                 #read 0-110 lasers into array
-        #                 self.read(msg.ranges, self.firstLaserReading)
-        #                 #add stop and wait actions to stack
-        #                 stop = self._actions_[3], [2]
-        #                 wait = self._actions_[4], [2]
-        #                 self._actionsStack_.append(stop)
-        #                 self._actionsStack_.append(wait)
-        #                 return
-        #             #check for an initial laser reading
-        #             if self.firstLaserReading != []:
-        #                 for i in range(len(self.firstLaserReading)):
-        #                     #check if laser reading's differ
-        #                     if self.firstLaserReading[i] != msg.ranges[i+70]:
-        #                         #if they do, entity is dynamic, so wait 5's for it to leave.
-        #                         # self.disableLaser = True
-        #                         self.disableSideLaser = True
-        #                         wait = self._actions_[4], [5]
-        #                         self._actionsStack_.append(wait)
-        #                         #reset laserReading
-        #                         self.firstLaserReading = []
-        #                         return
-        #                 #static actions
-        #                 if self.state != Robot.RobotState.PATH:
-        #                     self.previousState = self.state
-        #                     #object is an obstacle
-        #                     self.state = Robot.RobotState.PATH
-        #                     self.treesLeft = False
-        #                     for i in range(110, 180):
-        #                         if msg.ranges[i] < 5:
-        #                             self.treesLeft = True
-        #                             break
-        #                     print("calculating route")
-        #                     moveHorizontal = None
-        #                     moveVertical = None
-        #                     shortWait = None
-        #                     moveBack = None
-        #                     #decide which way the second to last turn will be
-        #                     shortWait = self._actions_[0], [0]
-        #                     # if self.treesLeft:
-        #                     #     turn = self._actions_[2], [Entity.Direction.LEFT]
-        #                     # else:
-        #                     #     turn = self._actions_[2], [Entity.Direction.RIGHT]
-        #                     d = self.get_current_direction()
-        #                     #decide which side ways direction to move
-        #                     x = -3
-        #                     if (d == Entity.Direction.NORTH and self.treesLeft) or \
-        #                             (d == Entity.Direction.SOUTH and not self.treesLeft):
-        #                         x = 3
-        #                     moveHorizontal = self._actions_[5], [self.px + x, self.py]
-        #                     #decide which vertical way to move
-        #                     if d == Entity.Direction.NORTH:
-        #                         moveVertical = self._actions_[5], [self.px+x, self.py+8]
-        #                         moveBack = self._actions_[5], [self.px, self.py+8]
-        #                     else:
-        #                         moveVertical = self._actions_[5], [self.px+x, self.py-8]
-        #                         moveBack = self._actions_[5], [self.px, self.py-8]
-        #                     self._actionsStack_.append(shortWait)
-        #                     self._actionsStack_.append(moveBack)
-        #                     self._actionsStack_.append(moveVertical)
-        #                     self._actionsStack_.append(moveHorizontal)
-        #                     self.firstLaserReading = []
-        #                     return
+        if not self.disableLaser:
+            for i in range(70, 110):
+                if (msg.ranges[i]< 4.0 and self.state!= Robot.RobotState.PATH) or (msg.ranges[i] < 1 and self.state == Robot.RobotState.PATH):
+                    #check if dynamic entity
+                    self._stopCurrentAction_ = True
+                    if self.firstLaserReading == []:
+                        self.disableLaser = True
+                        #read 0-110 lasers into array
+                        self.read(msg.ranges, self.firstLaserReading)
+                        #add stop and wait actions to stack
+                        stop = self._actions_[3], [2]
+                        wait = self._actions_[4], [2]
+                        self._actionsStack_.append(stop)
+                        self._actionsStack_.append(wait)
+                        return
+                    #check for an initial laser reading
+                    if self.firstLaserReading != []:
+                        for i in range(len(self.firstLaserReading)):
+                            #check if laser reading's differ
+                            if self.firstLaserReading[i] != msg.ranges[i+70]:
+                                #if they do, entity is dynamic, so wait 5's for it to leave.
+                                # self.disableLaser = True
+                                self.disableSideLaser = True
+                                wait = self._actions_[4], [5]
+                                self._actionsStack_.append(wait)
+                                #reset laserReading
+                                self.firstLaserReading = []
+                                return
+                        #static actions
+                        if self.state != Robot.RobotState.PATH:
+                            self.previousState = self.state
+                            #object is an obstacle
+                            self.state = Robot.RobotState.PATH
+                            self.treesLeft = False
+                            for i in range(110, 180):
+                                if msg.ranges[i] < 5:
+                                    self.treesLeft = True
+                                    break
+                            print("calculating route")
+                            moveHorizontal = None
+                            moveVertical = None
+                            shortWait = None
+                            moveBack = None
+                            #decide which way the second to last turn will be
+                            shortWait = self._actions_[0], [0]
+                            d = self.get_current_direction()
+                            #decide which side ways direction to move
+                            x = -3
+                            if (d == Entity.Direction.NORTH and self.treesLeft) or \
+                                    (d == Entity.Direction.SOUTH and not self.treesLeft):
+                                x = 3
+                            moveHorizontal = self._actions_[5], [self.px + x, self.py]
+                            #decide which vertical way to move
+                            if d == Entity.Direction.NORTH:
+                                moveVertical = self._actions_[5], [self.px+x, self.py+8]
+                                moveBack = self._actions_[5], [self.px, self.py+8]
+                            else:
+                                moveVertical = self._actions_[5], [self.px+x, self.py-8]
+                                moveBack = self._actions_[5], [self.px, self.py-8]
+                            #append all actions to the stack
+                            self._actionsStack_.append(shortWait)
+                            self._actionsStack_.append(moveBack)
+                            self._actionsStack_.append(moveVertical)
+                            self._actionsStack_.append(moveHorizontal)
+                            self.firstLaserReading = []
+                            return
 
     """
     @function

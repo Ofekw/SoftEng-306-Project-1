@@ -2,16 +2,11 @@
 
 import rospy
 from std_msgs.msg import*
-from geometry_msgs.msg import*
-from nav_msgs.msg import*
-from sensor_msgs.msg import*
 from tf.transformations import *
-import math
 import time
 from Robot import Robot
 import Entity
 import os
-import ActionInterruptException
 
 
 """
@@ -103,7 +98,7 @@ class RobotPicker(Robot):
             self.current_load = self.current_load + 1
             self.timeLastAdded = clockTime
 
-        """
+    """
     @function
 
     Wait for a carrier to pickup
@@ -117,6 +112,11 @@ class RobotPicker(Robot):
             self._stopCurrentAction_ = True
             self._actionsStack_.append(action)
 
+    """
+    @function
+
+    Laser call back method used to identify entitie's and plan paths
+    """
     def StageLaser_callback(self, msg):
         #Write laser data for ranger
         fn = os.path.join(os.path.dirname(__file__), str(self.robot_id)+"laser.ls")
@@ -125,9 +125,11 @@ class RobotPicker(Robot):
         output_file.write(str(formatted_ranges))
         output_file.close()
 
-
+        #check laser not disabled
         if not self.disableLaser:
+            #check range in from
             for i in range(70, 110):
+                #if object detected in front of robot stop robot and append waits for detections
                 if (msg.ranges[i]< 4.0 and self.state != Robot.RobotState.PATH) or (msg.ranges[i] < 3 and self.state == Robot.RobotState.PATH):
                     #check if dynamic entity
                     self._stopCurrentAction_ = True
@@ -226,12 +228,12 @@ class RobotPicker(Robot):
                     self.disableSideLaser = True
                     goToAction = self._actions_[5], [self.px+15, self.py]
                     self._actionsStack_.append(goToAction)
-                #check if no more trees at top
+                #check if no more trees and need to turn
                 elif self.noMoreTrees>15 and self.state == self.PickerState.PICKING:
                     self.noMoreTrees = 0
                     #stop the robot moving forward
                     self._stopCurrentAction_ = True
-                    #check other pickers to see if in row.
+                    #check if moving to next row and no other pickers in row.
                     if self.get_current_direction() == Entity.Direction.WEST:
                         for i in range(len(self.picker_robots)):
                             data = self.picker_robots[i].split(",")
@@ -239,19 +241,21 @@ class RobotPicker(Robot):
                             if self.px-0.5 <= float(data[0]) +i*10 <= self.px+0.5 and self.py-1 <= float(data[1]) <= self.py+1:
                                 continue
                             elif self.px-10 < float(data[0]) +i*10 < self.px+2 and self.py < float(data[1]) and float(data[0]) != 0:
+                                #if robot in row move to next row
                                 self.noMoreTrees = 0
                                 self.state = self.PickerState.FINDING
                                 self.disableSideLaser = True
                                 goToAction = self._actions_[5], [self.px+10, self.py]
                                 self._actionsStack_.append(goToAction)
                                 return
-
+                    #else just turn left to navigate around the orchard
                     self.noMoreTrees = 0
                     self.disableSideLaser = True
                     turnAction = self._actions_[2], [Entity.Direction.LEFT]
                     self._actionsStack_.append(turnAction)
 
                 elif rangeCount == 0:
+                    #check if passed tree's, if so start counter
                     self.noMoreTrees +=1
                     self.treeDetected = False
                 #check if new tree dected
