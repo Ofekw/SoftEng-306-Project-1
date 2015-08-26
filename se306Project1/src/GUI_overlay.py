@@ -23,6 +23,8 @@ import glob
 """
 @author: Harry
 
+@class
+
 GUI overlay class which contains information about each working robot on the orchard, including name,
 type, current action, current capacity (if applicable), position coordinates and also theta.
 
@@ -39,7 +41,13 @@ class GUI_overlay(Tkinter.Tk):
         self.initialize()
 
 
+    """
+    @function
 
+    Initialization of all instance fields and notebook (tab objects) for the GUI.
+    This function then can retreive the labels that are to be updated in real time (the entity state information)
+    and pass it to the updater function for the live GUI updates.
+    """
     def initialize(self):
         self.title('Mission Control: Fl0PPY D15K')
         geom = "700x850+603+196"
@@ -104,7 +112,12 @@ class GUI_overlay(Tkinter.Tk):
 
 
 
+    """
+    @function
 
+    Setup function to initialize the robot picker tab for the number of pickers (up to five) which
+    are currently loaded in the configuration
+    """
     def setup_pickers(self,nb,robot_tab):
 
         #ROBOT 1 ___________________________________________________________
@@ -539,6 +552,13 @@ class GUI_overlay(Tkinter.Tk):
 
         return robot_label_list
 
+
+    """
+    @function
+
+    Setup function to initialize the robot carrier tab for the number of carriers (up to five) which
+    are currently loaded in the configuration
+    """
     def setup_carriers(self,nb,robot_tab2):
 
         #ROBOT 1 ___________________________________________________________
@@ -1359,6 +1379,12 @@ class GUI_overlay(Tkinter.Tk):
 
         return human_label_list
 
+    """
+    @function
+
+    Setup function to initialize the animal tab for the number of animals (up to five) which
+    are currently loaded in the configuration
+    """
     def setup_animals(self,nb,animal_tab):
 
                #ANIMAL 1 ___________________________________________________________
@@ -1744,7 +1770,12 @@ class GUI_overlay(Tkinter.Tk):
                              animal_tab.TLabel25,animal_tab.TLabel26,animal_tab.TLabel27,animal_tab.TLabel28,animal_tab.TLabel29,animal_tab.TLabel30]
         return animal_label_list
 
+    """
+    @function
 
+    Sets up the initial default values and tab for the Status Overview tab which can subsequently be populated with
+    the data read from the status file.
+    """
     def setup_status(self,nb,status_tab):
 
         #Write default status values
@@ -1826,8 +1857,12 @@ class GUI_overlay(Tkinter.Tk):
 
         return status_label_list
 
+    """
+    @function
 
-    #Setup those laser rangers
+    Setup function to initialize lasers for the number of robot pickers (up to four) which
+    are currently loaded in the configuration
+    """
     def setup_lasers(self):
 
         self.LaserFrame1 = ttk.Labelframe(self.laser_tab)
@@ -2029,7 +2064,7 @@ class GUI_overlay(Tkinter.Tk):
     """
     @function
 
-    Main GUI updater that grabs the Entity states and displays them every few milliseconds
+    Main GUI updater that grabs the Entity states from file and displays them every few milliseconds on the GUI
 
     """
     def update(self):
@@ -2072,12 +2107,20 @@ class GUI_overlay(Tkinter.Tk):
         self.after(100,self.update)
 
 
+"""
+@function
+
+Deletes the temporary status files for entities when the program is closed
+"""
 def delete_files():
     for file in os.listdir("./"):
         if file.endswith(".sta") or file.endswith(".ls") or file.endswith(".que"):
             os.remove("./" + file)
             print(str(file) + " Deleted" )
 
+"""
+Main method called by script
+"""
 if __name__ == '__main__':
     gui = GUI_overlay()
     t1 = threading.Thread(target=gui.update_lasers, args=[])
