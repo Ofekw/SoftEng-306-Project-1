@@ -46,7 +46,7 @@ def main(argv, config):
         if config.get(type.lower() + '.number') is None:
             break
         number = int(config.get(type.lower() + '.number'))
-        if number > 4:
+        if number > 4:  # Limit of 4 for each entity
             number = 4
         robot = ""
         if type == "Carrier":
@@ -108,7 +108,6 @@ def main(argv, config):
             command = ["rosrun", "se306Project1", name]
             processes.append(subprocess.Popen(command, shell=False))
 
-    #processes.append(subprocess.Popen(["rosrun", "se306Project1", "Queue_0.py"], shell=False))
     return file_name
 
 """

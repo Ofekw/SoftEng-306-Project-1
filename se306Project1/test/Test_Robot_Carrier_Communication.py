@@ -15,18 +15,18 @@ from TestModule import TestModule
 import inspect
 import subprocess
 
-processes = []
 
 class Test_Robot_Carrier_Communication(unittest.TestCase,TestModule):
 
     robot1 = RobotCarrier("CarrierNode",1,0,-28, math.pi/2,50)
-    processes.append(subprocess.Popen(["rosrun", "se306Project1", "Run_RobotPicker.py"], shell=False))
+    process = (subprocess.Popen(["rosrun", "se306Project1", "Run_RobotPicker.py"], shell=False))
 
     def test_robot_carrier_communication(self):
-
-        rospy.sleep(5) # sleep for a while to let the robot picker start moving
+        rospy.sleep(5)  # sleep for a while to let the robot picker start moving
         self.assertNotEqual(self.robot1.picker_robots[0], "0,0,0")
 
+    def tearDown(self):
+        self.process.kill()
 
 if __name__ == '__main__':
    # unittest.main()

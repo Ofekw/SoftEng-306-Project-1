@@ -49,7 +49,10 @@ class TestGenerateFiles(unittest.TestCase):
         for i in os.listdir(path):
             if os.path.isfile(os.path.join(path, i)) and re.match('Picker\d.py',i):
                 number += 1
-        self.assertEqual(str(number), self.config.get('picker.number').rstrip(), "Testing picker files generated")
+        config_number = int(self.config.get('picker.number').rstrip())
+        if config_number > 4:
+            config_number = 4
+        self.assertEqual(number, config_number, "Testing picker files generated")
 
     def test_CarrierRobotGenerated(self):
         number = 0
@@ -58,7 +61,10 @@ class TestGenerateFiles(unittest.TestCase):
         for i in os.listdir(path):
             if os.path.isfile(os.path.join(path, i)) and re.match('Carrier\d.py',i):
                 number += 1
-        self.assertEqual(str(number), self.config.get('carrier.number').rstrip(), "Testing carrier files generated")
+        config_number = int(self.config.get('carrier.number').rstrip())
+        if config_number > 4:
+            config_number = 4
+        self.assertEqual(number, config_number, "Testing carrier files generated")
 
     def test_AnimalGenerated(self):
         number = 0
@@ -67,7 +73,10 @@ class TestGenerateFiles(unittest.TestCase):
         for i in os.listdir(path):
             if os.path.isfile(os.path.join(path, i)) and re.match('Animal\d.py',i):
                 number += 1
-        self.assertEqual(str(number), self.config.get('animal.number').rstrip(), "Testing animal files generated")
+        config_number = int(self.config.get('animal.number').rstrip())
+        if config_number > 4:
+            config_number = 4
+        self.assertEqual(number, config_number, "Testing animal files generated")
 
     def test_VisitorGenerated(self):
         number = 0
@@ -76,7 +85,22 @@ class TestGenerateFiles(unittest.TestCase):
         for i in os.listdir(path):
             if os.path.isfile(os.path.join(path, i)) and re.match('Visitor\d.py',i):
                 number += 1
-        self.assertEqual(str(number), self.config.get('visitor.number').rstrip(),"Testing visitor files generated")
+        config_number = int(self.config.get('visitor.number').rstrip())
+        if config_number > 4:
+            config_number = 4
+        self.assertEqual(number, config_number, "Testing visitor files generated")
+
+    def test_WorkerGenerated(self):
+        number = 0
+        path = "./se306Project1/src/"
+        files = []
+        for i in os.listdir(path):
+            if os.path.isfile(os.path.join(path, i)) and re.match('Visitor\d.py',i):
+                number += 1
+        config_number = int(self.config.get('worker.number').rstrip())
+        if config_number > 4:
+            config_number = 4
+        self.assertEqual(number, config_number, "Testing worker files generated")
 
     def tearDown(self):
         generateEntity.exit_process(self.list)
