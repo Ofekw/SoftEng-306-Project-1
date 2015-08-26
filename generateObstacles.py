@@ -11,6 +11,7 @@ def main(row_values, config):
     for i in row_values:
         x_values.append(i-4.2)
         x_values.append(i+4.2)
+    obstacle_gap = row_values[1] - row_values[0] - 8.4  # The gap between orchard rows
     obstacle_coordinates = []  # List of obstacle coordinates in the world
     if number > 5:
         number = 5
@@ -23,7 +24,10 @@ def main(row_values, config):
             y = random.randint(-4, 33)
             obstacle_tooNear = False
             for j in obstacle_coordinates:
-                if j[0] == x and abs(y - j[1]) < 16: # Check if the obstacle is too close in the same row
+                if j[0] == x and abs(y - j[1]) < 16:  # Checks if the obstacle is too close in the same row
+                    obstacle_tooNear = True
+                # Checks if the obstacle is too close to another obstacle in the opposite row
+                elif float(abs(j[0] - x)) == float(obstacle_gap) and abs(y - j[1])<5:
                     obstacle_tooNear = True
         obstacle_coordinates.append([x,y])
 
