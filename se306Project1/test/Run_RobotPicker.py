@@ -1,4 +1,8 @@
 #!/usr/bin/env python
+if __name__ == '__main__' and __package__ is None:
+    from os import sys, path
+    sys.path.append(path.abspath(path.join(path.dirname(__file__), '..')))
+
 
 import rospy
 from std_msgs.msg import*
@@ -7,10 +11,10 @@ from nav_msgs.msg import*
 from sensor_msgs.msg import*
 from tf.transformations import *
 import math
-from RobotPicker import RobotPicker
-import ActionInterruptException
-from Debugger import Debugger
-import Entity
+from src.RobotPicker import RobotPicker
+import src.ActionInterruptException
+from src.Debugger import Debugger
+from  src.Entity import Direction
 
 def main():
     #Construction of Robot objects take 3 params... Robot ID, Start X, Start Y. Start X and Start Y correlates to the myworld.world file
@@ -32,7 +36,7 @@ def main():
 
     moveAction = robot._actions_[0], [1000]
     goToAction = robot._actions_[5], [robot.px, -13]
-    turnAction = robot._actions_[2], [Entity.Direction.RIGHT]
+    turnAction = robot._actions_[2], [Direction.RIGHT]
 
     robot._actionsStack_.append(moveAction)
     robot._actionsStack_.append(turnAction)

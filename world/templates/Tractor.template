@@ -8,9 +8,10 @@ from sensor_msgs.msg import*
 from tf.transformations import *
 import math
 import numpy.testing
-from Worker import Worker
+from Tractor import Tractor
 import ActionInterruptException
 import time
+from Debugger import Debugger
 
 """
 @MAIN
@@ -20,7 +21,7 @@ Main function that creates robot and sets a path
 """
 
 def main():
-    robot = Worker("Worker0",2, 10, -20, 0)
+@@@
     rospy.sleep(5)
 
     while not rospy.is_shutdown():

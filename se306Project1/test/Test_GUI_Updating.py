@@ -1,8 +1,12 @@
 #!/usr/bin/env python
+if __name__ == '__main__' and __package__ is None:
+    from os import sys, path
+    sys.path.append(path.abspath(path.join(path.dirname(__file__), '..')))
+
 import unittest
 from TestModule import TestModule
 import rospy
-from se306Project1.src.GUI_overlay import GUI_overlay
+from src.GUI_overlay import GUI_overlay
 import inspect
 import sys
 import threading
