@@ -1,25 +1,17 @@
 # SoftEng-306-Project Group 8 (FloppyDisk)
 A simulation tool for testing harvesting robots in kiwifruit orchards
 
-##Prerequisites
+###Prerequisites
+It is recommended to run the simulator on Ubuntu 14.04 using [ROS Indigo](http://wiki.ros.org/indigo) and Python.
 
-* Ubuntu 14.04
-* ROS Indigo
+Click [here](http://wiki.ros.org/indigo/Installation/Ubuntu) for instruction on installing ROS Indigo 
 
-##Getting the Software
+###Getting the Software
+ Clone the repo from GitHub.
 
-git clone 
+         $ git clone https://github.com/Ofekw/SoftEng-306-Project-1.git
 
-		https://github.com/Ofekw/SoftEng-306-Project-1.git
-
-##Configuring the application (optional)
-  In the root directory you will find a "config.properties".Open it with any text editor and edit only the values (do not      change the variable names).
-  
-  Anything that is updated in here will be generated and updated when calling the run.py script.
-
-
-##Running the program 
-
+###Running the program 
 1. In terminal navigate to the home directory
 
 		cd SoftEng-306-Project-1
@@ -28,8 +20,8 @@ git clone
 
 	 	./run.py
 
-
-##Troubleshooting 
+[Click here for more information about the launcher](https://github.com/Ofekw/SoftEng-306-Project-1/wiki/3.1.1-Run-script)
+###Troubleshooting 
 Update	ROS_PACKAGE_PATH
 
 * in terminal call
