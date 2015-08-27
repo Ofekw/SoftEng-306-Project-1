@@ -1902,6 +1902,7 @@ class GUI_overlay(Tkinter.Tk):
         count = 0
         read = False
         laser_file_count = len(glob.glob1(directory,"*.ls"))
+        time.sleep(5)
         while laser_file_count > count:
             for file in os.listdir(directory):
                 if (file.endswith("laser.ls")) and (count == 0):
