@@ -37,12 +37,18 @@ def main(argv):
             if f.startswith('Test_'):
                 test_files.append(f)
 
+    automation_files = []
+    for f in listdir("./"):
+        if isfile(join("./",f)):
+            if f.startswith('Test_'):
+                automation_files.append(f)
+
     #logging
     log = open('test.log' ,'w+')
     error_log = open('test_error.log' ,'w+')
 
     #build and generation test
-    test_build()
+    test_build(automation_files)
 
     #start ros services
     start_services(processes)
@@ -56,17 +62,24 @@ def main(argv):
     #Print final outcome of all tests to screen
     print_final_outcome()
 
-def test_build():
+def test_build(automation_files):
+
     print "Build Script Testing:\n"
-    test_file = 'TestGenerateFiles.py'
-    print("---------TESTING: " + test_file +'\n')
-    s = subprocess.call(["chmod","+x",'./'+test_file])
-    p = subprocess.Popen(['python', test_file], shell=False, stdout=log, stderr=error_log)
-    p.wait()
-    if verbose_mode:
-        print_test_summary_verbose()
-    else:
-        print_test_summary_short()
+    spinner = spinning_cursor()
+    for file_name in automation_files:
+        print("---------TESTING: " + file_name +'\n')
+        s = subprocess.call(["chmod","+x",'./'+file_name])
+        p = subprocess.Popen(['python', file_name], shell=False, stdout=log, stderr=error_log)
+        for i in range(2,50):
+            sys.stdout.write(spinner.next())
+            sys.stdout.flush()
+            time.sleep(0.1)
+            sys.stdout.write('\b')
+        p.wait()
+        if verbose_mode:
+            print_test_summary_verbose()
+        else:
+            print_test_summary_short()
 
 def start_services(processes):
     generateWorldFile.main(config)
