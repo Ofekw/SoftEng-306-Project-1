@@ -1,17 +1,23 @@
-"""
-Webservice program that creates JSON Strings
-from Entity status files
 
-"""
 import os
 import ftplib
 import time
 import datetime
 
+"""
+@class
+
+Webservice program that creates JSON Strings
+from Entity status files and subsequently publishes this data model via
+FTP to a remote server to be parsed and displayed on a webpage
+
+"""
 class Webservice():
 
 
     """
+    @function
+
     Creates JSON strings for each entity
     """
     def create_JSON_strings(self):
@@ -55,6 +61,11 @@ class Webservice():
         JSON_string = "{\"lastModified\": "+sliceTime+","+"\"sEcho\": 1,\"iTotalRecords\": " + str(count)+","+"\"iTotalDisplayRecords\": 50,\"" + JSON_string
         return JSON_string
 
+    """
+    @function
+
+    Send the generated JSON Strings to the remote server
+    """
     def send_JSON_via_FTP(self,JSON_strings):
         fn = os.path.join(os.path.dirname(__file__),"state_file.json")
         output_file = open(fn, "w")
@@ -67,17 +78,29 @@ class Webservice():
         file.close()                                    # close file and FTP
         session.quit()
 
+    """
+    @function
 
+    Generate new data every half a second and send this to the
+    remote server that is defined
+    """
     def updater(self):
         JSON_strings = self.create_JSON_strings()
         self.send_JSON_via_FTP(JSON_strings)
 
+"""
+@function
+
+helper function to get UNIX timestamp
+"""
 def unix_time(dt):
     epoch = datetime.datetime.utcfromtimestamp(0)
     delta = dt - epoch
     return delta.total_seconds() *1000
 
-
+"""
+main function called
+"""
 if __name__ == '__main__':
     service = Webservice()
     while True:
