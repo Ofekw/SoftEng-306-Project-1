@@ -5,7 +5,7 @@ import run
 import generateEntity
 
 
-class TestGenerateFiles(unittest.TestCase):
+class Test_Generate_Files(unittest.TestCase):
     def setUp(self):
         self.list = run.main(['-t'])
         self.config = {}
@@ -108,4 +108,4 @@ class TestGenerateFiles(unittest.TestCase):
 if __name__ == '__main__':
     # unittest.main()
     import rostest
-    rostest.rosrun('se306Project1', 'test_bare_bones', TestGenerateFiles)
+    rostest.rosrun('se306Project1', 'test_bare_bones', Test_Generate_Files)
