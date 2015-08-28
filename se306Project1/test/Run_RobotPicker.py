@@ -12,7 +12,7 @@ from sensor_msgs.msg import*
 from tf.transformations import *
 import math
 from src.RobotPicker import RobotPicker
-import src.ActionInterruptException
+from src.ActionInterruptException import ActionInterruptException
 from src.Debugger import Debugger
 from  src.Entity import Direction
 
@@ -56,7 +56,7 @@ def main():
                 if result == 0:
                     robot._actionsStack_.pop()
                     robot.disableSideLaser = False
-            except ActionInterruptException.ActionInterruptException as e:
+            except ActionInterruptException as e:
                 print(e)
 
 

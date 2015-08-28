@@ -2,7 +2,12 @@
 __author__ = 'patrick'
 import threading
 
+"""
+    @class
 
+    Object's of this class can be used to debug entities, allowing access to the entites state during run time from
+    the command terminal.
+    """
 class Debugger:
 
     def __init__(self, robot):
@@ -35,6 +40,11 @@ class Debugger:
                 print(self.robot.state)
         self.inputThread._thread.exit()
 
+    """
+    @function
+
+    Starts the debugger thread listening for input commands
+    """
     def start(self):
         self.inputThread.daemon = True
         self.inputThread.start()
