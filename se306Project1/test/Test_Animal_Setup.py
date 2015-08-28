@@ -15,7 +15,13 @@ import logging
 from TestModule import TestModule
 import inspect
 
-class Test_Robot_Setup(unittest.TestCase,TestModule):
+"""
+@class
+
+This is a test for the correct construction of the Animal object.
+
+"""
+class Test_Animal_Setup(unittest.TestCase,TestModule):
 
     animal = Animal("Node",2,-10,-28, math.pi/2)
 
@@ -29,4 +35,4 @@ class Test_Robot_Setup(unittest.TestCase,TestModule):
 if __name__ == '__main__':
     # unittest.main()
     import rostest
-    rostest.rosrun('se306Project1', 'test_bare_bones', Test_Robot_Setup)
+    rostest.rosrun('se306Project1', 'test_bare_bones', Test_Animal_Setup)

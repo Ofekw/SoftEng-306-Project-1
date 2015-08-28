@@ -14,6 +14,12 @@ import Tkinter
 import multiprocessing
 import os
 
+"""
+@class
+
+This is a test for checking if the GUI is responsive to new data input. It should take new data and update itself.
+
+"""
 class Test_GUI_Updating(unittest.TestCase,TestModule):
 
     def createFile(self,file_path,topic_name,entity_type,current_action,px,py,theta,capacity):

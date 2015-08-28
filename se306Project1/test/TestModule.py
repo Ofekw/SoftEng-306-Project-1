@@ -4,6 +4,12 @@ import rospy
 import time
 import inspect
 
+"""
+@class
+
+This is a parent class to all our test cases. It provides beneficial functions that will reduce amounts of code in all our tests.
+
+"""
 class TestModule():
 
     def run_robot(self, robot0, action , time_limit):

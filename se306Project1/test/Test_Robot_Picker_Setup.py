@@ -12,6 +12,12 @@ import math
 from TestModule import TestModule
 import inspect
 
+"""
+@class
+
+This is a test for the correct construction of the Robot Picker object.
+
+"""
 class Test_Robot_Picker_Setup(unittest.TestCase,TestModule):
 
     robot0 = RobotPicker("Node",0,-20,-28, math.pi/2,50)

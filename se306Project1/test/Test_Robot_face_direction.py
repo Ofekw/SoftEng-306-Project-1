@@ -14,6 +14,12 @@ import logging
 from TestModule import TestModule
 import inspect
 
+"""
+@class
+
+This is a test for the ability of the function face_direction to turn in all directions possible
+
+"""
 class Test_Robot_face_direction(unittest.TestCase,TestModule):
 
     robot0 = RobotPicker("Node",0,-20,-28, math.pi/2,50)

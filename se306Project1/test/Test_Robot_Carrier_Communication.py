@@ -15,7 +15,12 @@ from TestModule import TestModule
 import inspect
 import subprocess
 
+"""
+@class
 
+This is a test for the correct communication of robots and carriers
+
+"""
 class Test_Robot_Carrier_Communication(unittest.TestCase,TestModule):
 
     robot1 = RobotCarrier("CarrierNode",1,0,-28, math.pi/2,50)

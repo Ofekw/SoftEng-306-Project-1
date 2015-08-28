@@ -16,8 +16,12 @@ import math
 import logging
 from TestModule import TestModule
 import inspect
+"""
+@class
 
-# A sample python unit test
+This is a test for the ability of the function turn to turn both right and left ( we only move in right angles, only turns needed)
+
+"""
 class Test_Robot_turn(unittest.TestCase,TestModule):
 
     #Not in 'setUp' because it will be called every time, and that will mean the node will restart its in instantiation

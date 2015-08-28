@@ -4,7 +4,14 @@ import os.path
 import run
 import generateEntity
 
+"""
+@class
 
+This test will check the correction generation of all our environment.
+Creating the worlds, meeting the configurations of the brief and more.
+This is our acceptance testing module.
+
+"""
 class Test_Generate_Files(unittest.TestCase):
     def setUp(self):
         self.list = run.main(['-t'])

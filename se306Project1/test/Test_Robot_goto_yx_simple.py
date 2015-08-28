@@ -18,7 +18,12 @@ import logging
 from TestModule import TestModule
 import inspect
 
+"""
+@class
 
+This is a test for the ability of the function goto_yy in a more simple sense, using straight travel in the x and y axis
+
+"""
 class Test_Robot_goto_yx(unittest.TestCase,TestModule):
 
     #Not in 'setUp' because it will be called every time, and that will mean the node will restart its in instantiation

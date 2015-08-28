@@ -15,6 +15,12 @@ import logging
 from TestModule import TestModule
 import inspect
 
+"""
+@class
+
+This is a test for the correct construction of the Robot Carrier object.
+
+"""
 class Test_Robot_Carrier_Setup(unittest.TestCase,TestModule):
 
     robot1 = RobotCarrier("Node",1,-10,-28, math.pi/2,50)

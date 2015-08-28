@@ -18,7 +18,12 @@ import logging
 from TestModule import TestModule
 import inspect
 
+"""
+@class
 
+This is a test for the ability of the function goto_yx in a more complex sense, using diagonal travels
+
+"""
 class Test_Robot_goto_yx_complex(unittest.TestCase,TestModule):
 
     #Not in 'setUp' because it will be called every time, and that will mean the node will restart its in instantiation
